@@ -1,0 +1,28 @@
+﻿@inject NavigationManager Navigation
+
+<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@GetLayout(routeData.PageType)" />
+    </Found>
+    <NotFound>
+        <PageTitle>Página não encontrada</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">Desculpe, essa página não existe.</p>
+        </LayoutView>
+    </NotFound>
+</Router>
+
+@code {
+    protected override void OnInitialized()
+    {
+        if (Navigation.Uri.EndsWith("/"))
+        {
+            Navigation.NavigateTo("/login", true);
+        }
+    }
+
+    private Type GetLayout(Type pageType)
+    {
+        return pageType == typeof(Pages.Login) ? typeof(EmptyLayout) : typeof(MainLayout);
+    }
+}

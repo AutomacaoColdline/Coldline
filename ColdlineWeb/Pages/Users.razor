@@ -1,0 +1,53 @@
+@page "/users"
+@using ColdlineWeb.Services
+@using ColdlineWeb.Models
+@inject UserService UserService
+
+
+<PageTitle>Lista de Usuários</PageTitle>
+
+<h3>Lista de Usuários</h3>
+
+@if (users == null)
+{
+    <p>Carregando...</p>
+}
+else if (users.Count == 0)
+{
+    <p>Nenhum usuário encontrado.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Departamento</th>
+                <th>Tipo de Usuário</th>
+                <th>Número de Identificação</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in users)
+            {
+                <tr>
+                    <td>@user.Name</td>
+                    <td>@user.Email</td>
+                    <td>@user.Department</td>
+                    <td>@user.UserType</td>
+                    <td>@user.IdentificationNumber</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<User>? users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await UserService.GetUsersAsync();
+    }
+}

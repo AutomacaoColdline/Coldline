@@ -8,7 +8,6 @@ using System.Text;
 using QuestPDF.Infrastructure;
 using ColdlineAPI.Infrastructure.Configurations;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Configurar o host para escutar em todas as interfaces
@@ -18,6 +17,15 @@ builder.WebHost.UseUrls("http://0.0.0.0:5000");
 QuestPDF.Settings.License = LicenseType.Community;
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+// ✅ Adicionando CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
 
 // Configurar Swagger com suporte a JWT
 builder.Services.AddSwaggerGen(c =>
@@ -66,11 +74,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // Configurar MongoDB via Dependency Injection
 builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDB"));
-builder.Services.Configure<SmtpConfig>(
-    builder.Configuration.GetSection("SMTP"));
+builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection("SMTP"));
 
-// Registrar o serviço de e-mail
-
+// Registrar o serviço de e-mail e outros serviços
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSingleton<IUserService, UserService>();
 builder.Services.AddScoped<IHelloWorldService, HelloWorldService>();
@@ -78,7 +84,9 @@ builder.Services.AddScoped<IFileService, FileService>();
 
 var app = builder.Build();
 
-// Configurar middlewares
+// ✅ Aplicar CORS antes dos middlewares
+app.UseCors("AllowAll");
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -88,8 +96,8 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection(); // Pode ser removido se não estiver rodando com HTTPS.
-app.UseAuthentication(); // Middleware de autenticação
+app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

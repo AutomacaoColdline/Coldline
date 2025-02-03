@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "u0jv0/XH8P8=",
+  "dgSpecHash": "22YmqNm9pSc=",
   "success": true,
   "projectFilePath": "/app/Application/Application.csproj",
   "expectedPackageFiles": [
+    "/root/.nuget/packages/bcrypt.net-next/4.0.2/bcrypt.net-next.4.0.2.nupkg.sha512",
     "/root/.nuget/packages/closedxml/0.104.2/closedxml.0.104.2.nupkg.sha512",
     "/root/.nuget/packages/closedxml.parser/1.2.0/closedxml.parser.1.2.0.nupkg.sha512",
     "/root/.nuget/packages/dnsclient/1.6.1/dnsclient.1.6.1.nupkg.sha512",

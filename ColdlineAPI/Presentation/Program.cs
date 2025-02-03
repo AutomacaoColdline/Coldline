@@ -8,6 +8,8 @@ using System.Text;
 using QuestPDF.Infrastructure;
 using ColdlineAPI.Infrastructure.Configurations;
 
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Configurar o host para escutar em todas as interfaces
@@ -81,6 +83,12 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSingleton<IUserService, UserService>();
 builder.Services.AddScoped<IHelloWorldService, HelloWorldService>();
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IUserTypeService, UserTypeService>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+
+
+
+
 
 var app = builder.Build();
 

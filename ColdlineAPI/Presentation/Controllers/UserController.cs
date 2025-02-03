@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -48,6 +50,17 @@ namespace ColdlineAPI.Presentation.Controllers
         {
             var deleted = await _userService.DeleteUserAsync(id);
             return deleted ? NoContent() : NotFound();
+        }
+        
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchUsers(
+            [FromQuery] string? name,
+            [FromQuery] string? email,
+            [FromQuery] string? departmentId,
+            [FromQuery] string? userTypeId)
+        {
+            var users = await _userService.SearchUsersAsync(name, email, departmentId, userTypeId);
+            return Ok(users);
         }
     }
 }

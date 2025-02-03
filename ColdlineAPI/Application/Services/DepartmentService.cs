@@ -12,13 +12,15 @@ namespace ColdlineAPI.Application.Services
     public class DepartmentService : IDepartmentService
     {
         private readonly IMongoCollection<Department> _departments;
+        private readonly IMongoCollection<User> _users; // Referência à coleção de usuários
 
         public DepartmentService(IOptions<MongoDBSettings> mongoDBSettings)
         {
             var client = new MongoClient(mongoDBSettings.Value.ConnectionString);
             var database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
 
-            _departments = database.GetCollection<Department>("Departments"); // Nome da coleção no MongoDB
+            _departments = database.GetCollection<Department>("Departments");
+            _users = database.GetCollection<User>("Users");
         }
 
         public async Task<List<Department>> GetAllDepartmentsAsync() =>
@@ -31,7 +33,7 @@ namespace ColdlineAPI.Application.Services
         {
             if (string.IsNullOrEmpty(department.Id) || !ObjectId.TryParse(department.Id, out _))
             {
-                department.Id = ObjectId.GenerateNewId().ToString(); // Gera ObjectId se necessário
+                department.Id = ObjectId.GenerateNewId().ToString();
             }
 
             await _departments.InsertOneAsync(department);
@@ -46,6 +48,13 @@ namespace ColdlineAPI.Application.Services
 
         public async Task<bool> DeleteDepartmentAsync(string id)
         {
+            // Verifica se existe algum usuário associado a este departamento
+            var isDepartmentInUse = await _users.Find(user => user.Department.Id == id).AnyAsync();
+            if (isDepartmentInUse)
+            {
+                throw new InvalidOperationException("O departamento não pode ser excluído pois está vinculado a um ou mais usuários.");
+            }
+
             var result = await _departments.DeleteOneAsync(department => department.Id == id);
             return result.IsAcknowledged && result.DeletedCount > 0;
         }

@@ -24,6 +24,7 @@
 /app/Presentation/bin/Debug/net8.0/Presentation.runtimeconfig.json
 /app/Presentation/bin/Debug/net8.0/Presentation.dll
 /app/Presentation/bin/Debug/net8.0/Presentation.pdb
+/app/Presentation/bin/Debug/net8.0/BCrypt.Net-Next.dll
 /app/Presentation/bin/Debug/net8.0/ClosedXML.dll
 /app/Presentation/bin/Debug/net8.0/ClosedXML.Parser.dll
 /app/Presentation/bin/Debug/net8.0/DnsClient.dll
@@ -200,4 +201,3 @@
 /app/Presentation/obj/Debug/net8.0/Presentation.pdb
 /app/Presentation/obj/Debug/net8.0/Presentation.genruntimeconfig.cache
 /app/Presentation/obj/Debug/net8.0/ref/Presentation.dll
-/app/Presentation/bin/Debug/net8.0/BCrypt.Net-Next.dll

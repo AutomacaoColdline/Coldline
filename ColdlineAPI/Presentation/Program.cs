@@ -79,8 +79,9 @@ builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("Mo
 builder.Services.Configure<SmtpConfig>(builder.Configuration.GetSection("SMTP"));
 
 // Registrar o serviço de e-mail e outros serviços
-builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddSingleton<IUserService, UserService>();
+// Alterado de Singleton para Scoped
+builder.Services.AddScoped<IUserService, UserService>(); 
+builder.Services.AddScoped<IEmailService, EmailService>(); 
 builder.Services.AddScoped<IHelloWorldService, HelloWorldService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IUserTypeService, UserTypeService>();

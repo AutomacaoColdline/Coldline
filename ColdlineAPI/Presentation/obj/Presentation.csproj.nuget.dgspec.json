@@ -136,7 +136,7 @@
           "dependencies": {
             "MongoDB.Driver": {
               "target": "Package",
-              "version": "[3.1.0, )"
+              "version": "[2.19.0, )"
             }
           },
           "imports": [
@@ -180,7 +180,11 @@
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "/app/Domain/Domain.csproj": {
+                "projectPath": "/app/Domain/Domain.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
@@ -202,13 +206,49 @@
               "target": "Package",
               "version": "[0.104.2, )"
             },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.AspNetCore.Authorization": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.Extensions.Configuration": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.Extensions.Configuration.Json": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.Extensions.DependencyInjection": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.Extensions.DependencyInjection.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.Extensions.Options": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.IdentityModel.Tokens": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
             "MongoDB.Driver": {
               "target": "Package",
-              "version": "[3.1.0, )"
+              "version": "[2.19.0, )"
             },
             "QuestPDF": {
               "target": "Package",
               "version": "[2024.12.3, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.5.0, )"
             }
           },
           "imports": [

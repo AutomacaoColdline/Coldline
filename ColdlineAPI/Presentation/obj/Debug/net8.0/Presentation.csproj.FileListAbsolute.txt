@@ -24,6 +24,8 @@
 /app/Presentation/bin/Debug/net8.0/Presentation.runtimeconfig.json
 /app/Presentation/bin/Debug/net8.0/Presentation.dll
 /app/Presentation/bin/Debug/net8.0/Presentation.pdb
+/app/Presentation/bin/Debug/net8.0/AWSSDK.Core.dll
+/app/Presentation/bin/Debug/net8.0/AWSSDK.SecurityToken.dll
 /app/Presentation/bin/Debug/net8.0/BCrypt.Net-Next.dll
 /app/Presentation/bin/Debug/net8.0/ClosedXML.dll
 /app/Presentation/bin/Debug/net8.0/ClosedXML.Parser.dll
@@ -66,6 +68,8 @@
 /app/Presentation/bin/Debug/net8.0/Microsoft.OpenApi.dll
 /app/Presentation/bin/Debug/net8.0/MongoDB.Bson.dll
 /app/Presentation/bin/Debug/net8.0/MongoDB.Driver.dll
+/app/Presentation/bin/Debug/net8.0/MongoDB.Driver.Core.dll
+/app/Presentation/bin/Debug/net8.0/MongoDB.Libmongocrypt.dll
 /app/Presentation/bin/Debug/net8.0/Mono.TextTemplating.dll
 /app/Presentation/bin/Debug/net8.0/QuestPDF.dll
 /app/Presentation/bin/Debug/net8.0/RBush.dll
@@ -153,6 +157,9 @@
 /app/Presentation/bin/Debug/net8.0/tr/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 /app/Presentation/bin/Debug/net8.0/zh-Hans/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 /app/Presentation/bin/Debug/net8.0/zh-Hant/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+/app/Presentation/bin/Debug/net8.0/runtimes/linux/native/libmongocrypt.so
+/app/Presentation/bin/Debug/net8.0/runtimes/osx/native/libmongocrypt.dylib
+/app/Presentation/bin/Debug/net8.0/runtimes/win/native/mongocrypt.dll
 /app/Presentation/bin/Debug/net8.0/runtimes/linux-arm64/native/libQuestPdfSkia.so
 /app/Presentation/bin/Debug/net8.0/runtimes/linux-arm64/native/libqpdf.so
 /app/Presentation/bin/Debug/net8.0/runtimes/linux-musl-x64/native/libQuestPdfSkia.so

@@ -23,7 +23,7 @@ namespace ColdlineAPI.Presentation.Controllers
         /// Retorna todos os usuários cadastrados.
         /// </summary>
         [HttpGet]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> GetUsers()
         {
             var users = await _userService.GetUsersAsync();
@@ -132,7 +132,7 @@ namespace ColdlineAPI.Presentation.Controllers
         /// Altera a senha do usuário.
         /// </summary>
         [HttpPost("change-password")]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
             bool success = await _userService.ChangePasswordAsync(request.UserId, request.OldPassword, request.NewPassword);

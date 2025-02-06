@@ -25,6 +25,9 @@
 /app/Infrastructure/bin/Debug/net8.0/Infrastructure.deps.json
 /app/Infrastructure/bin/Debug/net8.0/Infrastructure.dll
 /app/Infrastructure/bin/Debug/net8.0/Infrastructure.pdb
+/app/Infrastructure/bin/Debug/net8.0/Domain.dll
+/app/Infrastructure/bin/Debug/net8.0/Domain.pdb
+/app/Infrastructure/obj/Debug/net8.0/Infrastr.15EFFBFE.Up2Date
 /app/Infrastructure/obj/Debug/net8.0/Infrastructure.dll
 /app/Infrastructure/obj/Debug/net8.0/refint/Infrastructure.dll
 /app/Infrastructure/obj/Debug/net8.0/Infrastructure.pdb

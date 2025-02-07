@@ -22,6 +22,11 @@ namespace ColdlineAPI.Application.Configurations
             services.AddScoped<IMonitoringTypeService, MonitoringTypeService>();
             services.AddScoped<IMonitoringService, MonitoringService>();
             services.AddScoped<IQualityService, QualityService>();
+            services.AddScoped<IProcessService, ProcessService>();
+            services.AddScoped<IProcessTypeService, ProcessTypeService>();
+            services.AddScoped<IMachineService, MachineService>();
+
+
         }
     }
 }

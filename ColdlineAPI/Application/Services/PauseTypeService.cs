@@ -11,21 +11,21 @@ namespace ColdlineAPI.Application.Services
 {
     public class PauseTypeService : IPauseTypeService
     {
-        private readonly IMongoCollection<PauseType> _PauseTypes;
+        private readonly IMongoCollection<PauseType> _pauseTypes;
 
         public PauseTypeService(IOptions<MongoDBSettings> mongoDBSettings)
         {
             var client = new MongoClient(mongoDBSettings.Value.ConnectionString);
             var database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
 
-            _PauseTypes = database.GetCollection<PauseType>("PauseTypes");
+            _pauseTypes = database.GetCollection<PauseType>("PauseTypes");
         }
 
         public async Task<List<PauseType>> GetAllPauseTypesAsync() =>
-            await _PauseTypes.Find(PauseType => true).ToListAsync();
+            await _pauseTypes.Find(PauseType => true).ToListAsync();
 
         public async Task<PauseType?> GetPauseTypeByIdAsync(string id) =>
-            await _PauseTypes.Find(PauseType => PauseType.Id == id).FirstOrDefaultAsync();
+            await _pauseTypes.Find(PauseType => PauseType.Id == id).FirstOrDefaultAsync();
 
         public async Task<PauseType> CreatePauseTypeAsync(PauseType PauseType)
         {
@@ -34,19 +34,19 @@ namespace ColdlineAPI.Application.Services
                 PauseType.Id = ObjectId.GenerateNewId().ToString();
             }
 
-            await _PauseTypes.InsertOneAsync(PauseType);
+            await _pauseTypes.InsertOneAsync(PauseType);
             return PauseType;
         }
 
         public async Task<bool> UpdatePauseTypeAsync(string id, PauseType PauseType)
         {
-            var result = await _PauseTypes.ReplaceOneAsync(u => u.Id == id, PauseType);
+            var result = await _pauseTypes.ReplaceOneAsync(u => u.Id == id, PauseType);
             return result.IsAcknowledged && result.ModifiedCount > 0;
         }
 
         public async Task<bool> DeletePauseTypeAsync(string id)
         {
-            var result = await _PauseTypes.DeleteOneAsync(PauseType => PauseType.Id == id);
+            var result = await _pauseTypes.DeleteOneAsync(PauseType => PauseType.Id == id);
             return result.IsAcknowledged && result.DeletedCount > 0;
         }
     }

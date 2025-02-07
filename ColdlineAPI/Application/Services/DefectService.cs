@@ -12,6 +12,7 @@ namespace ColdlineAPI.Application.Services
     public class DefectService : IDefectService
     {
         private readonly IMongoCollection<Defect> _defects;
+        private readonly IMongoCollection<PauseType> _pauseType;
 
         public DefectService(IOptions<MongoDBSettings> mongoDBSettings)
         {
@@ -19,6 +20,7 @@ namespace ColdlineAPI.Application.Services
             var database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
 
             _defects = database.GetCollection<Defect>("Defects");
+            _pauseType = database.GetCollection<PauseType>("PauseTypes");
         }
 
         public async Task<List<Defect>> GetAllDefectsAsync() =>
@@ -46,7 +48,11 @@ namespace ColdlineAPI.Application.Services
 
         public async Task<bool> DeleteDefectAsync(string id)
         {
-
+            var isPartInUse = await _pauseType.Find(PauseType => PauseType.Defect.Id == id).AnyAsync();
+            if (isPartInUse)
+            {
+                throw new InvalidOperationException("O Defeito não pode ser excluído pois está vinculado a um ou mais Tipo de pausa.");
+            }
             var result = await _defects.DeleteOneAsync(Defect => Defect.Id == id);
             return result.IsAcknowledged && result.DeletedCount > 0;
         }

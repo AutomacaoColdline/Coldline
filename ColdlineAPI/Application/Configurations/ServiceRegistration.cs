@@ -17,6 +17,7 @@ namespace ColdlineAPI.Application.Configurations
             services.AddScoped<ITypeDefectService, TypeDefectService>();
             services.AddScoped<IPartService, PartService>();
             services.AddScoped<IDefectService, DefectService>();
+            services.AddScoped<IPauseTypeService, PauseTypeService>();
         }
     }
 }

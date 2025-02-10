@@ -12,8 +12,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName>ScopedCss</AssetTraitName>
       <AssetTraitValue>ApplicationBundle</AssetTraitValue>
-      <Fingerprint>3rtroqybsm</Fingerprint>
-      <Integrity>X2+wti5h+ilqABJsZBOnEeoeY2sP/BPUoZ9hRNjc8XQ=</Integrity>
+      <Fingerprint>nve92cncme</Fingerprint>
+      <Integrity>beridAUH7NjviHJRBHzKXo+AglZPScmi+d6w5/sW+nM=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\ColdlineWeb.styles.css'))</OriginalItemSpec>

@@ -1,0 +1,147 @@
+@page "/processtypes"
+@inject HttpClient Http
+
+<h3>Gerenciamento de Tipos de Processos</h3>
+
+@if (isLoading)
+{
+    <p>Carregando...</p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <button class="btn btn-primary mb-3" @onclick="ShowAddForm">Adicionar Tipo de Processo</button>
+
+    @if (showForm)
+    {
+        <EditForm Model="newProcessType" OnValidSubmit="SaveProcessType">
+            <DataAnnotationsValidator />
+            <div class="mb-3">
+                <label for="name" class="form-label">Nome</label>
+                <InputText id="name" class="form-control" @bind-Value="newProcessType.Name" required />
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Descrição</label>
+                <InputText id="description" class="form-control" @bind-Value="newProcessType.Description" required />
+            </div>
+            <button type="submit" class="btn btn-success">Salvar</button>
+            <button type="button" class="btn btn-secondary" @onclick="HideForm">Cancelar</button>
+        </EditForm>
+    }
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var processType in processTypes)
+            {
+                <tr>
+                    <td>@processType.Name</td>
+                    <td>@processType.Description</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => EditProcessType(processType)">Editar</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteProcessType(processType.Id)">Excluir</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<ProcessTypeModel> processTypes = new();
+    private bool isLoading = true;
+    private string? errorMessage;
+    private bool showForm = false;
+    private ProcessTypeModel newProcessType = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProcessTypes();
+    }
+
+    private async Task LoadProcessTypes()
+    {
+        try
+        {
+            processTypes = await Http.GetFromJsonAsync<List<ProcessTypeModel>>("api/ProcessType") ?? new List<ProcessTypeModel>();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao carregar tipos de processo.";
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ShowAddForm()
+    {
+        newProcessType = new ProcessTypeModel();
+        showForm = true;
+    }
+
+    private void EditProcessType(ProcessTypeModel processType)
+    {
+        newProcessType = new ProcessTypeModel { Id = processType.Id, Name = processType.Name, Description = processType.Description };
+        showForm = true;
+    }
+
+    private void HideForm()
+    {
+        showForm = false;
+    }
+
+    private async Task SaveProcessType()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(newProcessType.Id))
+            {
+                await Http.PostAsJsonAsync("api/ProcessType", newProcessType);
+            }
+            else
+            {
+                await Http.PutAsJsonAsync($"api/ProcessType/{newProcessType.Id}", newProcessType);
+            }
+            await LoadProcessTypes();
+            showForm = false;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao salvar o tipo de processo.";
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    private async Task DeleteProcessType(string id)
+    {
+        try
+        {
+            await Http.DeleteAsync($"api/ProcessType/{id}");
+            await LoadProcessTypes();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao excluir o tipo de processo.";
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    private class ProcessTypeModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+    }
+}

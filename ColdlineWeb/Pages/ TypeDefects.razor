@@ -1,0 +1,164 @@
+@page "/typedefects"
+@inject HttpClient Http
+
+<h3>Gerenciamento de Tipos de Defeito</h3>
+
+@if (isLoading)
+{
+    <p>Carregando...</p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <button class="btn btn-primary mb-3" @onclick="OpenAddTypeDefectModal">Adicionar Tipo de Defeito</button>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var typeDefect in typeDefects)
+            {
+                <tr>
+                    <td>@typeDefect.Name</td>
+                    <td>@typeDefect.Description</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => OpenEditTypeDefectModal(typeDefect)">Editar</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteTypeDefect(typeDefect.Id)">Excluir</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (showModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(isEditing ? "Editar Tipo de Defeito" : "Adicionar Tipo de Defeito")</h5>
+                    <button class="close btn btn-light" @onclick="CloseModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <label>Nome:</label>
+                    <input class="form-control" @bind="@currentTypeDefect.Name" />
+
+                    <label>Descrição:</label>
+                    <input class="form-control" @bind="@currentTypeDefect.Description" />
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
+                    <button class="btn btn-success" @onclick="SaveTypeDefect">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<TypeDefectModel> typeDefects = new();
+    private TypeDefectModel currentTypeDefect = new();
+    private bool isLoading = true;
+    private bool showModal = false;
+    private bool isEditing = false;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTypeDefects();
+    }
+
+    private async Task LoadTypeDefects()
+    {
+        try
+        {
+            typeDefects = await Http.GetFromJsonAsync<List<TypeDefectModel>>("api/TypeDefect") ?? new List<TypeDefectModel>();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao carregar tipos de defeito.";
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OpenAddTypeDefectModal()
+    {
+        currentTypeDefect = new TypeDefectModel();
+        showModal = true;
+        isEditing = false;
+    }
+
+    private void OpenEditTypeDefectModal(TypeDefectModel typeDefect)
+    {
+        currentTypeDefect = new TypeDefectModel
+        {
+            Id = typeDefect.Id,
+            Name = typeDefect.Name,
+            Description = typeDefect.Description
+        };
+        showModal = true;
+        isEditing = true;
+    }
+
+    private async Task SaveTypeDefect()
+    {
+        try
+        {
+            if (isEditing)
+            {
+                await Http.PutAsJsonAsync($"api/TypeDefect/{currentTypeDefect.Id}", currentTypeDefect);
+            }
+            else
+            {
+                await Http.PostAsJsonAsync("api/TypeDefect", currentTypeDefect);
+            }
+            showModal = false;
+            await LoadTypeDefects();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao salvar o tipo de defeito.";
+            Console.WriteLine(ex);
+        }
+    }
+
+    private async Task DeleteTypeDefect(string id)
+    {
+        try
+        {
+            await Http.DeleteAsync($"api/TypeDefect/{id}");
+            await LoadTypeDefects();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao excluir o tipo de defeito.";
+            Console.WriteLine(ex);
+        }
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
+    }
+
+    // 🔹 MODELO LOCAL PARA O BLAZOR 🔹
+    private class TypeDefectModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+    }
+}

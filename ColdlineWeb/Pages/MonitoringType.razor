@@ -1,0 +1,147 @@
+@page "/monitoringtypes"
+@inject HttpClient Http
+
+<h3>Gerenciamento de Tipos de Monitoramento</h3>
+
+@if (isLoading)
+{
+    <p>Carregando...</p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <button class="btn btn-primary mb-3" @onclick="ShowAddForm">Adicionar Tipo de Monitoramento</button>
+
+    @if (showForm)
+    {
+        <EditForm Model="newMonitoringType" OnValidSubmit="SaveMonitoringType">
+            <DataAnnotationsValidator />
+            <div class="mb-3">
+                <label for="name" class="form-label">Nome</label>
+                <InputText id="name" class="form-control" @bind-Value="newMonitoringType.Name" required />
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Descrição</label>
+                <InputText id="description" class="form-control" @bind-Value="newMonitoringType.Description" required />
+            </div>
+            <button type="submit" class="btn btn-success">Salvar</button>
+            <button type="button" class="btn btn-secondary" @onclick="HideForm">Cancelar</button>
+        </EditForm>
+    }
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var monitoringType in monitoringTypes)
+            {
+                <tr>
+                    <td>@monitoringType.Name</td>
+                    <td>@monitoringType.Description</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => EditMonitoringType(monitoringType)">Editar</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteMonitoringType(monitoringType.Id)">Excluir</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<MonitoringTypeModel> monitoringTypes = new();
+    private bool isLoading = true;
+    private string? errorMessage;
+    private bool showForm = false;
+    private MonitoringTypeModel newMonitoringType = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMonitoringTypes();
+    }
+
+    private async Task LoadMonitoringTypes()
+    {
+        try
+        {
+            monitoringTypes = await Http.GetFromJsonAsync<List<MonitoringTypeModel>>("api/MonitoringType") ?? new List<MonitoringTypeModel>();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao carregar tipos de monitoramento.";
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ShowAddForm()
+    {
+        newMonitoringType = new MonitoringTypeModel();
+        showForm = true;
+    }
+
+    private void EditMonitoringType(MonitoringTypeModel monitoringType)
+    {
+        newMonitoringType = new MonitoringTypeModel { Id = monitoringType.Id, Name = monitoringType.Name, Description = monitoringType.Description };
+        showForm = true;
+    }
+
+    private void HideForm()
+    {
+        showForm = false;
+    }
+
+    private async Task SaveMonitoringType()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(newMonitoringType.Id))
+            {
+                await Http.PostAsJsonAsync("api/MonitoringType", newMonitoringType);
+            }
+            else
+            {
+                await Http.PutAsJsonAsync($"api/MonitoringType/{newMonitoringType.Id}", newMonitoringType);
+            }
+            await LoadMonitoringTypes();
+            showForm = false;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao salvar o tipo de monitoramento.";
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    private async Task DeleteMonitoringType(string id)
+    {
+        try
+        {
+            await Http.DeleteAsync($"api/MonitoringType/{id}");
+            await LoadMonitoringTypes();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao excluir o tipo de monitoramento.";
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    private class MonitoringTypeModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+    }
+}

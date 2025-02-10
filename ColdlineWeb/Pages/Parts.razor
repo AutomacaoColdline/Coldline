@@ -1,0 +1,171 @@
+@page "/parts"
+@inject HttpClient Http
+
+<h3>Gerenciamento de Peças</h3>
+
+@if (isLoading)
+{
+    <p>Carregando...</p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <button class="btn btn-primary mb-3" @onclick="OpenAddPartModal">Adicionar Peça</button>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Valor</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var part in parts)
+            {
+                <tr>
+                    <td>@part.Name</td>
+                    <td>@part.Description</td>
+                    <td>R$ @part.Value.ToString("F2")</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => OpenEditPartModal(part)">Editar</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeletePart(part.Id)">Excluir</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (showModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(isEditing ? "Editar Peça" : "Adicionar Peça")</h5>
+                    <button class="close btn btn-light" @onclick="CloseModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <label>Nome:</label>
+                    <input class="form-control" @bind="@currentPart.Name" />
+
+                    <label>Descrição:</label>
+                    <input class="form-control" @bind="@currentPart.Description" />
+
+                    <label>Valor:</label>
+                    <input type="number" class="form-control" @bind="@currentPart.Value" step="0.01" />
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
+                    <button class="btn btn-success" @onclick="SavePart">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<PartModel> parts = new();
+    private PartModel currentPart = new();
+    private bool isLoading = true;
+    private bool showModal = false;
+    private bool isEditing = false;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadParts();
+    }
+
+    private async Task LoadParts()
+    {
+        try
+        {
+            parts = await Http.GetFromJsonAsync<List<PartModel>>("api/Part") ?? new List<PartModel>();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao carregar peças.";
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OpenAddPartModal()
+    {
+        currentPart = new PartModel();
+        showModal = true;
+        isEditing = false;
+    }
+
+    private void OpenEditPartModal(PartModel part)
+    {
+        currentPart = new PartModel
+        {
+            Id = part.Id,
+            Name = part.Name,
+            Description = part.Description,
+            Value = part.Value
+        };
+        showModal = true;
+        isEditing = true;
+    }
+
+    private async Task SavePart()
+    {
+        try
+        {
+            if (isEditing)
+            {
+                await Http.PutAsJsonAsync($"api/Part/{currentPart.Id}", currentPart);
+            }
+            else
+            {
+                await Http.PostAsJsonAsync("api/Part", currentPart);
+            }
+            showModal = false;
+            await LoadParts();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao salvar a peça.";
+            Console.WriteLine(ex);
+        }
+    }
+
+    private async Task DeletePart(string id)
+    {
+        try
+        {
+            await Http.DeleteAsync($"api/Part/{id}");
+            await LoadParts();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao excluir a peça.";
+            Console.WriteLine(ex);
+        }
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
+    }
+
+    // 🔹 MODELO LOCAL PARA O BLAZOR 🔹
+    private class PartModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public double Value { get; set; }
+    }
+}

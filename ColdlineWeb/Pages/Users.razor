@@ -1,31 +1,28 @@
 @page "/users"
-@using ColdlineWeb.Services
-@using ColdlineWeb.Models
-@inject UserService UserService
+@inject HttpClient Http
 
+<h3>Gerenciamento de Usuários</h3>
 
-<PageTitle>Lista de Usuários</PageTitle>
-
-<h3>Lista de Usuários</h3>
-
-@if (users == null)
+@if (isLoading)
 {
     <p>Carregando...</p>
 }
-else if (users.Count == 0)
+else if (!string.IsNullOrEmpty(errorMessage))
 {
-    <p>Nenhum usuário encontrado.</p>
+    <div class="alert alert-danger">@errorMessage</div>
 }
 else
 {
-    <table class="table">
+    <button class="btn btn-primary mb-3" @onclick="OpenAddUserModal">Adicionar Usuário</button>
+
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Nome</th>
                 <th>Email</th>
-                <th>Departamento</th>
                 <th>Tipo de Usuário</th>
-                <th>Número de Identificação</th>
+                <th>Departamento</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -34,20 +31,183 @@ else
                 <tr>
                     <td>@user.Name</td>
                     <td>@user.Email</td>
-                    <td>@user.Department</td>
-                    <td>@user.UserType</td>
-                    <td>@user.IdentificationNumber</td>
+                    <td>@user.UserType.Name</td>
+                    <td>@user.Department.Name</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => OpenEditUserModal(user)">Editar</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(user.Id)">Excluir</button>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
 }
 
+@if (showModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(isEditing ? "Editar Usuário" : "Adicionar Usuário")</h5>
+                    <button class="close btn btn-light" @onclick="CloseModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <label>Nome:</label>
+                    <input class="form-control" @bind="@currentUser.Name" />
+
+                    <label>Email:</label>
+                    <input class="form-control" @bind="@currentUser.Email" />
+
+                    <label>Senha:</label>
+                    <input type="password" class="form-control" @bind="@currentUser.Password" />
+
+                    <label>Tipo de Usuário:</label>
+                    <select class="form-control" @bind="@currentUser.UserType.Id">
+                        @foreach (var userType in userTypes)
+                        {
+                            <option value="@userType.Id">@userType.Name</option>
+                        }
+                    </select>
+
+                    <label>Departamento:</label>
+                    <select class="form-control" @bind="@currentUser.Department.Id">
+                        @foreach (var department in departments)
+                        {
+                            <option value="@department.Id">@department.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
+                    <button class="btn btn-success" @onclick="SaveUser">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
-    private List<User>? users;
+    private List<UserModel> users = new();
+    private List<UserTypeModel> userTypes = new();
+    private List<DepartmentModel> departments = new();
+    private UserModel currentUser = new();
+    private bool isLoading = true;
+    private bool showModal = false;
+    private bool isEditing = false;
+    private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
-        users = await UserService.GetUsersAsync();
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            users = await Http.GetFromJsonAsync<List<UserModel>>("api/User") ?? new List<UserModel>();
+            userTypes = await Http.GetFromJsonAsync<List<UserTypeModel>>("api/UserType") ?? new List<UserTypeModel>();
+            departments = await Http.GetFromJsonAsync<List<DepartmentModel>>("api/Department") ?? new List<DepartmentModel>();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao carregar dados.";
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OpenAddUserModal()
+    {
+        currentUser = new UserModel
+        {
+            UserType = new UserTypeModel(),
+            Department = new DepartmentModel()
+        };
+        showModal = true;
+        isEditing = false;
+    }
+
+    private void OpenEditUserModal(UserModel user)
+    {
+        currentUser = new UserModel
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Email = user.Email,
+            Password = "", // Não expor a senha
+            UserType = new UserTypeModel { Id = user.UserType.Id, Name = user.UserType.Name },
+            Department = new DepartmentModel { Id = user.Department.Id, Name = user.Department.Name }
+        };
+        showModal = true;
+        isEditing = true;
+    }
+
+    private async Task SaveUser()
+    {
+        try
+        {
+            if (isEditing)
+            {
+                await Http.PutAsJsonAsync($"api/User/{currentUser.Id}", currentUser);
+            }
+            else
+            {
+                await Http.PostAsJsonAsync("api/User", currentUser);
+            }
+            showModal = false;
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao salvar o usuário.";
+            Console.WriteLine(ex);
+        }
+    }
+
+    private async Task DeleteUser(string id)
+    {
+        try
+        {
+            await Http.DeleteAsync($"api/User/{id}");
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao excluir o usuário.";
+            Console.WriteLine(ex);
+        }
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
+    }
+
+    // 🔹 MODELOS LOCAIS PARA USO NO BLAZOR 🔹
+    private class UserModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public UserTypeModel UserType { get; set; } = new UserTypeModel();
+        public DepartmentModel Department { get; set; } = new DepartmentModel();
+    }
+
+    private class UserTypeModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
+
+    private class DepartmentModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
     }
 }

@@ -1,0 +1,148 @@
+@page "/departments"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<h3>Gerenciamento de Departamentos</h3>
+
+@if (isLoading)
+{
+    <p>Carregando...</p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <button class="btn btn-primary mb-3" @onclick="ShowAddForm">Adicionar Departamento</button>
+
+    @if (showForm)
+    {
+        <EditForm Model="newDepartment" OnValidSubmit="SaveDepartment">
+            <DataAnnotationsValidator />
+            <div class="mb-3">
+                <label for="name" class="form-label">Nome</label>
+                <InputText id="name" class="form-control" @bind-Value="newDepartment.Name" required />
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Descrição</label>
+                <InputText id="description" class="form-control" @bind-Value="newDepartment.Description" required />
+            </div>
+            <button type="submit" class="btn btn-success">Salvar</button>
+            <button type="button" class="btn btn-secondary" @onclick="HideForm">Cancelar</button>
+        </EditForm>
+    }
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var department in departments)
+            {
+                <tr>
+                    <td>@department.Name</td>
+                    <td>@department.Description</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => EditDepartment(department)">Editar</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteDepartment(department.Id)">Excluir</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<DepartmentModel> departments = new();
+    private bool isLoading = true;
+    private string? errorMessage;
+    private bool showForm = false;
+    private DepartmentModel newDepartment = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDepartments();
+    }
+
+    private async Task LoadDepartments()
+    {
+        try
+        {
+            departments = await Http.GetFromJsonAsync<List<DepartmentModel>>("api/Department") ?? new List<DepartmentModel>();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao carregar departamentos.";
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ShowAddForm()
+    {
+        newDepartment = new DepartmentModel();
+        showForm = true;
+    }
+
+    private void EditDepartment(DepartmentModel department)
+    {
+        newDepartment = new DepartmentModel { Id = department.Id, Name = department.Name, Description = department.Description };
+        showForm = true;
+    }
+
+    private void HideForm()
+    {
+        showForm = false;
+    }
+
+    private async Task SaveDepartment()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(newDepartment.Id))
+            {
+                await Http.PostAsJsonAsync("api/Department", newDepartment);
+            }
+            else
+            {
+                await Http.PutAsJsonAsync($"api/Department/{newDepartment.Id}", newDepartment);
+            }
+            await LoadDepartments();
+            showForm = false;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao salvar o departamento.";
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    private async Task DeleteDepartment(string id)
+    {
+        try
+        {
+            await Http.DeleteAsync($"api/Department/{id}");
+            await LoadDepartments();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao excluir o departamento.";
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    private class DepartmentModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+    }
+}

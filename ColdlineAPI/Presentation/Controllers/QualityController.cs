@@ -1,5 +1,6 @@
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Domain.Entities;
+using ColdlineAPI.Application.Filters;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -49,6 +50,12 @@ namespace ColdlineAPI.Presentation.Controllers
         {
             var deleted = await _qualityService.DeleteQualityAsync(id);
             return deleted ? NoContent() : NotFound();
+        }
+        [HttpPost("search")]
+        public async Task<ActionResult<IEnumerable<Quality>>> SearchQuality([FromBody] QualityFilter filter)
+        {
+            var results = await _qualityService.SearchQualityAsync(filter);
+            return Ok(results);
         }
     }
 }

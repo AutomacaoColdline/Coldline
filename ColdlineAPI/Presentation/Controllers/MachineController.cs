@@ -1,3 +1,4 @@
+using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +13,9 @@ namespace ColdlineAPI.Presentation.Controllers
     {
         private readonly IMachineService _machineService;
 
-        public MachineController(IMachineService MachineService)
+        public MachineController(IMachineService machineService)
         {
-            _machineService = MachineService;
+            _machineService = machineService;
         }
 
         [HttpGet]
@@ -26,21 +27,21 @@ namespace ColdlineAPI.Presentation.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Machine>> GetMachineById(string id)
         {
-            var Machine = await _machineService.GetMachineByIdAsync(id);
-            return Machine != null ? Ok(Machine) : NotFound();
+            var machine = await _machineService.GetMachineByIdAsync(id);
+            return machine != null ? Ok(machine) : NotFound();
         }
 
         [HttpPost]
-        public async Task<ActionResult<Machine>> CreateMachine([FromBody] Machine Machine)
+        public async Task<ActionResult<Machine>> CreateMachine([FromBody] Machine machine)
         {
-            var createdMachine = await _machineService.CreateMachineAsync(Machine);
+            var createdMachine = await _machineService.CreateMachineAsync(machine);
             return CreatedAtAction(nameof(GetMachineById), new { id = createdMachine.Id }, createdMachine);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateMachine(string id, [FromBody] Machine Machine)
+        public async Task<IActionResult> UpdateMachine(string id, [FromBody] Machine machine)
         {
-            var updated = await _machineService.UpdateMachineAsync(id, Machine);
+            var updated = await _machineService.UpdateMachineAsync(id, machine);
             return updated ? NoContent() : NotFound();
         }
 
@@ -49,6 +50,20 @@ namespace ColdlineAPI.Presentation.Controllers
         {
             var deleted = await _machineService.DeleteMachineAsync(id);
             return deleted ? NoContent() : NotFound();
+        }
+
+        [HttpPatch("{id}/process/{processId}")]
+        public async Task<IActionResult> UpdateProcessStatus(string id, string processId)
+        {
+            var updated = await _machineService.UpdateProcessStatusAsync(id, processId);
+            return updated ? NoContent() : NotFound();
+        }
+
+        [HttpPost("search")]
+        public async Task<ActionResult<IEnumerable<Machine>>> SearchMachines([FromBody] MachineFilter filter)
+        {
+            var machines = await _machineService.SearchMachinesAsync(filter);
+            return Ok(machines);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace ColdlineAPI.Domain.Entities
         [BsonElement("description")]
         public string Description { get; set; } = string.Empty;
 
-        [BsonElement("Value")]
+        [BsonElement("value")]
         public double Value { get; set; }
     }
 }

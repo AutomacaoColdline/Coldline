@@ -9,14 +9,14 @@ namespace ColdlineAPI.Domain.Entities
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; } 
-        [BsonElement("Process")]
+        [BsonElement("process")]
         public ReferenceEntity Process { get; set; } = new ReferenceEntity();
 
-        [BsonElement("Pause Type")]
+        [BsonElement("pause Type")]
         public ReferenceEntity PauseType { get; set; } = new ReferenceEntity();
-        [BsonElement("Defect")]
+        [BsonElement("defect")]
         public ReferenceEntity Defect { get; set; } = new ReferenceEntity();
-        [BsonElement("User")]
+        [BsonElement("user")]
         public ReferenceEntity User { get; set; } = new ReferenceEntity();
     }
 }

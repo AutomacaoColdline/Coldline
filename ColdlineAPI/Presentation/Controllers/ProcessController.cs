@@ -1,3 +1,4 @@
+using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -12,13 +13,13 @@ namespace ColdlineAPI.Presentation.Controllers
     {
         private readonly IProcessService _processService;
 
-        public ProcessController(IProcessService ProcessService)
+        public ProcessController(IProcessService processService)
         {
-            _processService = ProcessService;
+            _processService = processService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Process>>> GetAllProcesss()
+        public async Task<ActionResult<IEnumerable<Process>>> GetAllProcesses()
         {
             return Ok(await _processService.GetAllProcesssAsync());
         }
@@ -26,21 +27,21 @@ namespace ColdlineAPI.Presentation.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Process>> GetProcessById(string id)
         {
-            var Process = await _processService.GetProcessByIdAsync(id);
-            return Process != null ? Ok(Process) : NotFound();
+            var process = await _processService.GetProcessByIdAsync(id);
+            return process != null ? Ok(process) : NotFound();
         }
 
         [HttpPost]
-        public async Task<ActionResult<Process>> CreateProcess([FromBody] Process Process)
+        public async Task<ActionResult<Process>> CreateProcess([FromBody] Process process)
         {
-            var createdProcess = await _processService.CreateProcessAsync(Process);
+            var createdProcess = await _processService.CreateProcessAsync(process);
             return CreatedAtAction(nameof(GetProcessById), new { id = createdProcess.Id }, createdProcess);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProcess(string id, [FromBody] Process Process)
+        public async Task<IActionResult> UpdateProcess(string id, [FromBody] Process process)
         {
-            var updated = await _processService.UpdateProcessAsync(id, Process);
+            var updated = await _processService.UpdateProcessAsync(id, process);
             return updated ? NoContent() : NotFound();
         }
 
@@ -49,6 +50,13 @@ namespace ColdlineAPI.Presentation.Controllers
         {
             var deleted = await _processService.DeleteProcessAsync(id);
             return deleted ? NoContent() : NotFound();
+        }
+
+        [HttpPost("search")]
+        public async Task<ActionResult<IEnumerable<Process>>> SearchProcesses([FromBody] ProcessFilter filter)
+        {
+            var processes = await _processService.SearchProcessAsync(filter);
+            return Ok(processes);
         }
     }
 }

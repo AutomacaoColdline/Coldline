@@ -15,9 +15,11 @@ namespace ColdlineAPI.Domain.Entities
 
         [BsonElement("description")]
         public string Description { get; set; } = string.Empty;
-        [BsonElement("Type Defect")]
+        [BsonElement("internal")]
+        public bool Internal { get; set; } 
+        [BsonElement("type defect")]
         public ReferenceEntity TypeDefect { get; set; } = new ReferenceEntity();
-        [BsonElement("Part")]
+        [BsonElement("part")]
         public ReferenceEntity Part { get; set; } = new ReferenceEntity();
     }
 }

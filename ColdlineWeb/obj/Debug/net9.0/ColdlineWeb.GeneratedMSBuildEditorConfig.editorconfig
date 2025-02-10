@@ -40,6 +40,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ291bnRlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/app/Pages/Defect.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRGVmZWN0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [/app/Pages/Department.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRGVwYXJ0bWVudC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
@@ -52,16 +56,40 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTG9naW4ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[/app/Pages/Machine.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Monitoring.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTW9uaXRvcmluZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/app/Pages/MonitoringType.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTW9uaXRvcmluZ1R5cGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Occurrence.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT2NjdXJyZW5jZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/Parts.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[/app/Pages/PauseTypes.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGF1c2VUeXBlcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Process.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvY2Vzcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/app/Pages/ProcessType.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvY2Vzc1R5cGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/Users.razor]

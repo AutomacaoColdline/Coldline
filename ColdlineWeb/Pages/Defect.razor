@@ -1,0 +1,201 @@
+@page "/defects"
+@inject HttpClient Http
+
+<h3>Gerenciamento de Defeitos</h3>
+
+@if (isLoading)
+{
+    <p>Carregando...</p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <button class="btn btn-primary mb-3" @onclick="OpenAddDefectModal">Adicionar Defeito</button>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Interno</th>
+                <th>Tipo de Defeito</th>
+                <th>Peça</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var defect in defects)
+            {
+                <tr>
+                    <td>@defect.Name</td>
+                    <td>@defect.Description</td>
+                    <td>@(defect.Internal ? "Sim" : "Não")</td>
+                    <td>@defect.TypeDefect.Name</td>
+                    <td>@defect.Part.Name</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => OpenEditDefectModal(defect)">Editar</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteDefect(defect.Id)">Excluir</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (showModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(isEditing ? "Editar Defeito" : "Adicionar Defeito")</h5>
+                    <button class="close" @onclick="CloseModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <label>Nome:</label>
+                    <input class="form-control" @bind="currentDefect.Name" />
+
+                    <label>Descrição:</label>
+                    <input class="form-control" @bind="currentDefect.Description" />
+
+                    <label>Interno:</label>
+                    <input type="checkbox" class="form-check-input" @bind="currentDefect.Internal" />
+
+                    <label>Tipo de Defeito:</label>
+                    <select class="form-control" @bind="currentDefect.TypeDefect.Id">
+                        @foreach (var typeDefect in typeDefects)
+                        {
+                            <option value="@typeDefect.Id">@typeDefect.Name</option>
+                        }
+                    </select>
+
+                    <label>Peça:</label>
+                    <select class="form-control" @bind="currentDefect.Part.Id">
+                        @foreach (var part in parts)
+                        {
+                            <option value="@part.Id">@part.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
+                    <button class="btn btn-success" @onclick="SaveDefect">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<DefectModel> defects = new();
+    private List<ReferenceEntity> typeDefects = new();
+    private List<ReferenceEntity> parts = new();
+    private DefectModel currentDefect = new();
+    private bool isLoading = true;
+    private bool showModal = false;
+    private bool isEditing = false;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            defects = await Http.GetFromJsonAsync<List<DefectModel>>("api/Defect") ?? new List<DefectModel>();
+            typeDefects = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/TypeDefect") ?? new List<ReferenceEntity>();
+            parts = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Part") ?? new List<ReferenceEntity>();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao carregar dados.";
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OpenAddDefectModal()
+    {
+        currentDefect = new DefectModel();
+        showModal = true;
+        isEditing = false;
+    }
+
+    private void OpenEditDefectModal(DefectModel defect)
+    {
+        currentDefect = new DefectModel
+        {
+            Id = defect.Id,
+            Name = defect.Name,
+            Description = defect.Description,
+            Internal = defect.Internal,
+            TypeDefect = new ReferenceEntity { Id = defect.TypeDefect.Id, Name = defect.TypeDefect.Name },
+            Part = new ReferenceEntity { Id = defect.Part.Id, Name = defect.Part.Name }
+        };
+        showModal = true;
+        isEditing = true;
+    }
+
+    private async Task SaveDefect()
+    {
+        var selectedTypeDefect = typeDefects.FirstOrDefault(t => t.Id == currentDefect.TypeDefect.Id);
+        var selectedPart = parts.FirstOrDefault(p => p.Id == currentDefect.Part.Id);
+
+        if (selectedTypeDefect != null)
+        {
+            currentDefect.TypeDefect.Name = selectedTypeDefect.Name;
+        }
+
+        if (selectedPart != null)
+        {
+            currentDefect.Part.Name = selectedPart.Name;
+        }
+
+        if (isEditing)
+        {
+            await Http.PutAsJsonAsync($"api/Defect/{currentDefect.Id}", currentDefect);
+        }
+        else
+        {
+            await Http.PostAsJsonAsync("api/Defect", currentDefect);
+        }
+        showModal = false;
+        await LoadData();
+    }
+
+    private async Task DeleteDefect(string id)
+    {
+        await Http.DeleteAsync($"api/Defect/{id}");
+        await LoadData();
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
+    }
+
+    private class DefectModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public bool Internal { get; set; } = false;
+        public ReferenceEntity TypeDefect { get; set; } = new ReferenceEntity();
+        public ReferenceEntity Part { get; set; } = new ReferenceEntity();
+    }
+
+    private class ReferenceEntity
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
+}

@@ -1,0 +1,224 @@
+@page "/machines"
+@inject HttpClient Http
+
+<h3>Gerenciamento de Máquinas</h3>
+
+@if (isLoading)
+{
+    <p>Carregando...</p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <button class="btn btn-primary mb-3" @onclick="OpenAddMachineModal">Adicionar Máquina</button>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Nome do Cliente</th>
+                <th>Número de Identificação</th>
+                <th>Fase</th>
+                <th>Voltagem</th>
+                <th>Processo</th>
+                <th>Qualidade</th>
+                <th>Monitoramento</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var machine in machines)
+            {
+                <tr>
+                    <td>@machine.Name</td>
+                    <td>@machine.CustomerName</td>
+                    <td>@machine.IdentificationNumber</td>
+                    <td>@machine.Phase</td>
+                    <td>@machine.Voltage</td>
+                    <td>@machine.Process.Name</td>
+                    <td>@machine.Quality.Name</td>
+                    <td>@machine.Monitoring.Name</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => OpenEditMachineModal(machine)">Editar</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteMachine(machine.Id)">Excluir</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (showModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(isEditing ? "Editar Máquina" : "Adicionar Máquina")</h5>
+                    <button class="close" @onclick="CloseModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <label>Nome:</label>
+                    <input class="form-control" bind="@currentMachine.Name" />
+
+                    <label>Nome do Cliente:</label>
+                    <input class="form-control" bind="@currentMachine.CustomerName" />
+
+                    <label>Número de Identificação:</label>
+                    <input class="form-control" bind="@currentMachine.IdentificationNumber" />
+
+                    <label>Fase:</label>
+                    <input class="form-control" bind="@currentMachine.Phase" />
+
+                    <label>Voltagem:</label>
+                    <input class="form-control" bind="@currentMachine.Voltage" />
+
+                    <label>Processo:</label>
+                    <select class="form-control" bind="@currentMachine.Process.Id">
+                        @foreach (var process in processes)
+                        {
+                            <option value="@process.Id">@process.Name</option>
+                        }
+                    </select>
+
+                    <label>Qualidade:</label>
+                    <select class="form-control" bind="@currentMachine.Quality.Id">
+                        @foreach (var quality in qualities)
+                        {
+                            <option value="@quality.Id">@quality.Name</option>
+                        }
+                    </select>
+
+                    <label>Monitoramento:</label>
+                    <select class="form-control" bind="@currentMachine.Monitoring.Id">
+                        @foreach (var monitoring in monitorings)
+                        {
+                            <option value="@monitoring.Id">@monitoring.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
+                    <button class="btn btn-success" @onclick="SaveMachine">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<MachineModel> machines = new();
+    private List<ReferenceEntity> processes = new();
+    private List<ReferenceEntity> qualities = new();
+    private List<ReferenceEntity> monitorings = new();
+    private MachineModel currentMachine = new();
+    private bool isLoading = true;
+    private bool showModal = false;
+    private bool isEditing = false;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            machines = await Http.GetFromJsonAsync<List<MachineModel>>("api/Machine") ?? new List<MachineModel>();
+            processes = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Process") ?? new List<ReferenceEntity>();
+            qualities = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Quality") ?? new List<ReferenceEntity>();
+            monitorings = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Monitoring") ?? new List<ReferenceEntity>();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao carregar dados.";
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OpenAddMachineModal()
+    {
+        currentMachine = new MachineModel();
+        showModal = true;
+        isEditing = false;
+    }
+
+    private void OpenEditMachineModal(MachineModel machine)
+    {
+        currentMachine = new MachineModel
+        {
+            Id = machine.Id,
+            Name = machine.Name,
+            CustomerName = machine.CustomerName,
+            IdentificationNumber = machine.IdentificationNumber,
+            Phase = machine.Phase,
+            Voltage = machine.Voltage,
+            Process = new ReferenceEntity { Id = machine.Process.Id, Name = machine.Process.Name },
+            Quality = new ReferenceEntity { Id = machine.Quality.Id, Name = machine.Quality.Name },
+            Monitoring = new ReferenceEntity { Id = machine.Monitoring.Id, Name = machine.Monitoring.Name }
+        };
+        showModal = true;
+        isEditing = true;
+    }
+
+    private async Task SaveMachine()
+    {
+        var selectedProcess = processes.FirstOrDefault(p => p.Id == currentMachine.Process.Id);
+        var selectedQuality = qualities.FirstOrDefault(q => q.Id == currentMachine.Quality.Id);
+        var selectedMonitoring = monitorings.FirstOrDefault(m => m.Id == currentMachine.Monitoring.Id);
+
+        if (selectedProcess != null) currentMachine.Process.Name = selectedProcess.Name;
+        if (selectedQuality != null) currentMachine.Quality.Name = selectedQuality.Name;
+        if (selectedMonitoring != null) currentMachine.Monitoring.Name = selectedMonitoring.Name;
+
+        if (isEditing)
+        {
+            await Http.PutAsJsonAsync($"api/Machine/{currentMachine.Id}", currentMachine);
+        }
+        else
+        {
+            await Http.PostAsJsonAsync("api/Machine", currentMachine);
+        }
+        showModal = false;
+        await LoadData();
+    }
+
+    private async Task DeleteMachine(string id)
+    {
+        await Http.DeleteAsync($"api/Machine/{id}");
+        await LoadData();
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
+    }
+
+    private class MachineModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string CustomerName { get; set; } = string.Empty;
+        public string IdentificationNumber { get; set; } = string.Empty;
+        public string Phase { get; set; } = string.Empty;
+        public string Voltage { get; set; } = string.Empty;
+        public ReferenceEntity Process { get; set; } = new ReferenceEntity();
+        public ReferenceEntity Quality { get; set; } = new ReferenceEntity();
+        public ReferenceEntity Monitoring { get; set; } = new ReferenceEntity();
+    }
+
+    private class ReferenceEntity
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
+}

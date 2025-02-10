@@ -1,0 +1,241 @@
+@page "/monitoring"
+@inject HttpClient Http
+
+<h3>Gerenciamento de Monitoramento</h3>
+
+@if (isLoading)
+{
+    <p>Carregando...</p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <button class="btn btn-primary mb-3" @onclick="OpenAddMonitoringModal">Adicionar Monitoramento</button>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Gateway</th>
+                <th>IHM</th>
+                <th>CLP</th>
+                <th>ID RustDesk</th>
+                <th>ID AnyDesk</th>
+                <th>ID TeamViewer</th>
+                <th>Tipo de Monitoramento</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var monitoring in monitorings)
+            {
+                <tr>
+                    <td>@monitoring.Gateway</td>
+                    <td>@monitoring.IHM</td>
+                    <td>
+                        @if (monitoring.CLP.Any())
+                        {
+                            <ul>
+                                @foreach (var clp in monitoring.CLP)
+                                {
+                                    <li>@clp</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <span>Sem CLPs</span>
+                        }
+                    </td>
+                    <td>@monitoring.IdRustdesk</td>
+                    <td>@monitoring.IdAnydesk</td>
+                    <td>@monitoring.IdTeamViewer</td>
+                    <td>@monitoring.MonitoringType.Name</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => OpenEditMonitoringModal(monitoring)">Editar</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteMonitoring(monitoring.Id)">Excluir</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (showModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(isEditing ? "Editar Monitoramento" : "Adicionar Monitoramento")</h5>
+                    <button class="close" @onclick="CloseModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <label>Gateway:</label>
+                    <input class="form-control" bind="@currentMonitoring.Gateway" />
+
+                    <label>IHM:</label>
+                    <input class="form-control" bind="@currentMonitoring.IHM" />
+
+                    <label>CLP (Adicionar Múltiplos):</label>
+                    <div class="input-group mb-2">
+                        <input class="form-control" bind="@newCLP" placeholder="Digite um CLP e pressione Adicionar" />
+                        <button class="btn btn-success" @onclick="AddCLP">Adicionar</button>
+                    </div>
+                    <ul>
+                        @foreach (var clp in currentMonitoring.CLP)
+                        {
+                            <li>
+                                @clp <button class="btn btn-danger btn-sm" @onclick="() => RemoveCLP(clp)">X</button>
+                            </li>
+                        }
+                    </ul>
+
+                    <label>ID RustDesk:</label>
+                    <input class="form-control" bind="@currentMonitoring.IdRustdesk" />
+
+                    <label>ID AnyDesk:</label>
+                    <input class="form-control" bind="@currentMonitoring.IdAnydesk" />
+
+                    <label>ID TeamViewer:</label>
+                    <input class="form-control" bind="@currentMonitoring.IdTeamViewer" />
+
+                    <label>Tipo de Monitoramento:</label>
+                    <select class="form-control" bind="@currentMonitoring.MonitoringType.Id">
+                        @foreach (var monitoringType in monitoringTypes)
+                        {
+                            <option value="@monitoringType.Id">@monitoringType.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
+                    <button class="btn btn-success" @onclick="SaveMonitoring">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<MonitoringModel> monitorings = new();
+    private List<ReferenceEntity> monitoringTypes = new();
+    private MonitoringModel currentMonitoring = new();
+    private string newCLP = string.Empty;
+    private bool isLoading = true;
+    private bool showModal = false;
+    private bool isEditing = false;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            monitorings = await Http.GetFromJsonAsync<List<MonitoringModel>>("api/Monitoring") ?? new List<MonitoringModel>();
+            monitoringTypes = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/MonitoringType") ?? new List<ReferenceEntity>();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao carregar dados.";
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OpenAddMonitoringModal()
+    {
+        currentMonitoring = new MonitoringModel();
+        showModal = true;
+        isEditing = false;
+    }
+
+    private void OpenEditMonitoringModal(MonitoringModel monitoring)
+    {
+        currentMonitoring = new MonitoringModel
+        {
+            Id = monitoring.Id,
+            Gateway = monitoring.Gateway,
+            IHM = monitoring.IHM,
+            CLP = new List<string>(monitoring.CLP),
+            IdRustdesk = monitoring.IdRustdesk,
+            IdAnydesk = monitoring.IdAnydesk,
+            IdTeamViewer = monitoring.IdTeamViewer,
+            MonitoringType = new ReferenceEntity { Id = monitoring.MonitoringType.Id, Name = monitoring.MonitoringType.Name }
+        };
+        showModal = true;
+        isEditing = true;
+    }
+
+    private async Task SaveMonitoring()
+    {
+        var selectedMonitoringType = monitoringTypes.FirstOrDefault(mt => mt.Id == currentMonitoring.MonitoringType.Id);
+        if (selectedMonitoringType != null)
+        {
+            currentMonitoring.MonitoringType.Name = selectedMonitoringType.Name;
+        }
+
+        if (isEditing)
+        {
+            await Http.PutAsJsonAsync($"api/Monitoring/{currentMonitoring.Id}", currentMonitoring);
+        }
+        else
+        {
+            await Http.PostAsJsonAsync("api/Monitoring", currentMonitoring);
+        }
+        showModal = false;
+        await LoadData();
+    }
+
+    private async Task DeleteMonitoring(string id)
+    {
+        await Http.DeleteAsync($"api/Monitoring/{id}");
+        await LoadData();
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
+    }
+
+    private void AddCLP()
+    {
+        if (!string.IsNullOrEmpty(newCLP) && !currentMonitoring.CLP.Contains(newCLP))
+        {
+            currentMonitoring.CLP.Add(newCLP);
+            newCLP = string.Empty;
+        }
+    }
+
+    private void RemoveCLP(string clp)
+    {
+        currentMonitoring.CLP.Remove(clp);
+    }
+
+    private class MonitoringModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Gateway { get; set; } = string.Empty;
+        public string IHM { get; set; } = string.Empty;
+        public List<string> CLP { get; set; } = new();
+        public string IdRustdesk { get; set; } = string.Empty;
+        public string IdAnydesk { get; set; } = string.Empty;
+        public string IdTeamViewer { get; set; } = string.Empty;
+        public ReferenceEntity MonitoringType { get; set; } = new();
+    }
+
+    private class ReferenceEntity
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
+}

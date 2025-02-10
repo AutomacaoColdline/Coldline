@@ -1,0 +1,205 @@
+@page "/occurrences"
+@inject HttpClient Http
+
+<h3>Gerenciamento de Ocorrências</h3>
+
+@if (isLoading)
+{
+    <p>Carregando...</p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <button class="btn btn-primary mb-3" @onclick="OpenAddOccurrenceModal">Adicionar Ocorrência</button>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Processo</th>
+                <th>Tipo de Pausa</th>
+                <th>Defeito</th>
+                <th>Usuário</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var occurrence in occurrences)
+            {
+                <tr>
+                    <td>@occurrence.Process.Name</td>
+                    <td>@occurrence.PauseType.Name</td>
+                    <td>@occurrence.Defect.Name</td>
+                    <td>@occurrence.User.Name</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => OpenEditOccurrenceModal(occurrence)">Editar</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteOccurrence(occurrence.Id)">Excluir</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (showModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(isEditing ? "Editar Ocorrência" : "Adicionar Ocorrência")</h5>
+                    <button class="close" @onclick="CloseModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <label>Processo:</label>
+                    <select class="form-control" bind="@currentOccurrence.Process.Id">
+                        @foreach (var process in processes)
+                        {
+                            <option value="@process.Id">@process.Name</option>
+                        }
+                    </select>
+
+                    <label>Tipo de Pausa:</label>
+                    <select class="form-control" bind="@currentOccurrence.PauseType.Id">
+                        @foreach (var pauseType in pauseTypes)
+                        {
+                            <option value="@pauseType.Id">@pauseType.Name</option>
+                        }
+                    </select>
+
+                    <label>Defeito:</label>
+                    <select class="form-control" bind="@currentOccurrence.Defect.Id">
+                        @foreach (var defect in defects)
+                        {
+                            <option value="@defect.Id">@defect.Name</option>
+                        }
+                    </select>
+
+                    <label>Usuário:</label>
+                    <select class="form-control" bind="@currentOccurrence.User.Id">
+                        @foreach (var user in users)
+                        {
+                            <option value="@user.Id">@user.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
+                    <button class="btn btn-success" @onclick="SaveOccurrence">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<OccurrenceModel> occurrences = new();
+    private List<ReferenceEntity> processes = new();
+    private List<ReferenceEntity> pauseTypes = new();
+    private List<ReferenceEntity> defects = new();
+    private List<ReferenceEntity> users = new();
+    private OccurrenceModel currentOccurrence = new();
+    private bool isLoading = true;
+    private bool showModal = false;
+    private bool isEditing = false;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            occurrences = await Http.GetFromJsonAsync<List<OccurrenceModel>>("api/Occurrence") ?? new List<OccurrenceModel>();
+            processes = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Process") ?? new List<ReferenceEntity>();
+            pauseTypes = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/PauseType") ?? new List<ReferenceEntity>();
+            defects = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Defect") ?? new List<ReferenceEntity>();
+            users = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/User") ?? new List<ReferenceEntity>();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao carregar dados.";
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OpenAddOccurrenceModal()
+    {
+        currentOccurrence = new OccurrenceModel();
+        showModal = true;
+        isEditing = false;
+    }
+
+    private void OpenEditOccurrenceModal(OccurrenceModel occurrence)
+    {
+        currentOccurrence = new OccurrenceModel
+        {
+            Id = occurrence.Id,
+            Process = new ReferenceEntity { Id = occurrence.Process.Id, Name = occurrence.Process.Name },
+            PauseType = new ReferenceEntity { Id = occurrence.PauseType.Id, Name = occurrence.PauseType.Name },
+            Defect = new ReferenceEntity { Id = occurrence.Defect.Id, Name = occurrence.Defect.Name },
+            User = new ReferenceEntity { Id = occurrence.User.Id, Name = occurrence.User.Name }
+        };
+        showModal = true;
+        isEditing = true;
+    }
+
+    private async Task SaveOccurrence()
+    {
+        var selectedProcess = processes.FirstOrDefault(p => p.Id == currentOccurrence.Process.Id);
+        var selectedPauseType = pauseTypes.FirstOrDefault(p => p.Id == currentOccurrence.PauseType.Id);
+        var selectedDefect = defects.FirstOrDefault(d => d.Id == currentOccurrence.Defect.Id);
+        var selectedUser = users.FirstOrDefault(u => u.Id == currentOccurrence.User.Id);
+
+        if (selectedProcess != null) currentOccurrence.Process.Name = selectedProcess.Name;
+        if (selectedPauseType != null) currentOccurrence.PauseType.Name = selectedPauseType.Name;
+        if (selectedDefect != null) currentOccurrence.Defect.Name = selectedDefect.Name;
+        if (selectedUser != null) currentOccurrence.User.Name = selectedUser.Name;
+
+        if (isEditing)
+        {
+            await Http.PutAsJsonAsync($"api/Occurrence/{currentOccurrence.Id}", currentOccurrence);
+        }
+        else
+        {
+            await Http.PostAsJsonAsync("api/Occurrence", currentOccurrence);
+        }
+        showModal = false;
+        await LoadData();
+    }
+
+    private async Task DeleteOccurrence(string id)
+    {
+        await Http.DeleteAsync($"api/Occurrence/{id}");
+        await LoadData();
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
+    }
+
+    private class OccurrenceModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public ReferenceEntity Process { get; set; } = new ReferenceEntity();
+        public ReferenceEntity PauseType { get; set; } = new ReferenceEntity();
+        public ReferenceEntity Defect { get; set; } = new ReferenceEntity();
+        public ReferenceEntity User { get; set; } = new ReferenceEntity();
+    }
+
+    private class ReferenceEntity
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
+}

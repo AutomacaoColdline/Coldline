@@ -1,4 +1,4 @@
-using ColdlineAPI.Application.Configurations; // Agora chamamos o ServiceRegistration corretamente
+using ColdlineAPI.Application.Configurations;
 using ColdlineAPI.Infrastructure.Configurations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,11 +7,23 @@ using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuração dos serviços
+// ✅ 1. CONFIGURAR CORS PERMITINDO O BLAZOR WEBASSEMBLY
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy =>
+        {
+            policy.WithOrigins("http://10.0.0.44:5173", "http://coldline.industria.com") // 🔹 Incluímos a origem do Blazor
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials();
+        });
+});
+
+
+// ✅ 2. Configuração dos serviços
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
-// ✅ Ajustado para chamar ServiceRegistration do Application
 ServiceRegistration.ConfigureServices(builder.Services);
 AuthenticationConfig.ConfigureAuthentication(builder.Services, builder.Configuration);
 DatabaseConfig.ConfigureDatabase(builder.Services, builder.Configuration);
@@ -19,10 +31,10 @@ SwaggerConfig.ConfigureSwagger(builder.Services);
 
 var app = builder.Build();
 
-// ✅ Aplicar CORS antes dos middlewares
+// ✅ 3. **APLICAR O CORS ANTES DOS OUTROS MIDDLEWARES**
 app.UseCors("AllowAll");
 
-// ✅ Configuração do Swagger para ambiente de desenvolvimento
+// ✅ 4. Configuração do Swagger para ambiente de desenvolvimento
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -32,6 +44,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// ✅ 5. Ordem correta dos middlewares
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

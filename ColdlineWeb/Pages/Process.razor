@@ -1,0 +1,233 @@
+@page "/processes"
+@inject HttpClient Http
+
+<h3>Gerenciamento de Processos</h3>
+
+@if (isLoading)
+{
+    <p>Carregando...</p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <button class="btn btn-primary mb-3" @onclick="OpenAddProcessModal">Adicionar Processo</button>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Número de Identificação</th>
+                <th>Tempo do Processo</th>
+                <th>Data de Início</th>
+                <th>Data de Término</th>
+                <th>Usuário</th>
+                <th>Departamento</th>
+                <th>Tipo de Processo</th>
+                <th>Máquina</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var process in processes)
+            {
+                <tr>
+                    <td>@process.IdentificationNumber</td>
+                    <td>@process.ProcessTime</td>
+                    <td>@process.StartDate</td>
+                    <td>@process.EndDate</td>
+                    <td>@process.User.Name</td>
+                    <td>@process.Department.Name</td>
+                    <td>@process.ProcessType.Name</td>
+                    <td>@process.Machine.Name</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => OpenEditProcessModal(process)">Editar</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteProcess(process.Id)">Excluir</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (showModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(isEditing ? "Editar Processo" : "Adicionar Processo")</h5>
+                    <button class="close" @onclick="CloseModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <label>Número de Identificação:</label>
+                    <input class="form-control" bind="@currentProcess.IdentificationNumber" />
+
+                    <label>Tempo do Processo:</label>
+                    <input class="form-control" bind="@currentProcess.ProcessTime" />
+
+                    <label>Data de Início:</label>
+                    <input type="date" class="form-control" bind="@currentProcess.StartDate" />
+
+                    <label>Data de Término:</label>
+                    <input type="date" class="form-control" bind="@currentProcess.EndDate" />
+
+                    <label>Usuário:</label>
+                    <select class="form-control" bind="@currentProcess.User.Id">
+                        @foreach (var user in users)
+                        {
+                            <option value="@user.Id">@user.Name</option>
+                        }
+                    </select>
+
+                    <label>Departamento:</label>
+                    <select class="form-control" bind="@currentProcess.Department.Id">
+                        @foreach (var department in departments)
+                        {
+                            <option value="@department.Id">@department.Name</option>
+                        }
+                    </select>
+
+                    <label>Tipo de Processo:</label>
+                    <select class="form-control" bind="@currentProcess.ProcessType.Id">
+                        @foreach (var processType in processTypes)
+                        {
+                            <option value="@processType.Id">@processType.Name</option>
+                        }
+                    </select>
+
+                    <label>Máquina:</label>
+                    <select class="form-control" bind="@currentProcess.Machine.Id">
+                        @foreach (var machine in machines)
+                        {
+                            <option value="@machine.Id">@machine.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
+                    <button class="btn btn-success" @onclick="SaveProcess">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<ProcessModel> processes = new();
+    private List<ReferenceEntity> users = new();
+    private List<ReferenceEntity> departments = new();
+    private List<ReferenceEntity> processTypes = new();
+    private List<ReferenceEntity> machines = new();
+    private ProcessModel currentProcess = new();
+    private bool isLoading = true;
+    private bool showModal = false;
+    private bool isEditing = false;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            processes = await Http.GetFromJsonAsync<List<ProcessModel>>("api/Process") ?? new List<ProcessModel>();
+            users = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/User") ?? new List<ReferenceEntity>();
+            departments = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Department") ?? new List<ReferenceEntity>();
+            processTypes = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/ProcessType") ?? new List<ReferenceEntity>();
+            machines = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Machine") ?? new List<ReferenceEntity>();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao carregar dados.";
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OpenAddProcessModal()
+    {
+        currentProcess = new ProcessModel();
+        showModal = true;
+        isEditing = false;
+    }
+
+    private void OpenEditProcessModal(ProcessModel process)
+    {
+        currentProcess = new ProcessModel
+        {
+            Id = process.Id,
+            IdentificationNumber = process.IdentificationNumber,
+            ProcessTime = process.ProcessTime,
+            StartDate = process.StartDate,
+            EndDate = process.EndDate,
+            User = new ReferenceEntity { Id = process.User.Id, Name = process.User.Name },
+            Department = new ReferenceEntity { Id = process.Department.Id, Name = process.Department.Name },
+            ProcessType = new ReferenceEntity { Id = process.ProcessType.Id, Name = process.ProcessType.Name },
+            Machine = new ReferenceEntity { Id = process.Machine.Id, Name = process.Machine.Name }
+        };
+        showModal = true;
+        isEditing = true;
+    }
+
+    private async Task SaveProcess()
+    {
+        var selectedUser = users.FirstOrDefault(u => u.Id == currentProcess.User.Id);
+        var selectedDepartment = departments.FirstOrDefault(d => d.Id == currentProcess.Department.Id);
+        var selectedProcessType = processTypes.FirstOrDefault(pt => pt.Id == currentProcess.ProcessType.Id);
+        var selectedMachine = machines.FirstOrDefault(m => m.Id == currentProcess.Machine.Id);
+
+        if (selectedUser != null) currentProcess.User.Name = selectedUser.Name;
+        if (selectedDepartment != null) currentProcess.Department.Name = selectedDepartment.Name;
+        if (selectedProcessType != null) currentProcess.ProcessType.Name = selectedProcessType.Name;
+        if (selectedMachine != null) currentProcess.Machine.Name = selectedMachine.Name;
+
+        if (isEditing)
+        {
+            await Http.PutAsJsonAsync($"api/Process/{currentProcess.Id}", currentProcess);
+        }
+        else
+        {
+            await Http.PostAsJsonAsync("api/Process", currentProcess);
+        }
+        showModal = false;
+        await LoadData();
+    }
+
+    private async Task DeleteProcess(string id)
+    {
+        await Http.DeleteAsync($"api/Process/{id}");
+        await LoadData();
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
+    }
+
+    private class ProcessModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string IdentificationNumber { get; set; } = string.Empty;
+        public string ProcessTime { get; set; } = string.Empty;
+        public string StartDate { get; set; } = string.Empty;
+        public string EndDate { get; set; } = string.Empty;
+        public ReferenceEntity User { get; set; } = new ReferenceEntity();
+        public ReferenceEntity Department { get; set; } = new ReferenceEntity();
+        public ReferenceEntity ProcessType { get; set; } = new ReferenceEntity();
+        public ReferenceEntity Machine { get; set; } = new ReferenceEntity();
+    }
+
+    private class ReferenceEntity
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
+}

@@ -14,22 +14,34 @@ namespace ColdlineAPI.Domain.Entities
         public string IdentificationNumber { get; set; } = string.Empty;
 
         [BsonElement("process time")]
-        public string ProcessTime { get; set; } = string.Empty;
+        public string ProcessTime { get; set; } = "00:00:00"; // Agora armazenado como string
+
         [BsonElement("start date")]
-        public string StartDate { get; set; } = string.Empty;
+        [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+        public DateTime StartDate { get; set; } = DateTime.UtcNow;
+
         [BsonElement("end date")]
-        public string EndDate { get; set; } = string.Empty;
+        [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+        public DateTime EndDate { get; set; } = DateTime.UtcNow;
+
         [BsonElement("user")]
-        public ReferenceEntity User { get; set; } = new ReferenceEntity();
+        public ReferenceEntity? User { get; set; } = new ReferenceEntity();
+
         [BsonElement("departament")]
-        public ReferenceEntity Departament { get; set; } = new ReferenceEntity();
+        public ReferenceEntity? Department { get; set; } = new ReferenceEntity();
+
         [BsonElement("process type")]
-        public ReferenceEntity ProcessType { get; set; } = new ReferenceEntity();
+        public ReferenceEntity? ProcessType { get; set; } = new ReferenceEntity();
+
         [BsonElement("pause types")]
-        public ReferenceEntity PauseTypes { get; set; } = new ReferenceEntity();
+        public ReferenceEntity? PauseTypes { get; set; } = new ReferenceEntity();
+
         [BsonElement("occurrences")]
-        public List<ReferenceEntity> Occurrences { get; set; } = new List<ReferenceEntity>();
+        public List<ReferenceEntity>? Occurrences { get; set; } = new List<ReferenceEntity>();
+
         [BsonElement("machine")]
-        public ReferenceEntity Machine { get; set; } = new ReferenceEntity();
+        public ReferenceEntity? Machine { get; set; } = new ReferenceEntity();
+        [BsonElement("InOccurrence")]
+        public bool InOccurrence { get; set; }
     }
 }

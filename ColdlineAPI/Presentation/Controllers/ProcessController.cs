@@ -1,5 +1,5 @@
-using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Application.Interfaces;
+using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -21,7 +21,7 @@ namespace ColdlineAPI.Presentation.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Process>>> GetAllProcesses()
         {
-            return Ok(await _processService.GetAllProcesssAsync());
+            return Ok(await _processService.GetAllProcessesAsync());
         }
 
         [HttpGet("{id}")]
@@ -41,6 +41,11 @@ namespace ColdlineAPI.Presentation.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProcess(string id, [FromBody] Process process)
         {
+            if (process == null || string.IsNullOrEmpty(id))
+            {
+                return BadRequest(new { Message = "Os dados do processo são inválidos." });
+            }
+
             var updated = await _processService.UpdateProcessAsync(id, process);
             return updated ? NoContent() : NotFound();
         }
@@ -58,5 +63,6 @@ namespace ColdlineAPI.Presentation.Controllers
             var processes = await _processService.SearchProcessAsync(filter);
             return Ok(processes);
         }
+
     }
 }

@@ -5,6 +5,7 @@ using ColdlineAPI.Domain.Common;
 using ColdlineAPI.Infrastructure.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using MongoDB.Bson;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -40,7 +41,25 @@ namespace ColdlineAPI.Application.Services
 
         public async Task<bool> UpdateMachineAsync(string id, Machine machine)
         {
-            var result = await _machines.ReplaceOneAsync(m => m.Id == id, machine);
+            if (!ObjectId.TryParse(id, out ObjectId objectId))
+            {
+                return false; // Retorna falso se o ID não for válido
+            }
+
+            var existingMachine = await _machines.Find(m => m.Id == objectId.ToString()).FirstOrDefaultAsync();
+            if (existingMachine == null) return false;
+
+            var updateDefinition = Builders<Machine>.Update
+                .Set(m => m.Name, machine.Name ?? existingMachine.Name)
+                .Set(m => m.CustomerName, machine.CustomerName ?? existingMachine.CustomerName)
+                .Set(m => m.IdentificationNumber, machine.IdentificationNumber ?? existingMachine.IdentificationNumber)
+                .Set(m => m.Phase, machine.Phase ?? existingMachine.Phase)
+                .Set(m => m.Voltage, machine.Voltage ?? existingMachine.Voltage)
+                .Set(m => m.Process, machine.Process ?? existingMachine.Process)
+                .Set(m => m.Quality, machine.Quality ?? existingMachine.Quality)
+                .Set(m => m.Monitoring, machine.Monitoring ?? existingMachine.Monitoring);
+
+            var result = await _machines.UpdateOneAsync(m => m.Id == id, updateDefinition);
             return result.IsAcknowledged && result.ModifiedCount > 0;
         }
 
@@ -50,14 +69,7 @@ namespace ColdlineAPI.Application.Services
             return result.IsAcknowledged && result.DeletedCount > 0;
         }
 
-        public async Task<bool> UpdateProcessStatusAsync(string machineId, string processId)
-        {
-            var filter = Builders<Machine>.Filter.Eq(m => m.Id, machineId);
-            var update = Builders<Machine>.Update.Set(m => m.Process, new ReferenceEntity { Id = processId });
 
-            var result = await _machines.UpdateOneAsync(filter, update);
-            return result.IsAcknowledged && result.ModifiedCount > 0;
-        }
 
         public async Task<List<Machine>> SearchMachinesAsync(MachineFilter filter)
         {

@@ -22,10 +22,10 @@ namespace ColdlineAPI.Domain.Entities
         [BsonElement("voltage")]
         public string Voltage { get; set; } = string.Empty;
         [BsonElement("process")]
-        public ReferenceEntity Process { get; set; } = new ReferenceEntity();
+        public ReferenceEntity? Process { get; set; } = new ReferenceEntity();
         [BsonElement("quality")]
-        public ReferenceEntity Quality { get; set; } = new ReferenceEntity();
+        public ReferenceEntity? Quality { get; set; } = new ReferenceEntity();
         [BsonElement("monitoring")]
-        public ReferenceEntity Monitoring { get; set; } = new ReferenceEntity();
+        public ReferenceEntity? Monitoring { get; set; } = new ReferenceEntity();
     }
 }

@@ -52,12 +52,6 @@ namespace ColdlineAPI.Presentation.Controllers
             return deleted ? NoContent() : NotFound();
         }
 
-        [HttpPatch("{id}/process/{processId}")]
-        public async Task<IActionResult> UpdateProcessStatus(string id, string processId)
-        {
-            var updated = await _machineService.UpdateProcessStatusAsync(id, processId);
-            return updated ? NoContent() : NotFound();
-        }
 
         [HttpPost("search")]
         public async Task<ActionResult<IEnumerable<Machine>>> SearchMachines([FromBody] MachineFilter filter)

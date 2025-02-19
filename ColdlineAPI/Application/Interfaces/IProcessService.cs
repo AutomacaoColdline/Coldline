@@ -7,10 +7,10 @@ namespace ColdlineAPI.Application.Interfaces
 {
     public interface IProcessService
     {
-        Task<List<Process>> GetAllProcesssAsync();
+        Task<List<Process>> GetAllProcessesAsync();
         Task<Process?> GetProcessByIdAsync(string id);
-        Task<Process> CreateProcessAsync(Process Process);
-        Task<bool> UpdateProcessAsync(string id, Process Process);
+        Task<Process> CreateProcessAsync(Process process);
+        Task<bool> UpdateProcessAsync(string id, Process process);
         Task<bool> DeleteProcessAsync(string id);
         Task<List<Process>> SearchProcessAsync(ProcessFilter filter);
     }

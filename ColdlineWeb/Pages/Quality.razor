@@ -22,7 +22,7 @@ else
                 <th>Custo da Hora de Trabalho</th>
                 <th>Departamento</th>
                 <th>Máquina</th>
-                <th>Ocorrências</th>
+                <th>Ocorrências (ID)</th>
                 <th>Ações</th>
             </tr>
         </thead>
@@ -32,15 +32,15 @@ else
                 <tr>
                     <td>@quality.TotalPartValue</td>
                     <td>@quality.WorkHourCost</td>
-                    <td>@quality.Department.Name</td>
-                    <td>@quality.Machine.Name</td>
+                    <td>@(GetEntityName(departments, quality.Departament?.Id))</td>
+                    <td>@(GetEntityName(machines, quality.Machine?.Id))</td>
                     <td>
                         @if (quality.Occurrences.Any())
                         {
                             <ul>
                                 @foreach (var occurrence in quality.Occurrences)
                                 {
-                                    <li>@occurrence.Name</li>
+                                    <li>@occurrence.Id</li>
                                 }
                             </ul>
                         }
@@ -70,13 +70,13 @@ else
                 </div>
                 <div class="modal-body">
                     <label>Valor Total da Peça:</label>
-                    <input class="form-control" bind="@currentQuality.TotalPartValue" />
+                    <input class="form-control" @bind="currentQuality.TotalPartValue" />
 
                     <label>Custo da Hora de Trabalho:</label>
-                    <input class="form-control" bind="@currentQuality.WorkHourCost" />
+                    <input class="form-control" @bind="currentQuality.WorkHourCost" />
 
                     <label>Departamento:</label>
-                    <select class="form-control" bind="@currentQuality.Department.Id">
+                    <select class="form-control" @bind="currentQuality.Departament.Id">
                         @foreach (var department in departments)
                         {
                             <option value="@department.Id">@department.Name</option>
@@ -84,7 +84,7 @@ else
                     </select>
 
                     <label>Máquina:</label>
-                    <select class="form-control" bind="@currentQuality.Machine.Id">
+                    <select class="form-control" @bind="currentQuality.Machine.Id">
                         @foreach (var machine in machines)
                         {
                             <option value="@machine.Id">@machine.Name</option>
@@ -92,10 +92,12 @@ else
                     </select>
 
                     <label>Ocorrências:</label>
-                    <select multiple class="form-control" @bind="selectedOccurrences">
+                    <select multiple class="form-control" @onchange="HandleOccurrenceSelection">
                         @foreach (var occurrence in occurrences)
                         {
-                            <option value="@occurrence.Id">@occurrence.Name</option>
+                            <option value="@occurrence.Id" selected="@selectedOccurrences.Contains(occurrence.Id)">
+                                @occurrence.Id
+                            </option>
                         }
                     </select>
                 </div>
@@ -114,7 +116,7 @@ else
     private List<ReferenceEntity> machines = new();
     private List<ReferenceEntity> occurrences = new();
     private QualityModel currentQuality = new();
-    private List<string> selectedOccurrences = new();
+    private HashSet<string> selectedOccurrences = new();
     private bool isLoading = true;
     private bool showModal = false;
     private bool isEditing = false;
@@ -160,26 +162,38 @@ else
             Id = quality.Id,
             TotalPartValue = quality.TotalPartValue,
             WorkHourCost = quality.WorkHourCost,
-            Department = new ReferenceEntity { Id = quality.Department.Id, Name = quality.Department.Name },
-            Machine = new ReferenceEntity { Id = quality.Machine.Id, Name = quality.Machine.Name },
-            Occurrences = quality.Occurrences.Select(o => new ReferenceEntity { Id = o.Id, Name = o.Name }).ToList()
+            Departament = departments.FirstOrDefault(d => d.Id == quality.Departament.Id) ?? new ReferenceEntity(),
+            Machine = machines.FirstOrDefault(m => m.Id == quality.Machine.Id) ?? new ReferenceEntity(),
+            Occurrences = quality.Occurrences.Select(o => new ReferenceEntity { Id = o.Id, Name = o.Id }).ToList()
         };
-        selectedOccurrences = quality.Occurrences.Select(o => o.Id).ToList();
+        selectedOccurrences = new HashSet<string>(quality.Occurrences.Select(o => o.Id));
         showModal = true;
         isEditing = true;
     }
 
+    private void HandleOccurrenceSelection(ChangeEventArgs e)
+    {
+        var selectedValues = e.Value as string[];
+        if (selectedValues != null)
+        {
+            selectedOccurrences = new HashSet<string>(selectedValues);
+        }
+    }
+
     private async Task SaveQuality()
     {
-        var selectedDepartment = departments.FirstOrDefault(d => d.Id == currentQuality.Department.Id);
+        var selectedDepartment = departments.FirstOrDefault(d => d.Id == currentQuality.Departament.Id);
         var selectedMachine = machines.FirstOrDefault(m => m.Id == currentQuality.Machine.Id);
 
-        if (selectedDepartment != null) currentQuality.Department.Name = selectedDepartment.Name;
-        if (selectedMachine != null) currentQuality.Machine.Name = selectedMachine.Name;
+        if (selectedDepartment != null)
+            currentQuality.Departament = new ReferenceEntity { Id = selectedDepartment.Id, Name = selectedDepartment.Name };
+        if (selectedMachine != null)
+            currentQuality.Machine = new ReferenceEntity { Id = selectedMachine.Id, Name = selectedMachine.Name };
 
-        currentQuality.Occurrences = occurrences.Where(o => selectedOccurrences.Contains(o.Id))
-                                               .Select(o => new ReferenceEntity { Id = o.Id, Name = o.Name })
-                                               .ToList();
+        currentQuality.Occurrences = occurrences
+            .Where(o => selectedOccurrences.Contains(o.Id))
+            .Select(o => new ReferenceEntity { Id = o.Id, Name = o.Id })
+            .ToList();
 
         if (isEditing)
         {
@@ -204,14 +218,24 @@ else
         showModal = false;
     }
 
+    private string GetEntityName(List<ReferenceEntity> list, string? id)
+    {
+        return list.FirstOrDefault(e => e.Id == id)?.Name ?? "Não informado";
+    }
+
     private class QualityModel
     {
         public string Id { get; set; } = string.Empty;
         public string TotalPartValue { get; set; } = string.Empty;
         public string WorkHourCost { get; set; } = string.Empty;
-        public ReferenceEntity Department { get; set; } = new ReferenceEntity();
-        public ReferenceEntity Machine { get; set; } = new ReferenceEntity();
+        public ReferenceEntity Departament { get; set; } = new();
+        public ReferenceEntity Machine { get; set; } = new();
         public List<ReferenceEntity> Occurrences { get; set; } = new();
+    }
+    private class OccurrenceModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public ReferenceEntity PauseType { get; set; } = new();
     }
 
     private class ReferenceEntity

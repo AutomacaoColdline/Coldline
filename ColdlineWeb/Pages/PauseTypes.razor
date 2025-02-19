@@ -20,9 +20,8 @@ else
             <tr>
                 <th>Nome</th>
                 <th>Descrição</th>
-                <th>Data Início</th>
-                <th>Data Fim</th>
                 <th>Defeito</th>
+                <th>Retrabalho</th>
                 <th>Ações</th>
             </tr>
         </thead>
@@ -32,9 +31,8 @@ else
                 <tr>
                     <td>@pauseType.Name</td>
                     <td>@pauseType.Description</td>
-                    <td>@ConvertUnixToDate(pauseType.StartDate)</td>
-                    <td>@ConvertUnixToDate(pauseType.EndDate)</td>
                     <td>@pauseType.Defect.Name</td>
+                    <td>@(pauseType.Rework == true ? "Sim" : "Não")</td>
                     <td>
                         <button class="btn btn-warning btn-sm" @onclick="() => OpenEditPauseTypeModal(pauseType)">Editar</button>
                         <button class="btn btn-danger btn-sm" @onclick="() => DeletePauseType(pauseType.Id)">Excluir</button>
@@ -56,24 +54,22 @@ else
                 </div>
                 <div class="modal-body">
                     <label>Nome:</label>
-                    <input class="form-control" bind="@currentPauseType.Name" />
+                    <input class="form-control" @bind="currentPauseType.Name" />
 
                     <label>Descrição:</label>
-                    <input class="form-control" bind="@currentPauseType.Description" />
-
-                    <label>Data Início:</label>
-                    <input type="datetime-local" class="form-control" bind="@startDate" />
-
-                    <label>Data Fim:</label>
-                    <input type="datetime-local" class="form-control" bind="@endDate" />
+                    <input class="form-control" @bind="currentPauseType.Description" />
 
                     <label>Defeito:</label>
-                    <select class="form-control" bind="@currentPauseType.Defect.Id">
+                    <select class="form-control" @bind="currentPauseType.Defect.Id">
                         @foreach (var defect in defects)
                         {
                             <option value="@defect.Id">@defect.Name</option>
                         }
                     </select>
+
+                    <label>Retrabalho:</label>
+                    <input type="checkbox" class="form-check-input" @bind="currentPauseType.Rework" />
+                    <span class="ms-2">Marcar se requer retrabalho</span>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
@@ -92,8 +88,6 @@ else
     private bool showModal = false;
     private bool isEditing = false;
     private string? errorMessage;
-    private DateTime startDate = DateTime.Now;
-    private DateTime endDate = DateTime.Now;
 
     protected override async Task OnInitializedAsync()
     {
@@ -121,8 +115,6 @@ else
     private void OpenAddPauseTypeModal()
     {
         currentPauseType = new PauseTypeModel();
-        startDate = DateTime.Now;
-        endDate = DateTime.Now;
         showModal = true;
         isEditing = false;
     }
@@ -134,21 +126,15 @@ else
             Id = pauseType.Id,
             Name = pauseType.Name,
             Description = pauseType.Description,
-            StartDate = pauseType.StartDate,
-            EndDate = pauseType.EndDate,
-            Defect = new ReferenceEntity { Id = pauseType.Defect.Id, Name = pauseType.Defect.Name }
+            Defect = new ReferenceEntity { Id = pauseType.Defect.Id, Name = pauseType.Defect.Name },
+            Rework = pauseType.Rework
         };
-        startDate = ConvertUnixToDateTime(pauseType.StartDate);
-        endDate = ConvertUnixToDateTime(pauseType.EndDate);
         showModal = true;
         isEditing = true;
     }
 
     private async Task SavePauseType()
     {
-        currentPauseType.StartDate = ConvertDateTimeToUnix(startDate).ToString();
-        currentPauseType.EndDate = ConvertDateTimeToUnix(endDate).ToString();
-
         var selectedDefect = defects.FirstOrDefault(d => d.Id == currentPauseType.Defect.Id);
         if (selectedDefect != null)
         {
@@ -178,37 +164,13 @@ else
         showModal = false;
     }
 
-    private static string ConvertDateTimeToUnix(DateTime dateTime)
-    {
-        return new DateTimeOffset(dateTime).ToUnixTimeSeconds().ToString();
-    }
-
-    private static DateTime ConvertUnixToDateTime(string unixTime)
-    {
-        if (long.TryParse(unixTime, out long unixSeconds))
-        {
-            return DateTimeOffset.FromUnixTimeSeconds(unixSeconds).DateTime;
-        }
-        return DateTime.Now;
-    }
-
-    private static string ConvertUnixToDate(string unixTime)
-    {
-        if (long.TryParse(unixTime, out long unixSeconds))
-        {
-            return DateTimeOffset.FromUnixTimeSeconds(unixSeconds).ToString("dd/MM/yyyy HH:mm");
-        }
-        return "Data Inválida";
-    }
-
     private class PauseTypeModel
     {
         public string Id { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public string StartDate { get; set; } = string.Empty;
-        public string EndDate { get; set; } = string.Empty;
         public ReferenceEntity Defect { get; set; } = new ReferenceEntity();
+        public bool? Rework { get; set; }
     }
 
     private class ReferenceEntity

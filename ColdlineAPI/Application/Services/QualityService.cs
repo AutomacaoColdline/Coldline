@@ -5,6 +5,7 @@ using ColdlineAPI.Domain.Common;
 using ColdlineAPI.Infrastructure.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using MongoDB.Bson;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,16 +31,31 @@ namespace ColdlineAPI.Application.Services
 
         public async Task<Quality> CreateQualityAsync(Quality quality)
         {
+            if (string.IsNullOrEmpty(quality.Id))
+            {
+                quality.Id = ObjectId.GenerateNewId().ToString();
+            }
             await _qualities.InsertOneAsync(quality);
             return quality;
         }
 
         public async Task<bool> UpdateQualityAsync(string id, Quality quality)
         {
-            var result = await _qualities.ReplaceOneAsync(q => q.Id == id, quality);
+            var objectId = ObjectId.Parse(id);
+            var existingQuality = await _qualities.Find(q => q.Id == objectId.ToString()).FirstOrDefaultAsync();
+
+            if (existingQuality == null) return false;
+
+            var updateDefinition = Builders<Quality>.Update
+                .Set(q => q.TotalPartValue, quality.TotalPartValue ?? existingQuality.TotalPartValue)
+                .Set(q => q.WorkHourCost, quality.WorkHourCost ?? existingQuality.WorkHourCost)
+                .Set(q => q.Machine, quality.Machine ?? existingQuality.Machine)
+                .Set(q => q.Departament, quality.Departament ?? existingQuality.Departament)
+                .Set(q => q.Occurrences, quality.Occurrences ?? existingQuality.Occurrences);
+
+            var result = await _qualities.UpdateOneAsync(q => q.Id == id, updateDefinition);
             return result.IsAcknowledged && result.ModifiedCount > 0;
         }
-
         public async Task<bool> DeleteQualityAsync(string id)
         {
             var result = await _qualities.DeleteOneAsync(q => q.Id == id);
@@ -70,6 +86,5 @@ namespace ColdlineAPI.Application.Services
 
             return await _qualities.Find(finalFilter).ToListAsync();
         }
-
     }
 }

@@ -74,14 +74,14 @@ else
                 </div>
                 <div class="modal-body">
                     <label>Gateway:</label>
-                    <input class="form-control" bind="@currentMonitoring.Gateway" />
+                    <input class="form-control" @bind="currentMonitoring.Gateway" />
 
                     <label>IHM:</label>
-                    <input class="form-control" bind="@currentMonitoring.IHM" />
+                    <input class="form-control" @bind="currentMonitoring.IHM" />
 
                     <label>CLP (Adicionar Múltiplos):</label>
                     <div class="input-group mb-2">
-                        <input class="form-control" bind="@newCLP" placeholder="Digite um CLP e pressione Adicionar" />
+                        <input class="form-control" @bind="newCLP" placeholder="Digite um CLP e pressione Adicionar" />
                         <button class="btn btn-success" @onclick="AddCLP">Adicionar</button>
                     </div>
                     <ul>
@@ -94,16 +94,16 @@ else
                     </ul>
 
                     <label>ID RustDesk:</label>
-                    <input class="form-control" bind="@currentMonitoring.IdRustdesk" />
+                    <input class="form-control" @bind="currentMonitoring.IdRustdesk" />
 
                     <label>ID AnyDesk:</label>
-                    <input class="form-control" bind="@currentMonitoring.IdAnydesk" />
+                    <input class="form-control" @bind="currentMonitoring.IdAnydesk" />
 
                     <label>ID TeamViewer:</label>
-                    <input class="form-control" bind="@currentMonitoring.IdTeamViewer" />
+                    <input class="form-control" @bind="currentMonitoring.IdTeamViewer" />
 
                     <label>Tipo de Monitoramento:</label>
-                    <select class="form-control" bind="@currentMonitoring.MonitoringType.Id">
+                    <select class="form-control" @bind="currentMonitoring.MonitoringType.Id">
                         @foreach (var monitoringType in monitoringTypes)
                         {
                             <option value="@monitoringType.Id">@monitoringType.Name</option>
@@ -184,6 +184,10 @@ else
             currentMonitoring.MonitoringType.Name = selectedMonitoringType.Name;
         }
 
+        // Debug para verificar o JSON antes de enviar
+        var json = System.Text.Json.JsonSerializer.Serialize(currentMonitoring);
+        Console.WriteLine($"JSON Enviado: {json}");
+
         if (isEditing)
         {
             await Http.PutAsJsonAsync($"api/Monitoring/{currentMonitoring.Id}", currentMonitoring);
@@ -192,6 +196,7 @@ else
         {
             await Http.PostAsJsonAsync("api/Monitoring", currentMonitoring);
         }
+
         showModal = false;
         await LoadData();
     }
@@ -209,16 +214,16 @@ else
 
     private void AddCLP()
     {
-        if (!string.IsNullOrEmpty(newCLP) && !currentMonitoring.CLP.Contains(newCLP))
+        if (!string.IsNullOrWhiteSpace(newCLP) && !currentMonitoring.CLP.Contains(newCLP))
         {
-            currentMonitoring.CLP.Add(newCLP);
+            currentMonitoring.CLP = new List<string>(currentMonitoring.CLP) { newCLP }; // Atualiza corretamente o estado do Blazor
             newCLP = string.Empty;
         }
     }
 
     private void RemoveCLP(string clp)
     {
-        currentMonitoring.CLP.Remove(clp);
+        currentMonitoring.CLP = currentMonitoring.CLP.Where(c => c != clp).ToList();
     }
 
     private class MonitoringModel

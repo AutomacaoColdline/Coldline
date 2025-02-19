@@ -26,6 +26,8 @@ else
                 <th>Departamento</th>
                 <th>Tipo de Processo</th>
                 <th>Máquina</th>
+                <th>Ocorrências</th>
+                <th>Em Ocorrência</th>
                 <th>Ações</th>
             </tr>
         </thead>
@@ -35,12 +37,23 @@ else
                 <tr>
                     <td>@process.IdentificationNumber</td>
                     <td>@process.ProcessTime</td>
-                    <td>@process.StartDate</td>
-                    <td>@process.EndDate</td>
-                    <td>@process.User.Name</td>
-                    <td>@process.Department.Name</td>
-                    <td>@process.ProcessType.Name</td>
-                    <td>@process.Machine.Name</td>
+                    <td>@process.StartDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    <td>@process.EndDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    <td>@(process.User?.Name ?? "Não informado")</td>
+                    <td>@(process.Department?.Name ?? "Não informado")</td>
+                    <td>@(process.ProcessType?.Name ?? "Não informado")</td>
+                    <td>@(process.Machine?.Name ?? "Não informado")</td>
+                    <td>
+                        @if (process.Occurrences != null && process.Occurrences.Any())
+                        {
+                            @string.Join(", ", process.Occurrences.Select(o => o.Name))
+                        }
+                        else
+                        {
+                            <span>Sem ocorrências</span>
+                        }
+                    </td>
+                    <td>@(process.InOccurrence ? "Sim" : "Não")</td>
                     <td>
                         <button class="btn btn-warning btn-sm" @onclick="() => OpenEditProcessModal(process)">Editar</button>
                         <button class="btn btn-danger btn-sm" @onclick="() => DeleteProcess(process.Id)">Excluir</button>
@@ -62,19 +75,19 @@ else
                 </div>
                 <div class="modal-body">
                     <label>Número de Identificação:</label>
-                    <input class="form-control" bind="@currentProcess.IdentificationNumber" />
+                    <input class="form-control" @bind="currentProcess.IdentificationNumber" />
 
                     <label>Tempo do Processo:</label>
-                    <input class="form-control" bind="@currentProcess.ProcessTime" />
+                    <input class="form-control" @bind="currentProcess.ProcessTime" />
 
                     <label>Data de Início:</label>
-                    <input type="date" class="form-control" bind="@currentProcess.StartDate" />
+                    <input type="datetime-local" class="form-control" @bind="currentProcess.StartDate" />
 
                     <label>Data de Término:</label>
-                    <input type="date" class="form-control" bind="@currentProcess.EndDate" />
+                    <input type="datetime-local" class="form-control" @bind="currentProcess.EndDate" />
 
                     <label>Usuário:</label>
-                    <select class="form-control" bind="@currentProcess.User.Id">
+                    <select class="form-control" @bind="currentProcess.User.Id">
                         @foreach (var user in users)
                         {
                             <option value="@user.Id">@user.Name</option>
@@ -82,7 +95,7 @@ else
                     </select>
 
                     <label>Departamento:</label>
-                    <select class="form-control" bind="@currentProcess.Department.Id">
+                    <select class="form-control" @bind="currentProcess.Department.Id">
                         @foreach (var department in departments)
                         {
                             <option value="@department.Id">@department.Name</option>
@@ -90,7 +103,7 @@ else
                     </select>
 
                     <label>Tipo de Processo:</label>
-                    <select class="form-control" bind="@currentProcess.ProcessType.Id">
+                    <select class="form-control" @bind="currentProcess.ProcessType.Id">
                         @foreach (var processType in processTypes)
                         {
                             <option value="@processType.Id">@processType.Name</option>
@@ -98,12 +111,25 @@ else
                     </select>
 
                     <label>Máquina:</label>
-                    <select class="form-control" bind="@currentProcess.Machine.Id">
+                    <select class="form-control" @bind="currentProcess.Machine.Id">
                         @foreach (var machine in machines)
                         {
                             <option value="@machine.Id">@machine.Name</option>
                         }
                     </select>
+
+                    <label>Ocorrências:</label>
+                    <select multiple class="form-control" @onchange="HandleOccurrenceSelection">
+                        @foreach (var occurrence in occurrences)
+                        {
+                            <option value="@occurrence.Id" selected="@selectedOccurrences.Contains(occurrence.Id)">
+                                @occurrence.CodeOccurrence
+                            </option>
+                        }
+                    </select>
+
+                    <label>Em Ocorrência:</label>
+                    <input type="checkbox" @bind="currentProcess.InOccurrence" />
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
@@ -120,6 +146,8 @@ else
     private List<ReferenceEntity> departments = new();
     private List<ReferenceEntity> processTypes = new();
     private List<ReferenceEntity> machines = new();
+    private List<OccurrenceReferenceModel> occurrences = new();
+    private List<string> selectedOccurrences = new();
     private ProcessModel currentProcess = new();
     private bool isLoading = true;
     private bool showModal = false;
@@ -135,11 +163,12 @@ else
     {
         try
         {
-            processes = await Http.GetFromJsonAsync<List<ProcessModel>>("api/Process") ?? new List<ProcessModel>();
-            users = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/User") ?? new List<ReferenceEntity>();
-            departments = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Department") ?? new List<ReferenceEntity>();
-            processTypes = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/ProcessType") ?? new List<ReferenceEntity>();
-            machines = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Machine") ?? new List<ReferenceEntity>();
+            processes = await Http.GetFromJsonAsync<List<ProcessModel>>("api/Process") ?? new();
+            users = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/User") ?? new();
+            departments = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Department") ?? new();
+            processTypes = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/ProcessType") ?? new();
+            machines = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Machine") ?? new();
+            occurrences = await Http.GetFromJsonAsync<List<OccurrenceReferenceModel>>("api/Occurrence") ?? new();
         }
         catch (Exception ex)
         {
@@ -152,42 +181,33 @@ else
         }
     }
 
-    private void OpenAddProcessModal()
+    private void HandleOccurrenceSelection(ChangeEventArgs e)
     {
-        currentProcess = new ProcessModel();
-        showModal = true;
-        isEditing = false;
-    }
-
-    private void OpenEditProcessModal(ProcessModel process)
-    {
-        currentProcess = new ProcessModel
-        {
-            Id = process.Id,
-            IdentificationNumber = process.IdentificationNumber,
-            ProcessTime = process.ProcessTime,
-            StartDate = process.StartDate,
-            EndDate = process.EndDate,
-            User = new ReferenceEntity { Id = process.User.Id, Name = process.User.Name },
-            Department = new ReferenceEntity { Id = process.Department.Id, Name = process.Department.Name },
-            ProcessType = new ReferenceEntity { Id = process.ProcessType.Id, Name = process.ProcessType.Name },
-            Machine = new ReferenceEntity { Id = process.Machine.Id, Name = process.Machine.Name }
-        };
-        showModal = true;
-        isEditing = true;
+        selectedOccurrences = ((IEnumerable<string>)e.Value)?.ToList() ?? new();
     }
 
     private async Task SaveProcess()
     {
-        var selectedUser = users.FirstOrDefault(u => u.Id == currentProcess.User.Id);
-        var selectedDepartment = departments.FirstOrDefault(d => d.Id == currentProcess.Department.Id);
-        var selectedProcessType = processTypes.FirstOrDefault(pt => pt.Id == currentProcess.ProcessType.Id);
-        var selectedMachine = machines.FirstOrDefault(m => m.Id == currentProcess.Machine.Id);
+        if (string.IsNullOrWhiteSpace(currentProcess.IdentificationNumber))
+        {
+            errorMessage = "O número de identificação é obrigatório!";
+            return;
+        }
 
-        if (selectedUser != null) currentProcess.User.Name = selectedUser.Name;
-        if (selectedDepartment != null) currentProcess.Department.Name = selectedDepartment.Name;
-        if (selectedProcessType != null) currentProcess.ProcessType.Name = selectedProcessType.Name;
-        if (selectedMachine != null) currentProcess.Machine.Name = selectedMachine.Name;
+        // Preenche corretamente os nomes antes do envio
+        currentProcess.User.Name = users.FirstOrDefault(u => u.Id == currentProcess.User.Id)?.Name ?? "Desconhecido";
+        currentProcess.Department.Name = departments.FirstOrDefault(d => d.Id == currentProcess.Department.Id)?.Name ?? "Desconhecido";
+        currentProcess.ProcessType.Name = processTypes.FirstOrDefault(p => p.Id == currentProcess.ProcessType.Id)?.Name ?? "Desconhecido";
+        currentProcess.Machine.Name = machines.FirstOrDefault(m => m.Id == currentProcess.Machine.Id)?.Name ?? "Desconhecido";
+
+        // Ajusta as ocorrências para garantir que Name = CodeOccurrence antes do envio
+        currentProcess.Occurrences = occurrences
+            .Where(o => selectedOccurrences.Contains(o.Id))
+            .Select(o => new ReferenceEntity { Id = o.Id, Name = o.CodeOccurrence })
+            .ToList();
+
+        var json = System.Text.Json.JsonSerializer.Serialize(currentProcess);
+        Console.WriteLine($"JSON Enviado: {json}");
 
         if (isEditing)
         {
@@ -197,37 +217,66 @@ else
         {
             await Http.PostAsJsonAsync("api/Process", currentProcess);
         }
+
         showModal = false;
         await LoadData();
     }
 
     private async Task DeleteProcess(string id)
     {
-        await Http.DeleteAsync($"api/Process/{id}");
-        await LoadData();
+        try
+        {
+            await Http.DeleteAsync($"api/Process/{id}");
+            await LoadData(); // Recarrega a lista após a exclusão
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao excluir o processo.";
+            Console.WriteLine(ex);
+        }
+    }
+
+
+    private void OpenAddProcessModal()
+    {
+        currentProcess = new ProcessModel();
+        showModal = true;
+        isEditing = false;
+    }
+
+    private void OpenEditProcessModal(ProcessModel process)
+    {
+        currentProcess = process;
+        showModal = true;
+        isEditing = true;
     }
 
     private void CloseModal()
     {
         showModal = false;
     }
-
     private class ProcessModel
     {
         public string Id { get; set; } = string.Empty;
         public string IdentificationNumber { get; set; } = string.Empty;
-        public string ProcessTime { get; set; } = string.Empty;
-        public string StartDate { get; set; } = string.Empty;
-        public string EndDate { get; set; } = string.Empty;
-        public ReferenceEntity User { get; set; } = new ReferenceEntity();
-        public ReferenceEntity Department { get; set; } = new ReferenceEntity();
-        public ReferenceEntity ProcessType { get; set; } = new ReferenceEntity();
-        public ReferenceEntity Machine { get; set; } = new ReferenceEntity();
+        public string ProcessTime { get; set; } = "00:00:00";
+        public DateTime StartDate { get; set; } = DateTime.UtcNow;
+        public DateTime EndDate { get; set; } = DateTime.UtcNow;
+        public ReferenceEntity User { get; set; } = new();
+        public ReferenceEntity Department { get; set; } = new();
+        public ReferenceEntity ProcessType { get; set; } = new();
+        public ReferenceEntity Machine { get; set; } = new();
+        public List<ReferenceEntity> Occurrences { get; set; } = new();
+        public bool InOccurrence { get; set; }
     }
-
     private class ReferenceEntity
     {
         public string Id { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
+    }
+    private class OccurrenceReferenceModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string CodeOccurrence { get; set; } = string.Empty;
     }
 }

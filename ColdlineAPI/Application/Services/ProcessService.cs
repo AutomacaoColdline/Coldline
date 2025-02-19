@@ -1,11 +1,12 @@
-using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Application.Interfaces;
+using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Domain.Entities;
-using ColdlineAPI.Domain.Common;
 using ColdlineAPI.Infrastructure.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using MongoDB.Bson;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ColdlineAPI.Application.Services
@@ -21,17 +22,21 @@ namespace ColdlineAPI.Application.Services
             _processes = database.GetCollection<Process>("Processes");
         }
 
-        public async Task<List<Process>> GetAllProcesssAsync() =>
-            await _processes.Find(process => true).ToListAsync();
+        public async Task<List<Process>> GetAllProcessesAsync()
+        {
+            return await _processes.Find(process => true).ToListAsync();
+        }
 
-        public async Task<Process?> GetProcessByIdAsync(string id) =>
-            await _processes.Find(process => process.Id == id).FirstOrDefaultAsync();
+        public async Task<Process?> GetProcessByIdAsync(string id)
+        {
+            return await _processes.Find(process => process.Id == id).FirstOrDefaultAsync();
+        }
 
         public async Task<Process> CreateProcessAsync(Process process)
         {
             if (string.IsNullOrEmpty(process.Id))
             {
-                process.Id = MongoDB.Bson.ObjectId.GenerateNewId().ToString();
+                process.Id = ObjectId.GenerateNewId().ToString();
             }
 
             await _processes.InsertOneAsync(process);
@@ -40,7 +45,25 @@ namespace ColdlineAPI.Application.Services
 
         public async Task<bool> UpdateProcessAsync(string id, Process process)
         {
-            var result = await _processes.ReplaceOneAsync(p => p.Id == id, process);
+            var objectId = ObjectId.Parse(id);
+            var existingProcess = await _processes.Find(p => p.Id == objectId.ToString()).FirstOrDefaultAsync();
+
+            if (existingProcess == null) return false;
+
+            var updateDefinition = Builders<Process>.Update
+                .Set(p => p.IdentificationNumber, process.IdentificationNumber ?? existingProcess.IdentificationNumber)
+                .Set(p => p.ProcessTime, process.ProcessTime ?? existingProcess.ProcessTime) // Agora armazenado como string
+                .Set(p => p.StartDate, process.StartDate != default ? process.StartDate : existingProcess.StartDate)
+                .Set(p => p.EndDate, process.EndDate != default ? process.EndDate : existingProcess.EndDate)
+                .Set(p => p.User, process.User ?? existingProcess.User)
+                .Set(p => p.Department, process.Department ?? existingProcess.Department)
+                .Set(p => p.ProcessType, process.ProcessType ?? existingProcess.ProcessType)
+                .Set(p => p.PauseTypes, process.PauseTypes ?? existingProcess.PauseTypes)
+                .Set(p => p.Occurrences, process.Occurrences ?? existingProcess.Occurrences)
+                .Set(p => p.InOccurrence, process.InOccurrence)
+                .Set(p => p.Machine, process.Machine ?? existingProcess.Machine);
+
+            var result = await _processes.UpdateOneAsync(p => p.Id == id, updateDefinition);
             return result.IsAcknowledged && result.ModifiedCount > 0;
         }
 
@@ -61,34 +84,36 @@ namespace ColdlineAPI.Application.Services
             if (!string.IsNullOrEmpty(filter.ProcessTime))
                 filters.Add(builder.Eq(p => p.ProcessTime, filter.ProcessTime));
 
-            if (!string.IsNullOrEmpty(filter.StartDate))
-                filters.Add(builder.Eq(p => p.StartDate, filter.StartDate));
+            if (filter.StartDate.HasValue)
+                filters.Add(builder.Gte(p => p.StartDate, filter.StartDate.Value));
 
-            if (!string.IsNullOrEmpty(filter.EndDate))
-                filters.Add(builder.Eq(p => p.EndDate, filter.EndDate));
+            if (filter.EndDate.HasValue)
+                filters.Add(builder.Lte(p => p.EndDate, filter.EndDate.Value));
 
             if (!string.IsNullOrEmpty(filter.UserId))
-                filters.Add(builder.Eq(p => p.User.Id, filter.UserId));
+                filters.Add(builder.Eq(p => p.User!.Id, filter.UserId));
 
-            if (!string.IsNullOrEmpty(filter.DepartamentId))
-                filters.Add(builder.Eq(p => p.Departament.Id, filter.DepartamentId));
+            if (!string.IsNullOrEmpty(filter.DepartmentId))
+                filters.Add(builder.Eq(p => p.Department!.Id, filter.DepartmentId));
 
             if (!string.IsNullOrEmpty(filter.ProcessTypeId))
-                filters.Add(builder.Eq(p => p.ProcessType.Id, filter.ProcessTypeId));
+                filters.Add(builder.Eq(p => p.ProcessType!.Id, filter.ProcessTypeId));
 
             if (!string.IsNullOrEmpty(filter.PauseTypesId))
-                filters.Add(builder.Eq(p => p.PauseTypes.Id, filter.PauseTypesId));
+                filters.Add(builder.Eq(p => p.PauseTypes!.Id, filter.PauseTypesId));
 
             if (filter.OccurrencesIds != null && filter.OccurrencesIds.Count > 0)
-                filters.Add(builder.In("Occurrences.Id", filter.OccurrencesIds));
+            {
+                var occurrenceIds = filter.OccurrencesIds.ToList();
+                filters.Add(builder.In("Occurrences.Id", occurrenceIds));
+            }
 
             if (!string.IsNullOrEmpty(filter.MachineId))
-                filters.Add(builder.Eq(p => p.Machine.Id, filter.MachineId));
+                filters.Add(builder.Eq(p => p.Machine!.Id, filter.MachineId));
 
             var finalFilter = filters.Count > 0 ? builder.And(filters) : builder.Empty;
 
             return await _processes.Find(finalFilter).ToListAsync();
         }
-
     }
 }

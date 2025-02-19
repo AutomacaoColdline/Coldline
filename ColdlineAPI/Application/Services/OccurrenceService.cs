@@ -38,9 +38,22 @@ namespace ColdlineAPI.Application.Services
             return Occurrence;
         }
 
-        public async Task<bool> UpdateOccurrenceAsync(string id, Occurrence Occurrence)
+        
+        public async Task<bool> UpdateOccurrenceAsync(string id, Occurrence occurrence)
         {
-            var result = await _occurrences.ReplaceOneAsync(u => u.Id == id, Occurrence);
+            var filter = Builders<Occurrence>.Filter.Eq(o => o.Id, id);
+
+            var update = Builders<Occurrence>.Update
+                .Set(o => o.CodeOccurrence, occurrence.CodeOccurrence)
+                .Set(o => o.ProcessTime, occurrence.ProcessTime)
+                .Set(o => o.StartDate, occurrence.StartDate)
+                .Set(o => o.EndDate, occurrence.EndDate)
+                .Set(o => o.Process, occurrence.Process)
+                .Set(o => o.PauseType, occurrence.PauseType)
+                .Set(o => o.Defect, occurrence.Defect)
+                .Set(o => o.User, occurrence.User);
+
+            var result = await _occurrences.UpdateOneAsync(filter, update);
             return result.IsAcknowledged && result.ModifiedCount > 0;
         }
 

@@ -27,40 +27,52 @@ namespace ColdlineAPI.Application.Services
             _processTypes = database.GetCollection<ProcessType>("ProcessTypes");
         }
 
-        public async Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId)
+       public async Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId)
         {
+            // Buscar usuário pelo número de identificação
             var user = await _users.Find(u => u.IdentificationNumber == identificationNumber).FirstOrDefaultAsync();
             if (user == null)
             {
                 throw new ArgumentException("Usuário não encontrado.");
             }
 
+            // Buscar o tipo de processo pelo ID fornecido
             var processType = await _processTypes.Find(pt => pt.Id == processTypeId).FirstOrDefaultAsync();
             if (processType == null)
             {
                 throw new ArgumentException("Tipo de Processo não encontrado.");
             }
+
+            // Obter horário atual de Campo Grande (AMT)
             TimeZoneInfo campoGrandeTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Campo_Grande");
             DateTime campoGrandeTime = TimeZoneInfo.ConvertTime(DateTime.UtcNow, campoGrandeTimeZone);
 
-
+            // Criar novo processo
             var newProcess = new Process
             {
                 Id = ObjectId.GenerateNewId().ToString(),
                 IdentificationNumber = identificationNumber,
                 ProcessTime = "00:00:00",
                 StartDate = campoGrandeTime,
-                EndDate = null, 
+                EndDate = null,
                 User = new ReferenceEntity { Id = user.Id, Name = user.Name },
                 Department = new ReferenceEntity { Id = user.Department.Id, Name = user.Department.Name },
                 ProcessType = new ReferenceEntity { Id = processType.Id, Name = processType.Name },
                 InOccurrence = false
             };
 
+            // Inserir o novo processo no banco
             await _processes.InsertOneAsync(newProcess);
+
+            // Atualizar o usuário para armazenar o processo atual em CurrentProcess
+            var updateUser = Builders<User>.Update
+                .Set(u => u.CurrentProcess, new ReferenceEntity { Id = newProcess.Id, Name = newProcess.IdentificationNumber });
+
+            await _users.UpdateOneAsync(u => u.Id == user.Id, updateUser);
 
             return newProcess;
         }
+
 
 
         public async Task<List<Process>> GetAllProcessesAsync()

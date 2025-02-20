@@ -24,6 +24,8 @@ namespace ColdlineAPI.Domain.Entities
 
         [BsonElement("department")]
         public ReferenceEntity Department { get; set; } = new ReferenceEntity(); 
+        [BsonElement("currentProcess")]
+        public ReferenceEntity CurrentProcess { get; set; } = new ReferenceEntity();
 
         [BsonElement("identificationNumber")]
         public string IdentificationNumber { get; set; } = string.Empty;

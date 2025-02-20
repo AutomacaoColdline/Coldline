@@ -1,6 +1,7 @@
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Domain.Entities;
+using ColdlineAPI.Domain.Common;
 using ColdlineAPI.Infrastructure.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -14,13 +15,53 @@ namespace ColdlineAPI.Application.Services
     public class ProcessService : IProcessService
     {
         private readonly IMongoCollection<Process> _processes;
+        private readonly IMongoCollection<User> _users;
+        private readonly IMongoCollection<ProcessType> _processTypes;
 
         public ProcessService(IOptions<MongoDBSettings> mongoDBSettings)
         {
             var client = new MongoClient(mongoDBSettings.Value.ConnectionString);
             var database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
             _processes = database.GetCollection<Process>("Processes");
+            _users = database.GetCollection<User>("Users");
+            _processTypes = database.GetCollection<ProcessType>("ProcessTypes");
         }
+
+        public async Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId)
+        {
+            var user = await _users.Find(u => u.IdentificationNumber == identificationNumber).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                throw new ArgumentException("Usuário não encontrado.");
+            }
+
+            var processType = await _processTypes.Find(pt => pt.Id == processTypeId).FirstOrDefaultAsync();
+            if (processType == null)
+            {
+                throw new ArgumentException("Tipo de Processo não encontrado.");
+            }
+            TimeZoneInfo campoGrandeTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Campo_Grande");
+            DateTime campoGrandeTime = TimeZoneInfo.ConvertTime(DateTime.UtcNow, campoGrandeTimeZone);
+
+
+            var newProcess = new Process
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                IdentificationNumber = identificationNumber,
+                ProcessTime = "00:00:00",
+                StartDate = campoGrandeTime,
+                EndDate = null, 
+                User = new ReferenceEntity { Id = user.Id, Name = user.Name },
+                Department = new ReferenceEntity { Id = user.Department.Id, Name = user.Department.Name },
+                ProcessType = new ReferenceEntity { Id = processType.Id, Name = processType.Name },
+                InOccurrence = false
+            };
+
+            await _processes.InsertOneAsync(newProcess);
+
+            return newProcess;
+        }
+
 
         public async Task<List<Process>> GetAllProcessesAsync()
         {
@@ -61,6 +102,7 @@ namespace ColdlineAPI.Application.Services
                 .Set(p => p.PauseTypes, process.PauseTypes ?? existingProcess.PauseTypes)
                 .Set(p => p.Occurrences, process.Occurrences ?? existingProcess.Occurrences)
                 .Set(p => p.InOccurrence, process.InOccurrence)
+                .Set(p => p.Finished, process.Finished)
                 .Set(p => p.Machine, process.Machine ?? existingProcess.Machine);
 
             var result = await _processes.UpdateOneAsync(p => p.Id == id, updateDefinition);

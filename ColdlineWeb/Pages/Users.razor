@@ -22,6 +22,8 @@ else
                 <th>Email</th>
                 <th>Tipo de Usuário</th>
                 <th>Departamento</th>
+                <th>Número de Identificação</th>
+                <th>Processo Atual</th> <!-- Nova coluna para exibir o processo -->
                 <th>Ações</th>
             </tr>
         </thead>
@@ -33,6 +35,8 @@ else
                     <td>@user.Email</td>
                     <td>@user.UserType.Name</td>
                     <td>@user.Department.Name</td>
+                    <td>@user.IdentificationNumber</td>
+                    <td>@(user.CurrentProcess?.Name ?? "Nenhum")</td> <!-- Mostra o nome do processo atual -->
                     <td>
                         <button class="btn btn-warning btn-sm" @onclick="() => OpenEditUserModal(user)">Editar</button>
                         <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(user.Id)">Excluir</button>
@@ -50,20 +54,17 @@ else
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">@(isEditing ? "Editar Usuário" : "Adicionar Usuário")</h5>
-                    <button class="close btn btn-light" @onclick="CloseModal">&times;</button>
+                    <button class="close" @onclick="CloseModal">&times;</button>
                 </div>
                 <div class="modal-body">
                     <label>Nome:</label>
-                    <input class="form-control" @bind="@currentUser.Name" />
+                    <input class="form-control" @bind="currentUser.Name" />
 
                     <label>Email:</label>
-                    <input class="form-control" @bind="@currentUser.Email" />
-
-                    <label>Senha:</label>
-                    <input type="password" class="form-control" @bind="@currentUser.Password" />
+                    <input class="form-control" @bind="currentUser.Email" />
 
                     <label>Tipo de Usuário:</label>
-                    <select class="form-control" @bind="@currentUser.UserType.Id">
+                    <select class="form-control" @bind="currentUser.UserType.Id">
                         @foreach (var userType in userTypes)
                         {
                             <option value="@userType.Id">@userType.Name</option>
@@ -71,10 +72,22 @@ else
                     </select>
 
                     <label>Departamento:</label>
-                    <select class="form-control" @bind="@currentUser.Department.Id">
+                    <select class="form-control" @bind="currentUser.Department.Id">
                         @foreach (var department in departments)
                         {
                             <option value="@department.Id">@department.Name</option>
+                        }
+                    </select>
+
+                    <label>Número de Identificação:</label>
+                    <input class="form-control" @bind="currentUser.IdentificationNumber" />
+
+                    <label>Processo Atual:</label>
+                    <select class="form-control" @bind="currentUser.CurrentProcess.Id">
+                        <option value="">Nenhum</option>
+                        @foreach (var process in processes)
+                        {
+                            <option value="@process.Id">@process.IdentificationNumber</option>
                         }
                     </select>
                 </div>
@@ -89,8 +102,9 @@ else
 
 @code {
     private List<UserModel> users = new();
-    private List<UserTypeModel> userTypes = new();
-    private List<DepartmentModel> departments = new();
+    private List<ReferenceEntity> userTypes = new();
+    private List<ReferenceEntity> departments = new();
+    private List<ProcessModel> processes = new();
     private UserModel currentUser = new();
     private bool isLoading = true;
     private bool showModal = false;
@@ -106,9 +120,10 @@ else
     {
         try
         {
-            users = await Http.GetFromJsonAsync<List<UserModel>>("api/User") ?? new List<UserModel>();
-            userTypes = await Http.GetFromJsonAsync<List<UserTypeModel>>("api/UserType") ?? new List<UserTypeModel>();
-            departments = await Http.GetFromJsonAsync<List<DepartmentModel>>("api/Department") ?? new List<DepartmentModel>();
+            users = await Http.GetFromJsonAsync<List<UserModel>>("api/User") ?? new();
+            userTypes = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/UserType") ?? new();
+            departments = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Department") ?? new();
+            processes = await Http.GetFromJsonAsync<List<ProcessModel>>("api/Process") ?? new();
         }
         catch (Exception ex)
         {
@@ -123,11 +138,7 @@ else
 
     private void OpenAddUserModal()
     {
-        currentUser = new UserModel
-        {
-            UserType = new UserTypeModel(),
-            Department = new DepartmentModel()
-        };
+        currentUser = new UserModel();
         showModal = true;
         isEditing = false;
     }
@@ -139,9 +150,10 @@ else
             Id = user.Id,
             Name = user.Name,
             Email = user.Email,
-            Password = "", // Não expor a senha
-            UserType = new UserTypeModel { Id = user.UserType.Id, Name = user.UserType.Name },
-            Department = new DepartmentModel { Id = user.Department.Id, Name = user.Department.Name }
+            UserType = user.UserType,
+            Department = user.Department,
+            IdentificationNumber = user.IdentificationNumber,
+            CurrentProcess = user.CurrentProcess
         };
         showModal = true;
         isEditing = true;
@@ -149,38 +161,22 @@ else
 
     private async Task SaveUser()
     {
-        try
+        if (isEditing)
         {
-            if (isEditing)
-            {
-                await Http.PutAsJsonAsync($"api/User/{currentUser.Id}", currentUser);
-            }
-            else
-            {
-                await Http.PostAsJsonAsync("api/User", currentUser);
-            }
-            showModal = false;
-            await LoadData();
+            await Http.PutAsJsonAsync($"api/User/{currentUser.Id}", currentUser);
         }
-        catch (Exception ex)
+        else
         {
-            errorMessage = "Erro ao salvar o usuário.";
-            Console.WriteLine(ex);
+            await Http.PostAsJsonAsync("api/User", currentUser);
         }
+        showModal = false;
+        await LoadData();
     }
 
     private async Task DeleteUser(string id)
     {
-        try
-        {
-            await Http.DeleteAsync($"api/User/{id}");
-            await LoadData();
-        }
-        catch (Exception ex)
-        {
-            errorMessage = "Erro ao excluir o usuário.";
-            Console.WriteLine(ex);
-        }
+        await Http.DeleteAsync($"api/User/{id}");
+        await LoadData();
     }
 
     private void CloseModal()
@@ -188,24 +184,24 @@ else
         showModal = false;
     }
 
-    // 🔹 MODELOS LOCAIS PARA USO NO BLAZOR 🔹
     private class UserModel
     {
         public string Id { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public UserTypeModel UserType { get; set; } = new UserTypeModel();
-        public DepartmentModel Department { get; set; } = new DepartmentModel();
+        public ReferenceEntity UserType { get; set; } = new();
+        public ReferenceEntity Department { get; set; } = new();
+        public string IdentificationNumber { get; set; } = string.Empty;
+        public ReferenceEntity CurrentProcess { get; set; } = new();
     }
 
-    private class UserTypeModel
+    private class ProcessModel
     {
         public string Id { get; set; } = string.Empty;
-        public string Name { get; set; } = string.Empty;
+        public string IdentificationNumber { get; set; } = string.Empty;
     }
 
-    private class DepartmentModel
+    private class ReferenceEntity
     {
         public string Id { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;

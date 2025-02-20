@@ -63,7 +63,7 @@ namespace ColdlineAPI.Presentation.Controllers
         /// Atualiza um usuário pelo ID.
         /// </summary>
         [HttpPut("{id}")]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] User user)
         {
             var updated = await _userService.UpdateUserAsync(id, user);

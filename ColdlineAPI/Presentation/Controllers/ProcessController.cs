@@ -1,6 +1,7 @@
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Domain.Entities;
+using ColdlineAPI.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -63,6 +64,18 @@ namespace ColdlineAPI.Presentation.Controllers
             var processes = await _processService.SearchProcessAsync(filter);
             return Ok(processes);
         }
-
+        [HttpPost("start-process")]
+        public async Task<IActionResult> StartProcess([FromBody] StartProcessRequest request)
+        {
+            try
+            {
+                var process = await _processService.StartProcessAsync(request.IdentificationNumber, request.ProcessTypeId);
+                return Ok(process);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

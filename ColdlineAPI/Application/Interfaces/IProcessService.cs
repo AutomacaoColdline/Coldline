@@ -13,5 +13,6 @@ namespace ColdlineAPI.Application.Interfaces
         Task<bool> UpdateProcessAsync(string id, Process process);
         Task<bool> DeleteProcessAsync(string id);
         Task<List<Process>> SearchProcessAsync(ProcessFilter filter);
+        Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId);
     }
 }

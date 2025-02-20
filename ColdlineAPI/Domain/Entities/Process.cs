@@ -22,7 +22,7 @@ namespace ColdlineAPI.Domain.Entities
 
         [BsonElement("end date")]
         [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
-        public DateTime EndDate { get; set; } = DateTime.UtcNow;
+        public DateTime? EndDate { get; set; } = DateTime.UtcNow;
 
         [BsonElement("user")]
         public ReferenceEntity? User { get; set; } = new ReferenceEntity();
@@ -43,5 +43,7 @@ namespace ColdlineAPI.Domain.Entities
         public ReferenceEntity? Machine { get; set; } = new ReferenceEntity();
         [BsonElement("InOccurrence")]
         public bool InOccurrence { get; set; }
+        [BsonElement("finished")]
+        public bool Finished { get; set; }
     }
 }

@@ -38,9 +38,18 @@ else
                     <td>@machine.IdentificationNumber</td>
                     <td>@machine.Phase</td>
                     <td>@machine.Voltage</td>
-                    <td>@(GetEntityName(processes.Select(p => new ReferenceEntity { Id = p.Id, Name = p.IdentificationNumber }).ToList(), machine.Process?.Id))</td>
-                    <td>@(GetEntityName(qualities, machine.Quality?.Id))</td>
-                    <td>@(GetEntityName(monitorings, machine.Monitoring?.Id))</td>
+                    <td>@(machine.Process?.Name ?? "Sem Processo")</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(machine.Quality?.Id))
+                        {
+                            <span class="text-success">✔ Vinculada</span>
+                        }
+                        else
+                        {
+                            <span class="text-danger">Sem Qualidade</span>
+                        }
+                    </td>
+                    <td>@(machine.Monitoring?.Name ?? "Sem Monitoramento")</td> <!-- CORRIGIDO -->
                     <td>
                         <button class="btn btn-warning btn-sm" @onclick="() => OpenEditMachineModal(machine)">Editar</button>
                         <button class="btn btn-danger btn-sm" @onclick="() => DeleteMachine(machine.Id)">Excluir</button>
@@ -80,23 +89,7 @@ else
                     <select class="form-control" @bind="currentMachine.Process.Id">
                         @foreach (var process in processes)
                         {
-                            <option value="@process.Id">@process.IdentificationNumber</option>
-                        }
-                    </select>
-
-                    <label>Qualidade:</label>
-                    <select class="form-control" @bind="currentMachine.Quality.Id">
-                        @foreach (var quality in qualities)
-                        {
-                            <option value="@quality.Id">@quality.Name</option>
-                        }
-                    </select>
-
-                    <label>Monitoramento:</label>
-                    <select class="form-control" @bind="currentMachine.Monitoring.Id">
-                        @foreach (var monitoring in monitorings)
-                        {
-                            <option value="@monitoring.Id">@monitoring.Name</option>
+                            <option value="@process.Id">@process.Name</option>
                         }
                     </select>
                 </div>
@@ -113,7 +106,6 @@ else
     private List<MachineModel> machines = new();
     private List<ProcessModel> processes = new();
     private List<ReferenceEntity> qualities = new();
-    private List<ReferenceEntity> monitorings = new();
     private MachineModel currentMachine = new();
     private bool isLoading = true;
     private bool showModal = false;
@@ -129,10 +121,9 @@ else
     {
         try
         {
-            machines = await Http.GetFromJsonAsync<List<MachineModel>>("api/Machine") ?? new List<MachineModel>();
-            processes = await Http.GetFromJsonAsync<List<ProcessModel>>("api/Process") ?? new List<ProcessModel>();
-            qualities = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Quality") ?? new List<ReferenceEntity>();
-            monitorings = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Monitoring") ?? new List<ReferenceEntity>();
+            machines = await Http.GetFromJsonAsync<List<MachineModel>>("api/Machine") ?? new();
+            processes = await Http.GetFromJsonAsync<List<ProcessModel>>("api/Process") ?? new();
+            qualities = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Quality") ?? new();
         }
         catch (Exception ex)
         {
@@ -162,9 +153,7 @@ else
             IdentificationNumber = machine.IdentificationNumber,
             Phase = machine.Phase,
             Voltage = machine.Voltage,
-            Process = processes.FirstOrDefault(p => p.Id == machine.Process.Id) ?? new ProcessModel(),
-            Quality = qualities.FirstOrDefault(q => q.Id == machine.Quality.Id) ?? new ReferenceEntity(),
-            Monitoring = monitorings.FirstOrDefault(m => m.Id == machine.Monitoring.Id) ?? new ReferenceEntity()
+            Process = processes.FirstOrDefault(p => p.Id == machine.Process.Id) ?? new ProcessModel()
         };
         showModal = true;
         isEditing = true;
@@ -195,11 +184,6 @@ else
         showModal = false;
     }
 
-    private string GetEntityName(List<ReferenceEntity> list, string? id)
-    {
-        return list.FirstOrDefault(e => e.Id == id)?.Name ?? "Não informado";
-    }
-
     private class MachineModel
     {
         public string Id { get; set; } = string.Empty;
@@ -210,22 +194,13 @@ else
         public string Voltage { get; set; } = string.Empty;
         public ProcessModel Process { get; set; } = new();
         public ReferenceEntity Quality { get; set; } = new();
-        public ReferenceEntity Monitoring { get; set; } = new();
+        public ReferenceEntity Monitoring { get; set; } = new(); // Ajustado para pegar diretamente o Name
     }
 
     private class ProcessModel
     {
         public string Id { get; set; } = string.Empty;
-        public string IdentificationNumber { get; set; } = string.Empty;
-        public string ProcessTime { get; set; } = "00:00:00"; 
-        public DateTime StartDate { get; set; } = DateTime.UtcNow;
-        public DateTime EndDate { get; set; } = DateTime.UtcNow;
-        public ReferenceEntity User { get; set; } = new();
-        public ReferenceEntity Department { get; set; } = new();
-        public ReferenceEntity ProcessType { get; set; } = new();
-        public ReferenceEntity Machine { get; set; } = new();
-        public ReferenceEntity PauseTypes { get; set; } = new(); 
-        public List<ReferenceEntity> Occurrences { get; set; } = new(); 
+        public string Name { get; set; } = string.Empty;
     }
 
     private class ReferenceEntity

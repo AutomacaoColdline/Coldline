@@ -23,7 +23,8 @@ else
                 <th>Tipo de Usuário</th>
                 <th>Departamento</th>
                 <th>Número de Identificação</th>
-                <th>Processo Atual</th> <!-- Nova coluna para exibir o processo -->
+                <th>Processo Atual</th>
+                <th>Ocorrência Atual</th>
                 <th>Ações</th>
             </tr>
         </thead>
@@ -36,7 +37,8 @@ else
                     <td>@user.UserType.Name</td>
                     <td>@user.Department.Name</td>
                     <td>@user.IdentificationNumber</td>
-                    <td>@(user.CurrentProcess?.Name ?? "Nenhum")</td> <!-- Mostra o nome do processo atual -->
+                    <td>@(user.CurrentProcess?.Name ?? "Nenhum")</td>
+                    <td>@(user.CurrentOccurrence?.Name ?? "Nenhuma")</td>
                     <td>
                         <button class="btn btn-warning btn-sm" @onclick="() => OpenEditUserModal(user)">Editar</button>
                         <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(user.Id)">Excluir</button>
@@ -90,6 +92,15 @@ else
                             <option value="@process.Id">@process.IdentificationNumber</option>
                         }
                     </select>
+
+                    <label>Ocorrência Atual:</label>
+                    <select class="form-control" @bind="currentUser.CurrentOccurrence.Id">
+                        <option value="">Nenhuma</option>
+                        @foreach (var occurrence in occurrences)
+                        {
+                            <option value="@occurrence.Id">@occurrence.CodeOccurrence</option> <!-- Agora exibe CodeOccurrence -->
+                        }
+                    </select>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
@@ -105,6 +116,7 @@ else
     private List<ReferenceEntity> userTypes = new();
     private List<ReferenceEntity> departments = new();
     private List<ProcessModel> processes = new();
+    private List<OccurrenceModel> occurrences = new();
     private UserModel currentUser = new();
     private bool isLoading = true;
     private bool showModal = false;
@@ -124,6 +136,7 @@ else
             userTypes = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/UserType") ?? new();
             departments = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Department") ?? new();
             processes = await Http.GetFromJsonAsync<List<ProcessModel>>("api/Process") ?? new();
+            occurrences = await Http.GetFromJsonAsync<List<OccurrenceModel>>("api/Occurrence") ?? new();
         }
         catch (Exception ex)
         {
@@ -153,7 +166,8 @@ else
             UserType = user.UserType,
             Department = user.Department,
             IdentificationNumber = user.IdentificationNumber,
-            CurrentProcess = user.CurrentProcess
+            CurrentProcess = user.CurrentProcess,
+            CurrentOccurrence = user.CurrentOccurrence
         };
         showModal = true;
         isEditing = true;
@@ -161,6 +175,15 @@ else
 
     private async Task SaveUser()
     {
+        if (!string.IsNullOrWhiteSpace(currentUser.CurrentOccurrence.Id))
+        {
+            var selectedOccurrence = occurrences.FirstOrDefault(o => o.Id == currentUser.CurrentOccurrence.Id);
+            if (selectedOccurrence != null)
+            {
+                currentUser.CurrentOccurrence.Name = selectedOccurrence.CodeOccurrence; 
+            }
+        }
+
         if (isEditing)
         {
             await Http.PutAsJsonAsync($"api/User/{currentUser.Id}", currentUser);
@@ -172,6 +195,7 @@ else
         showModal = false;
         await LoadData();
     }
+
 
     private async Task DeleteUser(string id)
     {
@@ -193,12 +217,19 @@ else
         public ReferenceEntity Department { get; set; } = new();
         public string IdentificationNumber { get; set; } = string.Empty;
         public ReferenceEntity CurrentProcess { get; set; } = new();
+        public ReferenceEntity CurrentOccurrence { get; set; } = new();
     }
 
     private class ProcessModel
     {
         public string Id { get; set; } = string.Empty;
         public string IdentificationNumber { get; set; } = string.Empty;
+    }
+
+    private class OccurrenceModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string CodeOccurrence { get; set; } = string.Empty; /* Exibe CodeOccurrence */
     }
 
     private class ReferenceEntity

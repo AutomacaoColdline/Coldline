@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "ColdlineWeb",
   "resources": {
-    "hash": "sha256-BW20T+nene6FV506ibxBRPTJqadwWDhLOWw9hIAR1Uo=",
+    "hash": "sha256-3qFz+G+FCCCze6qVa+WDP4/vm+FdT9EMNfgd1vNQExI=",
     "fingerprinting": {
       "Microsoft.AspNetCore.Authorization.n41ua9ceve.wasm": "Microsoft.AspNetCore.Authorization.wasm",
       "Microsoft.AspNetCore.Components.h4ild4sjod.wasm": "Microsoft.AspNetCore.Components.wasm",
@@ -9,6 +9,7 @@
       "Microsoft.AspNetCore.Components.Web.gczxzkllks.wasm": "Microsoft.AspNetCore.Components.Web.wasm",
       "Microsoft.AspNetCore.Components.WebAssembly.5mh1xgfbey.wasm": "Microsoft.AspNetCore.Components.WebAssembly.wasm",
       "Microsoft.AspNetCore.Metadata.f0dx7f7ser.wasm": "Microsoft.AspNetCore.Metadata.wasm",
+      "Microsoft.AspNetCore.WebUtilities.wlxxhzcuy2.wasm": "Microsoft.AspNetCore.WebUtilities.wasm",
       "Microsoft.Extensions.Configuration.h7p166i5j0.wasm": "Microsoft.Extensions.Configuration.wasm",
       "Microsoft.Extensions.Configuration.Abstractions.4wniagvoij.wasm": "Microsoft.Extensions.Configuration.Abstractions.wasm",
       "Microsoft.Extensions.Configuration.Binder.oft8zow1u0.wasm": "Microsoft.Extensions.Configuration.Binder.wasm",
@@ -25,6 +26,7 @@
       "Microsoft.Extensions.Primitives.3pkwbmnqmy.wasm": "Microsoft.Extensions.Primitives.wasm",
       "Microsoft.JSInterop.gkumi7kxvo.wasm": "Microsoft.JSInterop.wasm",
       "Microsoft.JSInterop.WebAssembly.wzrhx8t8bu.wasm": "Microsoft.JSInterop.WebAssembly.wasm",
+      "Microsoft.Net.Http.Headers.et8r51eav9.wasm": "Microsoft.Net.Http.Headers.wasm",
       "Microsoft.CSharp.0krj4ve566.wasm": "Microsoft.CSharp.wasm",
       "Microsoft.VisualBasic.Core.bcw8auwqwc.wasm": "Microsoft.VisualBasic.Core.wasm",
       "Microsoft.VisualBasic.ezua2clavb.wasm": "Microsoft.VisualBasic.wasm",
@@ -201,8 +203,8 @@
       "icudt_CJK.tjcz0u77k5.dat": "icudt_CJK.dat",
       "icudt_EFIGS.tptq2av103.dat": "icudt_EFIGS.dat",
       "icudt_no_CJK.lfu7j35m59.dat": "icudt_no_CJK.dat",
-      "ColdlineWeb.nw0aqybie6.wasm": "ColdlineWeb.wasm",
-      "ColdlineWeb.lv5cyshxao.pdb": "ColdlineWeb.pdb"
+      "ColdlineWeb.m4eddu03su.wasm": "ColdlineWeb.wasm",
+      "ColdlineWeb.t7alawuuah.pdb": "ColdlineWeb.pdb"
     },
     "jsModuleNative": {
       "dotnet.native.8o8n7iomrf.js": "sha256-WIUiy49hHQ3kOAtRdCtUzm3Yg5BnOqCC+Q+kri9Fi1g="
@@ -229,6 +231,7 @@
       "Microsoft.AspNetCore.Components.Web.gczxzkllks.wasm": "sha256-0GsGHUcZqMbcNzsilO3GcgG7962qJ/ZHuKufQPUcbh4=",
       "Microsoft.AspNetCore.Components.WebAssembly.5mh1xgfbey.wasm": "sha256-bcBNpQFDHBkNzyn5jS+H2hh1Dm0ra0paIjloKIHy5r4=",
       "Microsoft.AspNetCore.Metadata.f0dx7f7ser.wasm": "sha256-4cwypYnAi4rj5KOaa6JhniDEFacv1aXC85uiheBnFzE=",
+      "Microsoft.AspNetCore.WebUtilities.wlxxhzcuy2.wasm": "sha256-ZIXaCwkw/nFJbQVtpXyC1p+/8+HBXuY23SvQp2APHug=",
       "Microsoft.Extensions.Configuration.h7p166i5j0.wasm": "sha256-3TPUsnMMwttXgftVgbXhX0+ZG+UHYp0RAzg60SK4Xfk=",
       "Microsoft.Extensions.Configuration.Abstractions.4wniagvoij.wasm": "sha256-jDyhCV8cQbTPnpBqglv4yrebO3dwcGR9Qxr3jDN3TiE=",
       "Microsoft.Extensions.Configuration.Binder.oft8zow1u0.wasm": "sha256-/BVr1LLZIYqgXdQ90iUr1/D2t3vcprltsUruXsJ0cfg=",
@@ -245,6 +248,7 @@
       "Microsoft.Extensions.Primitives.3pkwbmnqmy.wasm": "sha256-OdxJw7jdILDZ3gOpGiCsOP1rr13RNw5EjKRvXzmr5Lg=",
       "Microsoft.JSInterop.gkumi7kxvo.wasm": "sha256-wG2lM2idoDLOwqFHD84hv6SbaH0Yt59g1BsijrC8V1U=",
       "Microsoft.JSInterop.WebAssembly.wzrhx8t8bu.wasm": "sha256-/Fh5R9UI8OZOGuj4Pz4sd8vLYjZQVqxDj8gWWqd8kA0=",
+      "Microsoft.Net.Http.Headers.et8r51eav9.wasm": "sha256-Yo7yLbCzyuItdqdLb8FoWGyyLhzpdzNo1Xt9w15FOQ8=",
       "Microsoft.CSharp.0krj4ve566.wasm": "sha256-QJKG5agfskYhNg4CWMzF8EqwsNALoPtT7h5pO9k6aHk=",
       "Microsoft.VisualBasic.Core.bcw8auwqwc.wasm": "sha256-Raj1ha4M/EXL7zvyW9Evn28B9GxWHE0gaLR/NXPSrdk=",
       "Microsoft.VisualBasic.ezua2clavb.wasm": "sha256-Wn1A97sEio88/HfvTRdDM1pgRek6RfaNgVkwzSIvIAw=",
@@ -412,10 +416,10 @@
       "WindowsBase.ovqw333kan.wasm": "sha256-7LCr4nX9JSGuwzMr8Rk8TGvC6ApzQNxCDiMV/0I9JlI=",
       "mscorlib.l6md3pggqy.wasm": "sha256-jZgH0LixLeQKqaq33akQgDGhfE7vbXbHtvCId5HC0Yo=",
       "netstandard.lij9csiyuf.wasm": "sha256-DeeBl9s8G34N3IfYRQ+MoY807amodj8cvpuvUSNaWE4=",
-      "ColdlineWeb.nw0aqybie6.wasm": "sha256-6Yq4TfzgE8eDtcyraJgTqHgFq7WFnZRx7dFHEb2W46I="
+      "ColdlineWeb.m4eddu03su.wasm": "sha256-xq3UxuO4oG0iMYjLDwNhA51mA7Vm9F0KJQvfudLmFxY="
     },
     "pdb": {
-      "ColdlineWeb.lv5cyshxao.pdb": "sha256-P7WFttE41MnJMaXw5s7+hBwKqhLanFEsZx6FKjie554="
+      "ColdlineWeb.t7alawuuah.pdb": "sha256-B68uBeCLKif/jhINmlmKUBOM48quOR/nvqFHyQSmeEY="
     }
   },
   "cacheBootResources": true,

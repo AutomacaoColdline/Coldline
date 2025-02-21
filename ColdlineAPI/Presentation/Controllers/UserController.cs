@@ -129,6 +129,18 @@ namespace ColdlineAPI.Presentation.Controllers
         }
 
         /// <summary>
+        /// Retorna um usuário pelo número de identificação.
+        /// </summary>
+        [HttpGet("identification/{identificationNumber}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetUserByIdentificationNumber(string identificationNumber)
+        {
+            var user = await _userService.GetUserByIdentificationNumberAsync(identificationNumber);
+            return user != null ? Ok(user) : NotFound(new { Message = "Usuário não encontrado!" });
+        }
+
+
+        /// <summary>
         /// Altera a senha do usuário.
         /// </summary>
         [HttpPost("change-password")]

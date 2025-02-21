@@ -42,8 +42,10 @@ namespace ColdlineAPI.Domain.Entities
         [BsonElement("machine")]
         public ReferenceEntity? Machine { get; set; } = new ReferenceEntity();
         [BsonElement("InOccurrence")]
-        public bool InOccurrence { get; set; }
+        public bool? InOccurrence { get; set; }
         [BsonElement("finished")]
-        public bool Finished { get; set; }
+        public bool? Finished { get; set; }
+        [BsonElement("preIndustrialization")]
+        public bool? PreIndustrialization { get; set; }
     }
 }

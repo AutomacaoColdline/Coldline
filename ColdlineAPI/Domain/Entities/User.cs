@@ -24,8 +24,14 @@ namespace ColdlineAPI.Domain.Entities
 
         [BsonElement("department")]
         public ReferenceEntity Department { get; set; } = new ReferenceEntity(); 
+
         [BsonElement("currentProcess")]
-        public ReferenceEntity CurrentProcess { get; set; } = new ReferenceEntity();
+        [BsonIgnoreIfNull] // 🔹 Se for NULL, MongoDB ignora esse campo
+        public ReferenceEntity? CurrentProcess { get; set; } = null;
+
+        [BsonElement("currentOccurrence")]
+        [BsonIgnoreIfNull] // 🔹 Se for NULL, MongoDB ignora esse campo
+        public ReferenceEntity? CurrentOccurrence { get; set; } = null;
 
         [BsonElement("identificationNumber")]
         public string IdentificationNumber { get; set; } = string.Empty;

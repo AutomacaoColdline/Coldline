@@ -1,0 +1,76 @@
+@page "/industria/login"
+@layout EmptyLayout
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<style>
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f8f9fa;
+    }
+
+    .login-card {
+        width: 400px;
+        padding: 20px;
+        background: white;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        text-align: center;
+    }
+</style>
+
+<div class="login-container">
+    <div class="login-card">
+        <h3 class="mb-4">Login Industrial</h3>
+        
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger text-center">@errorMessage</div>
+        }
+
+        <label class="form-label">Número de Identificação:</label>
+        <input class="form-control text-center" @bind="identificationNumber" placeholder="Digite seu número de identificação" />
+
+        <button class="btn btn-primary w-100 mt-3" @onclick="Login">Login</button>
+    </div>
+</div>
+
+@code {
+    private string identificationNumber = string.Empty;
+    private string? errorMessage;
+
+    private async Task Login()
+    {
+        if (string.IsNullOrWhiteSpace(identificationNumber))
+        {
+            errorMessage = "Por favor, digite um número de identificação.";
+            return;
+        }
+
+        try
+        {
+            var user = await Http.GetFromJsonAsync<UserModel>($"api/User/identification/{identificationNumber}");
+
+            if (user != null)
+            {
+                Navigation.NavigateTo($"/industria?identificationNumber={identificationNumber}");
+            }
+            else
+            {
+                errorMessage = "Usuário não encontrado.";
+            }
+        }
+        catch (HttpRequestException)
+        {
+            errorMessage = "Erro na requisição. Tente novamente.";
+        }
+    }
+
+    private class UserModel
+    {
+        public string IdentificationNumber { get; set; } = string.Empty;
+    }
+}

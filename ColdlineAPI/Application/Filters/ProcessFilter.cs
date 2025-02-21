@@ -6,14 +6,16 @@ namespace ColdlineAPI.Application.Filters
     public class ProcessFilter
     {
         public string? IdentificationNumber { get; set; }
-        public string? ProcessTime { get; set; } // Mantém como string (formato HH:mm:ss)
-        public DateTime? StartDate { get; set; } // Agora como DateTime para comparação correta
-        public DateTime? EndDate { get; set; } // Agora como DateTime para comparação correta
+        public string? ProcessTime { get; set; } 
+        public DateTime? StartDate { get; set; } 
+        public DateTime? EndDate { get; set; } 
         public string? UserId { get; set; }
         public string? DepartmentId { get; set; }
         public string? ProcessTypeId { get; set; }
         public string? PauseTypesId { get; set; }
         public List<string>? OccurrencesIds { get; set; }
         public string? MachineId { get; set; }
+        public bool? Finished { get; set; }
+        public bool? PreIndustrialization { get; set; }
     }
 }

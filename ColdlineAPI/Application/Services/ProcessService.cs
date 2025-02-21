@@ -17,6 +17,7 @@ namespace ColdlineAPI.Application.Services
         private readonly IMongoCollection<Process> _processes;
         private readonly IMongoCollection<User> _users;
         private readonly IMongoCollection<ProcessType> _processTypes;
+        private readonly IMongoCollection<Machine> _machines;
 
         public ProcessService(IOptions<MongoDBSettings> mongoDBSettings)
         {
@@ -25,9 +26,10 @@ namespace ColdlineAPI.Application.Services
             _processes = database.GetCollection<Process>("Processes");
             _users = database.GetCollection<User>("Users");
             _processTypes = database.GetCollection<ProcessType>("ProcessTypes");
+            _machines = database.GetCollection<Machine>("Machines");
         }
 
-       public async Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId)
+        public async Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId, string machineId)
         {
             // Buscar usuário pelo número de identificação
             var user = await _users.Find(u => u.IdentificationNumber == identificationNumber).FirstOrDefaultAsync();
@@ -41,6 +43,13 @@ namespace ColdlineAPI.Application.Services
             if (processType == null)
             {
                 throw new ArgumentException("Tipo de Processo não encontrado.");
+            }
+
+            // Buscar a máquina pelo ID fornecido
+            var machine = await _machines.Find(m => m.Id == machineId).FirstOrDefaultAsync();
+            if (machine == null)
+            {
+                throw new ArgumentException("Máquina não encontrada.");
             }
 
             // Obter horário atual de Campo Grande (AMT)
@@ -58,23 +67,27 @@ namespace ColdlineAPI.Application.Services
                 User = new ReferenceEntity { Id = user.Id, Name = user.Name },
                 Department = new ReferenceEntity { Id = user.Department.Id, Name = user.Department.Name },
                 ProcessType = new ReferenceEntity { Id = processType.Id, Name = processType.Name },
+                Machine = new ReferenceEntity { Id = machine.Id, Name = machine.Name }, // Associando a máquina ao processo
                 InOccurrence = false
             };
 
             // Inserir o novo processo no banco
             await _processes.InsertOneAsync(newProcess);
 
-            // Atualizar o usuário para armazenar o processo atual em CurrentProcess
+            // Atualizar o usuário para armazenar o processo atual
             var updateUser = Builders<User>.Update
                 .Set(u => u.CurrentProcess, new ReferenceEntity { Id = newProcess.Id, Name = newProcess.IdentificationNumber });
 
             await _users.UpdateOneAsync(u => u.Id == user.Id, updateUser);
 
+            // Atualizar a máquina para armazenar a referência do processo atual
+            var updateMachine = Builders<Machine>.Update
+                .Set(m => m.Process, new ReferenceEntity { Id = newProcess.Id, Name = newProcess.IdentificationNumber });
+
+            await _machines.UpdateOneAsync(m => m.Id == machine.Id, updateMachine);
+
             return newProcess;
         }
-
-
-
         public async Task<List<Process>> GetAllProcessesAsync()
         {
             return await _processes.Find(process => true).ToListAsync();
@@ -115,6 +128,7 @@ namespace ColdlineAPI.Application.Services
                 .Set(p => p.Occurrences, process.Occurrences ?? existingProcess.Occurrences)
                 .Set(p => p.InOccurrence, process.InOccurrence)
                 .Set(p => p.Finished, process.Finished)
+                .Set(p => p.PreIndustrialization, process.PreIndustrialization)
                 .Set(p => p.Machine, process.Machine ?? existingProcess.Machine);
 
             var result = await _processes.UpdateOneAsync(p => p.Id == id, updateDefinition);
@@ -161,6 +175,11 @@ namespace ColdlineAPI.Application.Services
                 var occurrenceIds = filter.OccurrencesIds.ToList();
                 filters.Add(builder.In("Occurrences.Id", occurrenceIds));
             }
+            if (filter.Finished.HasValue)
+                filters.Add(builder.Eq(p => p.Finished, filter.Finished.Value));
+
+            if (filter.PreIndustrialization.HasValue)
+                filters.Add(builder.Eq(p => p.PreIndustrialization, filter.PreIndustrialization.Value));
 
             if (!string.IsNullOrEmpty(filter.MachineId))
                 filters.Add(builder.Eq(p => p.Machine!.Id, filter.MachineId));

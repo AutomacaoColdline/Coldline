@@ -69,7 +69,7 @@ namespace ColdlineAPI.Presentation.Controllers
         {
             try
             {
-                var process = await _processService.StartProcessAsync(request.IdentificationNumber, request.ProcessTypeId);
+                var process = await _processService.StartProcessAsync(request.IdentificationNumber, request.ProcessTypeId, request.MachineId);
                 return Ok(process);
             }
             catch (ArgumentException ex)

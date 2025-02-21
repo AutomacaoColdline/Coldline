@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
+using MongoDB.Bson;
 using ColdlineAPI.Infrastructure.Utils;
 
 namespace ColdlineAPI.Application.Services
@@ -99,9 +100,47 @@ namespace ColdlineAPI.Application.Services
 
         public async Task<bool> UpdateUserAsync(string id, User user)
         {
-            var result = await _users.ReplaceOneAsync(u => u.Id == id, user);
+            // 🔹 Validação do ID como ObjectId
+            if (!ObjectId.TryParse(id, out ObjectId objectId))
+            {
+                throw new ArgumentException("O ID fornecido não é um ObjectId válido.");
+            }
+
+            // 🔹 Busca o usuário no banco para verificar se ele existe
+            var existingUser = await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
+            if (existingUser == null)
+            {
+                return false; // Usuário não encontrado
+            }
+
+            // 🔹 Verificação e ajuste de campos `null`
+            if (user.CurrentProcess?.Id == null || string.IsNullOrWhiteSpace(user.CurrentProcess.Id))
+            {
+                user.CurrentProcess = null;
+            }
+
+            if (user.CurrentOccurrence?.Id == null || string.IsNullOrWhiteSpace(user.CurrentOccurrence.Id))
+            {
+                user.CurrentOccurrence = null;
+            }
+
+            // 🔹 Criação do UpdateDefinition para modificar apenas os campos enviados
+            var updateDefinition = Builders<User>.Update
+                .Set(u => u.Name, user.Name ?? existingUser.Name)
+                .Set(u => u.Email, user.Email ?? existingUser.Email)
+                .Set(u => u.Password, string.IsNullOrEmpty(user.Password) ? existingUser.Password : user.Password)
+                .Set(u => u.UserType, user.UserType ?? existingUser.UserType)
+                .Set(u => u.Department, user.Department ?? existingUser.Department)
+                .Set(u => u.CurrentProcess, user.CurrentProcess)
+                .Set(u => u.CurrentOccurrence, user.CurrentOccurrence)
+                .Set(u => u.IdentificationNumber, user.IdentificationNumber ?? existingUser.IdentificationNumber);
+
+            // 🔹 Atualização no banco
+            var result = await _users.UpdateOneAsync(u => u.Id == id, updateDefinition);
+
             return result.IsAcknowledged && result.ModifiedCount > 0;
         }
+
 
         public async Task<bool> DeleteUserAsync(string id)
         {
@@ -148,6 +187,12 @@ namespace ColdlineAPI.Application.Services
 
             return true; // Senha alterada com sucesso
         }
+
+        public async Task<User?> GetUserByIdentificationNumberAsync(string identificationNumber)
+        {
+            return await _users.Find(user => user.IdentificationNumber == identificationNumber).FirstOrDefaultAsync();
+        }
+
 
 
         public string GenerateJwtToken(User user)

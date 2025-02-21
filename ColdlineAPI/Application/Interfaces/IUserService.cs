@@ -16,6 +16,8 @@ namespace ColdlineAPI.Application.Interfaces
         string GenerateJwtToken(User user); 
         Task<bool> ForgotPasswordAsync(string email);
         Task<bool> ChangePasswordAsync(string userId, string oldPassword, string newPassword);
+        Task<User?> GetUserByIdentificationNumberAsync(string identificationNumber);
+
 
     }
 }

@@ -1,0 +1,29 @@
+@using ColdlineWeb.Models
+@code {
+    [Parameter] public ProcessModel? ProcessDetails { get; set; }
+}
+
+<div class="user-info-card">
+    @if (ProcessDetails != null)
+    {
+        <h5>Processo Atual</h5>
+        <p><strong>Numero do processo:</strong> @ProcessDetails.IdentificationNumber</p>
+        <p><strong>Tipo do processo:</strong> @ProcessDetails.ProcessType?.Name</p>
+
+        @if (ProcessDetails.Machine != null)
+        {
+            <p><strong>Máquina:</strong> @ProcessDetails.Machine.Name</p>
+        }
+        else
+        {
+            <p><strong>Máquina:</strong> Não aplicável</p>
+        }
+
+        <p><strong>Tempo decorrido no processo:</strong> @ProcessDetails.ProcessTime</p>
+        <p><strong>Pré - Industrialização:</strong> @(ProcessDetails.PreIndustrialization ?? false ? "Sim" : "Não")</p>
+    }
+    else
+    {
+        <p>Nenhum processo em andamento.</p>
+    }
+</div>

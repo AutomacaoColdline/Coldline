@@ -1,0 +1,75 @@
+@using ColdlineWeb.Models
+
+@code {
+    [Parameter] public List<ReferenceEntity> ProcessTypes { get; set; } = new();
+    [Parameter] public List<MachineModel> Machines { get; set; } = new();
+    [Parameter] public EventCallback<StartProcessModel> OnStartProcess { get; set; }
+
+    private string selectedProcessTypeId = "";
+    private string selectedMachineId = "";
+    private bool preIndustrialization = false;
+
+    private bool CanStartProcess =>
+        !string.IsNullOrWhiteSpace(selectedProcessTypeId) &&
+        (preIndustrialization || !string.IsNullOrWhiteSpace(selectedMachineId));
+
+    private async Task HandleStartProcess()
+    {
+        if (!CanStartProcess) return;
+
+        var processModel = new StartProcessModel
+        {
+            ProcessTypeId = selectedProcessTypeId,
+            PreIndustrialization = preIndustrialization,
+            MachineId = preIndustrialization ? null : selectedMachineId // Passa null se for pré-industrialização
+        };
+
+        await OnStartProcess.InvokeAsync(processModel);
+    }
+
+    private void TogglePreIndustrialization()
+    {
+        if (preIndustrialization)
+        {
+            selectedMachineId = ""; // Limpa a seleção da máquina ao ativar pré-industrialização
+        }
+    }
+}
+
+<div class="process-card">
+    <h5>Iniciar Novo Processo</h5>
+
+    <div class="form-group">
+        <label>Tipo de Processo</label>
+        <select @bind="selectedProcessTypeId" class="form-control">
+            <option value="">Selecione um tipo</option>
+            @foreach (var processType in ProcessTypes)
+            {
+                <option value="@processType.Id">@processType.Name</option>
+            }
+        </select>
+    </div>
+
+    @if (!preIndustrialization)  
+    {
+        <div class="form-group">
+            <label>Máquina</label>
+            <select @bind="selectedMachineId" class="form-control">
+                <option value="">Selecione uma máquina</option>
+                @foreach (var machine in Machines)
+                {
+                    <option value="@machine.Id">@($"{machine.Name} - {machine.IdentificationNumber}")</option>
+                }
+            </select>
+        </div>
+    }
+
+    <div class="form-group checkbox-group">
+        <input type="checkbox" id="preIndustrialization" @bind="preIndustrialization" @bind:after="TogglePreIndustrialization" />
+        <label for="preIndustrialization">Pré-industrialização</label>
+    </div>
+
+    <button class="btn btn-primary mt-2" @onclick="HandleStartProcess" disabled="@(!CanStartProcess)">
+        Iniciar Processo
+    </button>
+</div>

@@ -52,8 +52,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSG9tZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Industria.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kdXN0cmlhLnJhem9y
+[/app/Pages/Industria/Components/ProcessCard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kdXN0cmlhL0NvbXBvbmVudHMvUHJvY2Vzc0NhcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Industria/Components/Sidebar.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kdXN0cmlhL0NvbXBvbmVudHMvU2lkZWJhci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Industria/Components/UserInfo.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kdXN0cmlhL0NvbXBvbmVudHMvVXNlckluZm8ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Industria/Industria.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kdXN0cmlhL0luZHVzdHJpYS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/IndustriaLogin.razor]

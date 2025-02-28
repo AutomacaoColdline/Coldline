@@ -12,9 +12,6 @@ builder.Services.AddScoped(sp => new HttpClient
     BaseAddress = new Uri("http://10.0.0.44:5000/")
 });
 
-
-
-
-builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IndustriaService>();
 
 await builder.Build().RunAsync();

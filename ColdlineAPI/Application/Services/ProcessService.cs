@@ -6,6 +6,7 @@ using ColdlineAPI.Infrastructure.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,34 +30,27 @@ namespace ColdlineAPI.Application.Services
             _machines = database.GetCollection<Machine>("Machines");
         }
 
-        public async Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId, string machineId)
+        public async Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId, string? machineId, bool preIndustrialization)
         {
-            // Buscar usuário pelo número de identificação
             var user = await _users.Find(u => u.IdentificationNumber == identificationNumber).FirstOrDefaultAsync();
-            if (user == null)
-            {
-                throw new ArgumentException("Usuário não encontrado.");
-            }
+            if (user == null) throw new ArgumentException("Usuário não encontrado.");
 
-            // Buscar o tipo de processo pelo ID fornecido
             var processType = await _processTypes.Find(pt => pt.Id == processTypeId).FirstOrDefaultAsync();
-            if (processType == null)
+            if (processType == null) throw new ArgumentException("Tipo de Processo não encontrado.");
+
+            ReferenceEntity? machineReference = null;
+
+            if (!string.IsNullOrWhiteSpace(machineId))
             {
-                throw new ArgumentException("Tipo de Processo não encontrado.");
+                var machine = await _machines.Find(m => m.Id == machineId).FirstOrDefaultAsync();
+                if (machine == null) throw new ArgumentException("Máquina não encontrada.");
+
+                machineReference = new ReferenceEntity { Id = machine.Id, Name = machine.Name };
             }
 
-            // Buscar a máquina pelo ID fornecido
-            var machine = await _machines.Find(m => m.Id == machineId).FirstOrDefaultAsync();
-            if (machine == null)
-            {
-                throw new ArgumentException("Máquina não encontrada.");
-            }
-
-            // Obter horário atual de Campo Grande (AMT)
             TimeZoneInfo campoGrandeTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Campo_Grande");
             DateTime campoGrandeTime = TimeZoneInfo.ConvertTime(DateTime.UtcNow, campoGrandeTimeZone);
 
-            // Criar novo processo
             var newProcess = new Process
             {
                 Id = ObjectId.GenerateNewId().ToString(),
@@ -67,43 +61,84 @@ namespace ColdlineAPI.Application.Services
                 User = new ReferenceEntity { Id = user.Id, Name = user.Name },
                 Department = new ReferenceEntity { Id = user.Department.Id, Name = user.Department.Name },
                 ProcessType = new ReferenceEntity { Id = processType.Id, Name = processType.Name },
-                Machine = new ReferenceEntity { Id = machine.Id, Name = machine.Name }, // Associando a máquina ao processo
-                InOccurrence = false
+                Machine = machineReference, // Pode ser null
+                InOccurrence = false,
+                PreIndustrialization = preIndustrialization,
+                Finished = false
             };
 
-            // Inserir o novo processo no banco
             await _processes.InsertOneAsync(newProcess);
 
-            // Atualizar o usuário para armazenar o processo atual
             var updateUser = Builders<User>.Update
                 .Set(u => u.CurrentProcess, new ReferenceEntity { Id = newProcess.Id, Name = newProcess.IdentificationNumber });
-
             await _users.UpdateOneAsync(u => u.Id == user.Id, updateUser);
 
-            // Atualizar a máquina para armazenar a referência do processo atual
-            var updateMachine = Builders<Machine>.Update
-                .Set(m => m.Process, new ReferenceEntity { Id = newProcess.Id, Name = newProcess.IdentificationNumber });
-
-            await _machines.UpdateOneAsync(m => m.Id == machine.Id, updateMachine);
+            if (machineReference != null)
+            {
+                var updateMachine = Builders<Machine>.Update
+                    .Set(m => m.Process, new ReferenceEntity { Id = newProcess.Id, Name = newProcess.IdentificationNumber });
+                await _machines.UpdateOneAsync(m => m.Id == machineReference.Id, updateMachine);
+            }
 
             return newProcess;
         }
+
+
         public async Task<List<Process>> GetAllProcessesAsync()
         {
-            return await _processes.Find(process => true).ToListAsync();
+            var processes = await _processes.Find(process => true).ToListAsync();
+            foreach (var process in processes)
+            {
+                string updatedTime = CalculateProcessTime(process.StartDate);
+                await UpdateProcessTimeInDatabase(process.Id, updatedTime);
+                process.ProcessTime = updatedTime;
+            }
+            return processes;
         }
 
         public async Task<Process?> GetProcessByIdAsync(string id)
         {
-            return await _processes.Find(process => process.Id == id).FirstOrDefaultAsync();
+            var process = await _processes.Find(process => process.Id == id).FirstOrDefaultAsync();
+            if (process != null)
+            {
+                string updatedTime = CalculateProcessTime(process.StartDate);
+                await UpdateProcessTimeInDatabase(process.Id, updatedTime);
+                process.ProcessTime = updatedTime;
+            }
+            return process;
+        }
+
+        public async Task<List<Process>> SearchProcessAsync(ProcessFilter filter)
+        {
+            var filters = new List<FilterDefinition<Process>>();
+            var builder = Builders<Process>.Filter;
+
+            if (!string.IsNullOrEmpty(filter.IdentificationNumber))
+                filters.Add(builder.Eq(p => p.IdentificationNumber, filter.IdentificationNumber));
+
+            if (filter.StartDate.HasValue)
+                filters.Add(builder.Gte(p => p.StartDate, filter.StartDate.Value));
+
+            if (filter.EndDate.HasValue)
+                filters.Add(builder.Lte(p => p.EndDate, filter.EndDate.Value));
+
+            var finalFilter = filters.Count > 0 ? builder.And(filters) : builder.Empty;
+            var processes = await _processes.Find(finalFilter).ToListAsync();
+
+            foreach (var process in processes)
+            {
+                string updatedTime = CalculateProcessTime(process.StartDate);
+                await UpdateProcessTimeInDatabase(process.Id, updatedTime);
+                process.ProcessTime = updatedTime;
+            }
+
+            return processes;
         }
 
         public async Task<Process> CreateProcessAsync(Process process)
         {
             if (string.IsNullOrEmpty(process.Id))
-            {
                 process.Id = ObjectId.GenerateNewId().ToString();
-            }
 
             await _processes.InsertOneAsync(process);
             return process;
@@ -111,24 +146,19 @@ namespace ColdlineAPI.Application.Services
 
         public async Task<bool> UpdateProcessAsync(string id, Process process)
         {
-            var objectId = ObjectId.Parse(id);
-            var existingProcess = await _processes.Find(p => p.Id == objectId.ToString()).FirstOrDefaultAsync();
-
+            var existingProcess = await _processes.Find(p => p.Id == id).FirstOrDefaultAsync();
             if (existingProcess == null) return false;
+
+            process.ProcessTime = CalculateProcessTime(existingProcess.StartDate);
 
             var updateDefinition = Builders<Process>.Update
                 .Set(p => p.IdentificationNumber, process.IdentificationNumber ?? existingProcess.IdentificationNumber)
-                .Set(p => p.ProcessTime, process.ProcessTime ?? existingProcess.ProcessTime) // Agora armazenado como string
-                .Set(p => p.StartDate, process.StartDate != default ? process.StartDate : existingProcess.StartDate)
-                .Set(p => p.EndDate, process.EndDate != default ? process.EndDate : existingProcess.EndDate)
+                .Set(p => p.ProcessTime, process.ProcessTime)
+                .Set(p => p.StartDate, process.StartDate)
+                .Set(p => p.EndDate, process.EndDate)
                 .Set(p => p.User, process.User ?? existingProcess.User)
                 .Set(p => p.Department, process.Department ?? existingProcess.Department)
                 .Set(p => p.ProcessType, process.ProcessType ?? existingProcess.ProcessType)
-                .Set(p => p.PauseTypes, process.PauseTypes ?? existingProcess.PauseTypes)
-                .Set(p => p.Occurrences, process.Occurrences ?? existingProcess.Occurrences)
-                .Set(p => p.InOccurrence, process.InOccurrence)
-                .Set(p => p.Finished, process.Finished)
-                .Set(p => p.PreIndustrialization, process.PreIndustrialization)
                 .Set(p => p.Machine, process.Machine ?? existingProcess.Machine);
 
             var result = await _processes.UpdateOneAsync(p => p.Id == id, updateDefinition);
@@ -141,52 +171,52 @@ namespace ColdlineAPI.Application.Services
             return result.IsAcknowledged && result.DeletedCount > 0;
         }
 
-        public async Task<List<Process>> SearchProcessAsync(ProcessFilter filter)
+        public async Task<bool> UpdateProcessTimeInDatabase(string processId, string processTime)
         {
-            var filters = new List<FilterDefinition<Process>>();
-            var builder = Builders<Process>.Filter;
-
-            if (!string.IsNullOrEmpty(filter.IdentificationNumber))
-                filters.Add(builder.Eq(p => p.IdentificationNumber, filter.IdentificationNumber));
-
-            if (!string.IsNullOrEmpty(filter.ProcessTime))
-                filters.Add(builder.Eq(p => p.ProcessTime, filter.ProcessTime));
-
-            if (filter.StartDate.HasValue)
-                filters.Add(builder.Gte(p => p.StartDate, filter.StartDate.Value));
-
-            if (filter.EndDate.HasValue)
-                filters.Add(builder.Lte(p => p.EndDate, filter.EndDate.Value));
-
-            if (!string.IsNullOrEmpty(filter.UserId))
-                filters.Add(builder.Eq(p => p.User!.Id, filter.UserId));
-
-            if (!string.IsNullOrEmpty(filter.DepartmentId))
-                filters.Add(builder.Eq(p => p.Department!.Id, filter.DepartmentId));
-
-            if (!string.IsNullOrEmpty(filter.ProcessTypeId))
-                filters.Add(builder.Eq(p => p.ProcessType!.Id, filter.ProcessTypeId));
-
-            if (!string.IsNullOrEmpty(filter.PauseTypesId))
-                filters.Add(builder.Eq(p => p.PauseTypes!.Id, filter.PauseTypesId));
-
-            if (filter.OccurrencesIds != null && filter.OccurrencesIds.Count > 0)
-            {
-                var occurrenceIds = filter.OccurrencesIds.ToList();
-                filters.Add(builder.In("Occurrences.Id", occurrenceIds));
-            }
-            if (filter.Finished.HasValue)
-                filters.Add(builder.Eq(p => p.Finished, filter.Finished.Value));
-
-            if (filter.PreIndustrialization.HasValue)
-                filters.Add(builder.Eq(p => p.PreIndustrialization, filter.PreIndustrialization.Value));
-
-            if (!string.IsNullOrEmpty(filter.MachineId))
-                filters.Add(builder.Eq(p => p.Machine!.Id, filter.MachineId));
-
-            var finalFilter = filters.Count > 0 ? builder.And(filters) : builder.Empty;
-
-            return await _processes.Find(finalFilter).ToListAsync();
+            var update = Builders<Process>.Update.Set(p => p.ProcessTime, processTime);
+            var result = await _processes.UpdateOneAsync(p => p.Id == processId, update);
+            return result.IsAcknowledged && result.ModifiedCount > 0;
         }
+
+        private string CalculateProcessTime(DateTime startDate)
+        {
+            DateTime now = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("America/Campo_Grande"));
+
+            // 🔥 Garante que não haverá erro de tempo negativo
+            if (now < startDate)
+            {
+                return "00:00:00";
+            }
+
+            // Definir horário comercial
+            TimeSpan workStart = TimeSpan.FromHours(7.5);  // 07:30
+            TimeSpan workEnd = TimeSpan.FromHours(17.5);   // 17:30
+
+            TimeSpan totalTime = TimeSpan.Zero;
+            DateTime currentDay = startDate.Date;
+
+            while (currentDay <= now.Date)
+            {
+                DateTime start = currentDay == startDate.Date ? startDate : currentDay.Add(workStart);
+                DateTime end = currentDay == now.Date ? now : currentDay.Add(workEnd);
+
+                // 🔥 Ajuste correto para respeitar o horário comercial
+                if (start.TimeOfDay < workStart) start = currentDay.Add(workStart);
+                if (end.TimeOfDay > workEnd) end = currentDay.Add(workEnd);
+
+                // 🔥 Só soma tempo SE estamos dentro do horário comercial
+                if (now.TimeOfDay >= workStart && now.TimeOfDay <= workEnd)
+                {
+                    totalTime += end - start;
+                }
+
+                currentDay = currentDay.AddDays(1);
+            }
+
+            return $"{(int)totalTime.TotalHours:D2}:{totalTime.Minutes:D2}:{totalTime.Seconds:D2}";
+        }
+
+
+
     }
 }

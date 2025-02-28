@@ -25,12 +25,12 @@ namespace ColdlineAPI.Domain.Entities
         public DateTime EndDate { get; set; } = DateTime.UtcNow;
 
         [BsonElement("process")]
-        public ReferenceEntity Process { get; set; } = new ReferenceEntity();
+        public ReferenceEntity? Process { get; set; } = new ReferenceEntity();
 
         [BsonElement("pause Type")]
         public ReferenceEntity PauseType { get; set; } = new ReferenceEntity();
         [BsonElement("defect")]
-        public ReferenceEntity Defect { get; set; } = new ReferenceEntity();
+        public ReferenceEntity? Defect { get; set; } = new ReferenceEntity();
         [BsonElement("user")]
         public ReferenceEntity User { get; set; } = new ReferenceEntity();
     }

@@ -1,0 +1,34 @@
+@page "/industria"
+@layout EmptyLayout
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+@using ColdlineWeb.Models
+@using ColdlineWeb.Pages.Industria.Components
+@using ColdlineWeb.Services
+
+<link rel="stylesheet" href="css/Industria.css">
+
+<div class="container-industria">
+    <Sidebar User="user" OnLogout="Logout" />
+
+    <div class="main-content">
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <p class="error-message">@errorMessage</p>
+        }
+        else if (user?.CurrentProcess == null || processDetails == null)
+        {
+            <!-- Exibir o card para iniciar um novo processo -->
+            <ProcessCard 
+                ProcessTypes="processTypes" 
+                Machines="machines" 
+                OnStartProcess="@StartProcess" /> 
+        }
+        else
+        {
+            <!-- Exibir os detalhes do processo -->
+            <UserInfo ProcessDetails="processDetails" />
+        }
+    </div>
+</div>

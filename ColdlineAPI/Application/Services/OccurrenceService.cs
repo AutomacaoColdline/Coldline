@@ -1,5 +1,8 @@
 using ColdlineAPI.Application.Interfaces;
+using ColdlineAPI.Application.Filters;
+using ColdlineAPI.Application.DTOs;
 using ColdlineAPI.Domain.Entities;
+using ColdlineAPI.Domain.Common;
 using ColdlineAPI.Infrastructure.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -12,6 +15,8 @@ namespace ColdlineAPI.Application.Services
     public class OccurrenceService : IOccurrenceService
     {
         private readonly IMongoCollection<Occurrence> _occurrences;
+        private readonly IMongoCollection<Process> _processes;
+        private readonly IMongoCollection<User> _users;
 
         public OccurrenceService(IOptions<MongoDBSettings> mongoDBSettings)
         {
@@ -19,6 +24,8 @@ namespace ColdlineAPI.Application.Services
             var database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
 
             _occurrences = database.GetCollection<Occurrence>("Occurrences");
+            _processes = database.GetCollection<Process>("Processes");
+            _users = database.GetCollection<User>("Users");
         }
 
         public async Task<List<Occurrence>> GetAllOccurrencesAsync() =>
@@ -61,6 +68,43 @@ namespace ColdlineAPI.Application.Services
         {
             var result = await _occurrences.DeleteOneAsync(Occurrence => Occurrence.Id == id);
             return result.IsAcknowledged && result.DeletedCount > 0;
+        }
+
+        public async Task<Occurrence> StartOccurrenceAsync(StartOccurrenceRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.CodeOccurrence) || request.PauseType == null)
+            {
+                throw new ArgumentException("CodeOccurrence e PauseType são obrigatórios.");
+            }
+
+            var process = await _processes.Find(p => p.Id == request.Process.Id).FirstOrDefaultAsync();
+            if (process == null)
+            {
+                throw new ArgumentException("Processo não encontrado.");
+            }
+
+            var newOccurrence = new Occurrence
+            {
+                Id = ObjectId.GenerateNewId().ToString(),
+                CodeOccurrence = request.CodeOccurrence,
+                ProcessTime = "00:00:00",
+                StartDate = DateTime.UtcNow,
+                EndDate = null,
+                Process = new ReferenceEntity { Id = process.Id, Name = process.IdentificationNumber },
+                PauseType = request.PauseType,
+                Defect = request.Defect,
+                User = request.User
+            };
+
+            await _occurrences.InsertOneAsync(newOccurrence);
+
+            var updateProcess = Builders<Process>.Update.Push(p => p.Occurrences, new ReferenceEntity { Id = newOccurrence.Id, Name = newOccurrence.CodeOccurrence });
+            await _processes.UpdateOneAsync(p => p.Id == process.Id, updateProcess);
+
+            var updateUser = Builders<User>.Update.Set(u => u.CurrentOccurrence, new ReferenceEntity { Id = newOccurrence.Id, Name = newOccurrence.CodeOccurrence });
+            await _users.UpdateOneAsync(u => u.Id == request.User.Id, updateUser);
+
+            return newOccurrence;
         }
     }
 }

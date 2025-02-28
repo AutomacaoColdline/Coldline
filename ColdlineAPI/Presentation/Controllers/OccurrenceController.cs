@@ -1,5 +1,8 @@
 using ColdlineAPI.Application.Interfaces;
+using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Domain.Entities;
+using ColdlineAPI.Domain.Common;
+using ColdlineAPI.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -49,6 +52,20 @@ namespace ColdlineAPI.Presentation.Controllers
         {
             var deleted = await _occurrenceService.DeleteOccurrenceAsync(id);
             return deleted ? NoContent() : NotFound();
+        }
+
+        [HttpPost("start-occurrence")]
+        public async Task<ActionResult<Occurrence>> StartOccurrence([FromBody] StartOccurrenceRequest request)
+        {
+            try
+            {
+                var occurrence = await _occurrenceService.StartOccurrenceAsync(request);
+                return CreatedAtAction(nameof(GetOccurrenceById), new { id = occurrence.Id }, occurrence);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

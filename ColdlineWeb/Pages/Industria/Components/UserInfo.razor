@@ -1,15 +1,41 @@
 @using ColdlineWeb.Models
+@using ColdlineWeb.Services
+
+@inject IndustriaService IndustriaService
+
 @code {
     [Parameter] public ProcessModel? ProcessDetails { get; set; }
+    [Parameter] public List<OccurrenceModel> ProcessOccurrences { get; set; } = new();
+    private bool showOccurrenceForm = false;
+
+    private async Task StartOccurrence(StartOccurrenceModel occurrenceModel)
+    {
+        if (IndustriaService == null) return; // Garante que o serviço está injetado corretamente
+
+        var success = await IndustriaService.StartOccurrenceAsync(occurrenceModel);
+        if (success)
+        {
+            ProcessOccurrences.Add(new OccurrenceModel
+            {
+                Id = Guid.NewGuid().ToString(),
+                CodeOccurrence = occurrenceModel.CodeOccurrence,
+                Process = new ReferenceEntity { Id = occurrenceModel.Process.Id },
+                PauseType = occurrenceModel.PauseType,
+                Defect = occurrenceModel.Defect,
+                User = occurrenceModel.User
+            });
+            showOccurrenceForm = false;
+        }
+    }
 }
 
 <div class="user-info-card">
     @if (ProcessDetails != null)
     {
         <h5>Processo Atual</h5>
-        <p><strong>Numero do processo:</strong> @ProcessDetails.IdentificationNumber</p>
+        <p><strong>Número do processo:</strong> @ProcessDetails.IdentificationNumber</p>
         <p><strong>Tipo do processo:</strong> @ProcessDetails.ProcessType?.Name</p>
-
+        
         @if (ProcessDetails.Machine != null)
         {
             <p><strong>Máquina:</strong> @ProcessDetails.Machine.Name</p>
@@ -19,8 +45,31 @@
             <p><strong>Máquina:</strong> Não aplicável</p>
         }
 
-        <p><strong>Tempo decorrido no processo:</strong> @ProcessDetails.ProcessTime</p>
-        <p><strong>Pré - Industrialização:</strong> @(ProcessDetails.PreIndustrialization ?? false ? "Sim" : "Não")</p>
+        <p><strong>Tempo decorrido:</strong> @ProcessDetails.ProcessTime</p>
+        <p><strong>Pré-industrialização:</strong> @(ProcessDetails.PreIndustrialization ?? false ? "Sim" : "Não")</p>
+
+        <button class="btn btn-warning mt-2" @onclick="() => showOccurrenceForm = true">
+            Registrar Ocorrência
+        </button>
+
+        @if (showOccurrenceForm)
+        {
+            <OccurrenceForm OnStartOccurrence="StartOccurrence" ProcessId="@ProcessDetails.Id" />
+        }
+
+        @if (ProcessOccurrences != null && ProcessOccurrences.Any())
+        {
+            <h5>Ocorrências Registradas</h5>
+            @foreach (var occurrence in ProcessOccurrences)
+            {
+                <div class="info-item">
+                    <p><strong>Código:</strong> @occurrence.CodeOccurrence</p>
+                    <p><strong>Tipo de Pausa:</strong> @occurrence.PauseType.Name</p>
+                    <p><strong>Defeito:</strong> @(occurrence.Defect?.Name ?? "Não informado")</p>
+                    <p><strong>Tempo:</strong> @occurrence.ProcessTime</p>
+                </div>
+            }
+        }
     }
     else
     {

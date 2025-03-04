@@ -15,8 +15,29 @@ namespace ColdlineWeb.Services
             _http = http;
         }
 
-        public async Task<UserModel?> GetUserById(string id) =>
-            await _http.GetFromJsonAsync<UserModel>($"api/User/identification/{id}");
+        public async Task<UserModel?> GetUserByIdentificationNumber(string identificationNumber)
+        {
+            try
+            {
+                return await _http.GetFromJsonAsync<UserModel>($"api/User/identification/{identificationNumber}");
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
+        }
+
+        public async Task<UserModel?> GetUserById(string id)
+        {
+            try
+            {
+                return await _http.GetFromJsonAsync<UserModel>($"api/User/{id}");
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
+        }
 
         public async Task<ProcessModel?> GetProcessById(string processId)
         {
@@ -30,7 +51,6 @@ namespace ColdlineWeb.Services
             }
         }
 
-        // 🔥 Adicionando os métodos que estavam faltando:
         public async Task<List<ReferenceEntity>> GetProcessTypesAsync()
         {
             return await _http.GetFromJsonAsync<List<ReferenceEntity>>("api/ProcessType") ?? new List<ReferenceEntity>();
@@ -41,19 +61,16 @@ namespace ColdlineWeb.Services
             return await _http.GetFromJsonAsync<List<MachineModel>>("api/Machine") ?? new List<MachineModel>();
         }
 
-        public async Task<bool> StartProcessAsync(string identificationNumber, string processTypeId, string machineId, bool preIndustrialization)
+        public async Task<List<ReferenceEntity>> GetPauseTypesAsync()
         {
-            var request = new
-            {
-                IdentificationNumber = identificationNumber,
-                ProcessTypeId = processTypeId,
-                MachineId = machineId,
-                PreIndustrialization = preIndustrialization
-            };
-
-            var response = await _http.PostAsJsonAsync("api/Process/start-process", request);
-            return response.IsSuccessStatusCode;
+            return await _http.GetFromJsonAsync<List<ReferenceEntity>>("api/PauseType") ?? new List<ReferenceEntity>();
         }
+
+        public async Task<List<ReferenceEntity>> GetDefectsAsync()
+        {
+            return await _http.GetFromJsonAsync<List<ReferenceEntity>>("api/Defect") ?? new List<ReferenceEntity>();
+        }
+
         public async Task<bool> StartProcessAsync(string identificationNumber, string processTypeId, bool preIndustrialization, string? machineId = null)
         {
             var request = new
@@ -61,12 +78,40 @@ namespace ColdlineWeb.Services
                 IdentificationNumber = identificationNumber,
                 ProcessTypeId = processTypeId,
                 PreIndustrialization = preIndustrialization,
-                MachineId = machineId // Será enviado apenas se não for null
+                MachineId = machineId
             };
 
             var response = await _http.PostAsJsonAsync("api/Process/start-process", request);
             return response.IsSuccessStatusCode;
         }
 
+        public async Task<bool> StartOccurrenceAsync(StartOccurrenceModel occurrenceModel)
+        {
+            var response = await _http.PostAsJsonAsync("api/Occurrence/start-occurrence", occurrenceModel);
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<List<OccurrenceModel>> GetOccurrencesByProcessAsync(List<string> occurrenceIds)
+        {
+            var occurrences = new List<OccurrenceModel>();
+
+            foreach (var id in occurrenceIds)
+            {
+                try
+                {
+                    var occurrence = await _http.GetFromJsonAsync<OccurrenceModel>($"api/Occurrence/{id}");
+                    if (occurrence != null)
+                    {
+                        occurrences.Add(occurrence);
+                    }
+                }
+                catch (HttpRequestException)
+                {
+                    // Continua mesmo se houver erro ao buscar uma ocorrência
+                }
+            }
+
+            return occurrences;
+        }
     }
 }

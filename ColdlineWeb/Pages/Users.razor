@@ -34,8 +34,8 @@ else
                 <tr>
                     <td>@user.Name</td>
                     <td>@user.Email</td>
-                    <td>@user.UserType.Name</td>
-                    <td>@user.Department.Name</td>
+                    <td>@(user.UserType?.Name ?? "Sem Tipo")</td>
+                    <td>@(user.Department?.Name ?? "Sem Departamento")</td>
                     <td>@user.IdentificationNumber</td>
                     <td>@(user.CurrentProcess?.Name ?? "Nenhum")</td>
                     <td>@(user.CurrentOccurrence?.Name ?? "Nenhuma")</td>
@@ -67,6 +67,7 @@ else
 
                     <label>Tipo de Usuário:</label>
                     <select class="form-control" @bind="currentUser.UserType.Id">
+                        <option value="">Selecione...</option>
                         @foreach (var userType in userTypes)
                         {
                             <option value="@userType.Id">@userType.Name</option>
@@ -75,6 +76,7 @@ else
 
                     <label>Departamento:</label>
                     <select class="form-control" @bind="currentUser.Department.Id">
+                        <option value="">Selecione...</option>
                         @foreach (var department in departments)
                         {
                             <option value="@department.Id">@department.Name</option>
@@ -98,7 +100,7 @@ else
                         <option value="">Nenhuma</option>
                         @foreach (var occurrence in occurrences)
                         {
-                            <option value="@occurrence.Id">@occurrence.CodeOccurrence</option> <!-- Agora exibe CodeOccurrence -->
+                            <option value="@occurrence.Id">@occurrence.CodeOccurrence</option>
                         }
                     </select>
                 </div>
@@ -151,7 +153,13 @@ else
 
     private void OpenAddUserModal()
     {
-        currentUser = new UserModel();
+        currentUser = new UserModel
+        {
+            UserType = new ReferenceEntity(),
+            Department = new ReferenceEntity(),
+            CurrentProcess = new ReferenceEntity(),
+            CurrentOccurrence = new ReferenceEntity()
+        };
         showModal = true;
         isEditing = false;
     }
@@ -163,11 +171,11 @@ else
             Id = user.Id,
             Name = user.Name,
             Email = user.Email,
-            UserType = user.UserType,
-            Department = user.Department,
             IdentificationNumber = user.IdentificationNumber,
-            CurrentProcess = user.CurrentProcess,
-            CurrentOccurrence = user.CurrentOccurrence
+            UserType = userTypes.FirstOrDefault(ut => ut.Id == user.UserType.Id) ?? new ReferenceEntity(),
+            Department = departments.FirstOrDefault(d => d.Id == user.Department.Id) ?? new ReferenceEntity(),
+            CurrentProcess = user.CurrentProcess ?? new ReferenceEntity(),
+            CurrentOccurrence = user.CurrentOccurrence ?? new ReferenceEntity()
         };
         showModal = true;
         isEditing = true;
@@ -175,14 +183,8 @@ else
 
     private async Task SaveUser()
     {
-        if (!string.IsNullOrWhiteSpace(currentUser.CurrentOccurrence.Id))
-        {
-            var selectedOccurrence = occurrences.FirstOrDefault(o => o.Id == currentUser.CurrentOccurrence.Id);
-            if (selectedOccurrence != null)
-            {
-                currentUser.CurrentOccurrence.Name = selectedOccurrence.CodeOccurrence; 
-            }
-        }
+        currentUser.UserType.Name = userTypes.FirstOrDefault(ut => ut.Id == currentUser.UserType.Id)?.Name ?? "";
+        currentUser.Department.Name = departments.FirstOrDefault(d => d.Id == currentUser.Department.Id)?.Name ?? "";
 
         if (isEditing)
         {
@@ -195,7 +197,6 @@ else
         showModal = false;
         await LoadData();
     }
-
 
     private async Task DeleteUser(string id)
     {
@@ -229,7 +230,7 @@ else
     private class OccurrenceModel
     {
         public string Id { get; set; } = string.Empty;
-        public string CodeOccurrence { get; set; } = string.Empty; /* Exibe CodeOccurrence */
+        public string CodeOccurrence { get; set; } = string.Empty;
     }
 
     private class ReferenceEntity

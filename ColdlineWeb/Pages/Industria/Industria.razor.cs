@@ -3,6 +3,7 @@ using ColdlineWeb.Models;
 using ColdlineWeb.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace ColdlineWeb.Pages.Industria
 {
@@ -12,6 +13,7 @@ namespace ColdlineWeb.Pages.Industria
         private UserModel? user;
         private List<ReferenceEntity> processTypes = new();
         private List<MachineModel> machines = new();
+        private List<OccurrenceModel> processOccurrences = new();
         private ProcessModel? processDetails;
         private string errorMessage = "";
 
@@ -54,6 +56,12 @@ namespace ColdlineWeb.Pages.Industria
             try
             {
                 processDetails = await IndustriaService.GetProcessById(processId);
+
+                if (processDetails?.Occurrences != null && processDetails.Occurrences.Any())
+                {
+                    var occurrenceIds = processDetails.Occurrences.Select(o => o.Id).ToList();
+                    processOccurrences = await IndustriaService.GetOccurrencesByProcessAsync(occurrenceIds);
+                }
             }
             catch (HttpRequestException)
             {
@@ -88,11 +96,9 @@ namespace ColdlineWeb.Pages.Industria
 
             if (success)
             {
-                await LoadUser(user.IdentificationNumber);
+                await LoadUser(user.Id);
             }
         }
-
-
 
         private void Logout() => Navigation.NavigateTo("/industria/login");
     }

@@ -44,7 +44,7 @@ namespace ColdlineWeb.Pages.Industria
 
         private async Task LoadUser(string id)
         {
-            user = await IndustriaService.GetUserById(id);
+            user = await IndustriaService.GetUserByIdentificationNumber(id);
             if (user?.CurrentProcess != null)
             {
                 await LoadProcessDetails(user.CurrentProcess.Id);

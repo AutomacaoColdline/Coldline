@@ -48,8 +48,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>f32xzl76pg</Fingerprint>
-      <Integrity>2+9fKbLjsI1AqvoADrObQm64te9ROY0rT5U0k8QBhd4=</Integrity>
+      <Fingerprint>v3mzmhp4po</Fingerprint>
+      <Integrity>q6Sca3rs0cVAz0+MCmeETmpsYervbq92584e0F/Q9QQ=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\Industria.css'))</OriginalItemSpec>

@@ -6,22 +6,34 @@
 @code {
     [Parameter] public EventCallback<StartOccurrenceModel> OnStartOccurrence { get; set; }
     [Parameter] public string ProcessId { get; set; } = string.Empty;
-    [Parameter] public UserModel User { get; set; } = new();
+    [Parameter] public ProcessModel? ProcessDetails { get; set; }
 
     private string codeOccurrence = "";
     private string selectedPauseTypeId = "";
     private string selectedDefectId = "";
     private List<ReferenceEntity> pauseTypes = new();
     private List<ReferenceEntity> defects = new();
+    private bool isLoading = true; // 🔹 Adiciona um estado de carregamento para evitar problemas
 
     protected override async Task OnInitializedAsync()
     {
         pauseTypes = await IndustriaService.GetPauseTypesAsync();
         defects = await IndustriaService.GetDefectsAsync();
+
+        if (ProcessDetails == null || string.IsNullOrWhiteSpace(ProcessDetails.Id))
+        {
+            ProcessDetails = await IndustriaService.GetProcessById(ProcessId);
+        }
+
+        isLoading = false; // 🔹 Marca o carregamento como concluído
+        StateHasChanged(); // 🔹 Garante que a interface seja atualizada corretamente
     }
 
     private bool CanStartOccurrence =>
-        !string.IsNullOrWhiteSpace(codeOccurrence) && !string.IsNullOrWhiteSpace(selectedPauseTypeId);
+        !string.IsNullOrWhiteSpace(codeOccurrence) && 
+        !string.IsNullOrWhiteSpace(selectedPauseTypeId) &&
+        ProcessDetails?.User != null && 
+        !string.IsNullOrWhiteSpace(ProcessDetails.User.Id); // 🔹 Verificação reforçada para evitar problemas
 
     private async Task HandleStartOccurrence()
     {
@@ -29,10 +41,6 @@
 
         var pauseType = pauseTypes.FirstOrDefault(pt => pt.Id == selectedPauseTypeId);
         var defect = defects.FirstOrDefault(d => d.Id == selectedDefectId);
-
-        // Garante que o ID do usuário é o correto
-        var userId = User?.Id ?? string.Empty;
-        var userName = User?.Name ?? "Usuário Desconhecido";
 
         var occurrenceModel = new StartOccurrenceModel
         {
@@ -42,50 +50,55 @@
             Defect = defect ?? new ReferenceEntity(),
             User = new ReferenceEntity
             { 
-                Id = userId,
-                Name = userName
+                Id = ProcessDetails?.User?.Id ?? "",
+                Name = ProcessDetails?.User?.Name ?? "Usuário Desconhecido"
             }
         };
-
-        Console.WriteLine($"🚀 Enviando para API: Usuário: {occurrenceModel.User.Id} - {occurrenceModel.User.Name}, Processo: {occurrenceModel.Process.Id}");
 
         await OnStartOccurrence.InvokeAsync(occurrenceModel);
     }
 }
 
-<div class="modal">
-    <div class="modal-content">
-        <h5>Registrar Nova Ocorrência</h5>
+@if (isLoading)
+{
+    <p>Carregando...</p>
+}
+else
+{
+    <div class="modal">
+        <div class="modal-content">
+            <h5>Registrar Nova Ocorrência</h5>
 
-        <div class="form-group">
-            <label>Código da Ocorrência</label>
-            <input type="text" @bind="codeOccurrence" class="form-control" />
+            <div class="form-group">
+                <label>Código da Ocorrência</label>
+                <input type="text" @bind="codeOccurrence" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label>Tipo de Pausa</label>
+                <select @bind="selectedPauseTypeId" class="form-control">
+                    <option value="">Selecione um tipo</option>
+                    @foreach (var type in pauseTypes)
+                    {
+                        <option value="@type.Id">@type.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Defeito (Opcional)</label>
+                <select @bind="selectedDefectId" class="form-control">
+                    <option value="">Nenhum</option>
+                    @foreach (var defect in defects)
+                    {
+                        <option value="@defect.Id">@defect.Name</option>
+                    }
+                </select>
+            </div>
+
+            <button class="btn btn-primary mt-2" @onclick="HandleStartOccurrence" disabled="@(!CanStartOccurrence)">
+                Registrar Ocorrência
+            </button>
         </div>
-
-        <div class="form-group">
-            <label>Tipo de Pausa</label>
-            <select @bind="selectedPauseTypeId" class="form-control">
-                <option value="">Selecione um tipo</option>
-                @foreach (var type in pauseTypes)
-                {
-                    <option value="@type.Id">@type.Name</option>
-                }
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Defeito (Opcional)</label>
-            <select @bind="selectedDefectId" class="form-control">
-                <option value="">Nenhum</option>
-                @foreach (var defect in defects)
-                {
-                    <option value="@defect.Id">@defect.Name</option>
-                }
-            </select>
-        </div>
-
-        <button class="btn btn-primary mt-2" @onclick="HandleStartOccurrence" disabled="@(!CanStartOccurrence)">
-            Registrar Ocorrência
-        </button>
     </div>
-</div>
+}

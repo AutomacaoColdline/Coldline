@@ -42,6 +42,7 @@ namespace ColdlineAPI.Application.Services
 
             if (!string.IsNullOrWhiteSpace(machineId))
             {
+                
                 var machine = await _machines.Find(m => m.Id == machineId).FirstOrDefaultAsync();
                 if (machine == null) throw new ArgumentException("Máquina não encontrada.");
 

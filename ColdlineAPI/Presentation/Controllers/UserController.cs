@@ -34,7 +34,7 @@ namespace ColdlineAPI.Presentation.Controllers
         /// Retorna um usuário pelo ID.
         /// </summary>
         [HttpGet("{id}")]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> GetUserById(string id)
         {
             var user = await _userService.GetUserByIdAsync(id);
@@ -74,7 +74,7 @@ namespace ColdlineAPI.Presentation.Controllers
         /// Exclui um usuário pelo ID.
         /// </summary>
         [HttpDelete("{id}")]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> DeleteUser(string id)
         {
             var deleted = await _userService.DeleteUserAsync(id);

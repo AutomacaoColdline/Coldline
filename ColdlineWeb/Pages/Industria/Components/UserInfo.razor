@@ -8,71 +8,71 @@
     [Parameter] public List<OccurrenceModel> ProcessOccurrences { get; set; } = new();
     private bool showOccurrenceForm = false;
 
+    protected override async Task OnInitializedAsync()
+    {
+        if (ProcessDetails?.Id != null)
+        {
+            // Obtém as ocorrências do processo
+            var occurrenceIds = ProcessDetails.Occurrences?.Select(o => o.Id).ToList() ?? new List<string>();
+            ProcessOccurrences = await IndustriaService.GetOccurrencesByProcessAsync(occurrenceIds);
+        }
+    }
+
     private async Task StartOccurrence(StartOccurrenceModel occurrenceModel)
     {
-        if (IndustriaService == null) return; // Garante que o serviço está injetado corretamente
+        if (IndustriaService == null) return;
 
         var success = await IndustriaService.StartOccurrenceAsync(occurrenceModel);
         if (success)
         {
+            // Adiciona a nova ocorrência à lista e recarrega a exibição
             ProcessOccurrences.Add(new OccurrenceModel
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = occurrenceModel.Process.Id,
                 CodeOccurrence = occurrenceModel.CodeOccurrence,
                 Process = new ReferenceEntity { Id = occurrenceModel.Process.Id },
                 PauseType = occurrenceModel.PauseType,
                 Defect = occurrenceModel.Defect,
                 User = occurrenceModel.User
             });
+
             showOccurrenceForm = false;
+            StateHasChanged(); // Atualiza a interface
         }
     }
 }
 
-<div class="user-info-card">
-    @if (ProcessDetails != null)
-    {
-        <h5>Processo Atual</h5>
-        <p><strong>Número do processo:</strong> @ProcessDetails.IdentificationNumber</p>
-        <p><strong>Tipo do processo:</strong> @ProcessDetails.ProcessType?.Name</p>
-        
-        @if (ProcessDetails.Machine != null)
-        {
-            <p><strong>Máquina:</strong> @ProcessDetails.Machine.Name</p>
-        }
-        else
-        {
-            <p><strong>Máquina:</strong> Não aplicável</p>
-        }
-
-        <p><strong>Tempo decorrido:</strong> @ProcessDetails.ProcessTime</p>
-        <p><strong>Pré-industrialização:</strong> @(ProcessDetails.PreIndustrialization ?? false ? "Sim" : "Não")</p>
-
-        <button class="btn btn-warning mt-2" @onclick="() => showOccurrenceForm = true">
-            Registrar Ocorrência
-        </button>
-
-        @if (showOccurrenceForm)
-        {
-            <OccurrenceForm OnStartOccurrence="StartOccurrence" ProcessId="@ProcessDetails.Id" />
-        }
-
-        @if (ProcessOccurrences != null && ProcessOccurrences.Any())
-        {
-            <h5>Ocorrências Registradas</h5>
-            @foreach (var occurrence in ProcessOccurrences)
-            {
-                <div class="info-item">
-                    <p><strong>Código:</strong> @occurrence.CodeOccurrence</p>
-                    <p><strong>Tipo de Pausa:</strong> @occurrence.PauseType.Name</p>
-                    <p><strong>Defeito:</strong> @(occurrence.Defect?.Name ?? "Não informado")</p>
-                    <p><strong>Tempo:</strong> @occurrence.ProcessTime</p>
-                </div>
-            }
-        }
-    }
-    else
-    {
-        <p>Nenhum processo em andamento.</p>
-    }
+<div class="process-header">
+    <div class="process-info">
+        <strong>Número do processo:</strong> @ProcessDetails.IdentificationNumber |
+        <strong>Tipo:</strong> @ProcessDetails.ProcessType?.Name |
+        <strong>Máquina:</strong> @(ProcessDetails.Machine?.Name ?? "Não aplicável") |
+        <strong>Tempo decorrido:</strong> @ProcessDetails.ProcessTime |
+        <strong>Pré-industrialização:</strong> @(ProcessDetails.PreIndustrialization ?? false ? "Sim" : "Não")
+    </div>
+    
+    <button class="btn-register-occurrence" @onclick="() => showOccurrenceForm = true">
+        Registrar Ocorrência
+    </button>
 </div>
+
+@if (showOccurrenceForm)
+{
+    <OccurrenceForm OnStartOccurrence="StartOccurrence" ProcessId="@ProcessDetails.Id" />
+}
+
+@if (ProcessOccurrences != null && ProcessOccurrences.Any())
+{
+    <h5>Ocorrências Registradas</h5>
+    <div class="occurrence-list">
+        @foreach (var occurrence in ProcessOccurrences)
+        {
+            <div class="occurrence-item">
+                <span><strong>Código:</strong> @occurrence.CodeOccurrence</span>
+                <span><strong>Tipo de Pausa:</strong> @occurrence.PauseType.Name</span>
+                <span><strong>Defeito:</strong> @(occurrence.Defect?.Name ?? "Não informado")</span>
+                <span><strong>Tempo:</strong> @occurrence.ProcessTime</span>
+            </div>
+        }
+    </div>
+}

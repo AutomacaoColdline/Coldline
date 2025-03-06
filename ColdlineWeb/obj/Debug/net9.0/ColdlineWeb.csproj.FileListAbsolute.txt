@@ -819,7 +819,6 @@
 /app/obj/Debug/net9.0/blazor.build.boot-extension.json
 /app/obj/Debug/net9.0/blazor.boot.json
 /app/obj/Debug/net9.0/compressed/1ozb1uklr5-8rbvw3on5j.gz
-/app/obj/Debug/net9.0/compressed/dv4exvi334-f32xzl76pg.gz
 /app/obj/Debug/net9.0/compressed/tkr4znluw0-silagwqz4h.gz
 /app/obj/Debug/net9.0/compressed/44421v302u-bqjiyaj88i.gz
 /app/obj/Debug/net9.0/compressed/zh579iauum-c2jlpeoesf.gz
@@ -1085,10 +1084,11 @@
 /app/obj/Debug/net9.0/refint/ColdlineWeb.dll
 /app/obj/Debug/net9.0/ColdlineWeb.pdb
 /app/obj/Debug/net9.0/ref/ColdlineWeb.dll
-/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.xxtda3u7ut.pdb
-/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.s6hsgykeeh.wasm
-/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.s6hsgykeeh.wasm.gz
-/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.xxtda3u7ut.pdb.gz
-/app/obj/Debug/net9.0/compressed/hscczrya4x-s6hsgykeeh.gz
-/app/obj/Debug/net9.0/compressed/q644bqhs6y-xxtda3u7ut.gz
-/app/obj/Debug/net9.0/compressed/cbhgt0xw5z-brrzd5hi3c.gz
+/app/obj/Debug/net9.0/compressed/dv4exvi334-v3mzmhp4po.gz
+/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.b462mhz8of.pdb
+/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.f27wrfsqh2.wasm
+/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.f27wrfsqh2.wasm.gz
+/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.b462mhz8of.pdb.gz
+/app/obj/Debug/net9.0/compressed/hscczrya4x-f27wrfsqh2.gz
+/app/obj/Debug/net9.0/compressed/q644bqhs6y-b462mhz8of.gz
+/app/obj/Debug/net9.0/compressed/cbhgt0xw5z-y4hgkbxf7e.gz

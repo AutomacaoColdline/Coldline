@@ -84,6 +84,46 @@ namespace ColdlineAPI.Application.Services
             return newProcess;
         }
 
+        public async Task<bool> EndProcessAsync(string processId)
+        {
+            var process = await _processes.Find(p => p.Id == processId).FirstOrDefaultAsync();
+            if (process == null)
+            {
+                throw new ArgumentException("Processo não encontrado.");
+            }
+
+            // 🔹 Verifica se o usuário ainda tem uma ocorrência aberta
+            var user = await _users.Find(u => u.Id == process.User.Id).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                throw new ArgumentException("Usuário do processo não encontrado.");
+            }
+
+            if (user.CurrentOccurrence != null)
+            {
+                throw new InvalidOperationException("Não é possível finalizar o processo enquanto houver uma ocorrência aberta.");
+            }
+
+            // 🔹 Obtém a data e hora no fuso correto
+            TimeZoneInfo campoGrandeTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Campo_Grande");
+            DateTime campoGrandeTime = TimeZoneInfo.ConvertTime(DateTime.UtcNow, campoGrandeTimeZone);
+
+            // 🔹 Atualiza o processo para finalizado
+            var updateProcess = Builders<Process>.Update
+                .Set(p => p.Finished, true)
+                .Set(p => p.EndDate, campoGrandeTime); // Define a data de finalização
+
+            var resultProcess = await _processes.UpdateOneAsync(p => p.Id == processId, updateProcess);
+
+            // 🔹 Remove o processo atual do usuário
+            var updateUser = Builders<User>.Update.Set(u => u.CurrentProcess, null);
+            var resultUser = await _users.UpdateOneAsync(u => u.Id == user.Id, updateUser);
+
+            return resultProcess.IsAcknowledged && resultProcess.ModifiedCount > 0 &&
+                resultUser.IsAcknowledged && resultUser.ModifiedCount > 0;
+        }
+
+
 
         public async Task<List<Process>> GetAllProcessesAsync()
         {
@@ -160,6 +200,7 @@ namespace ColdlineAPI.Application.Services
                 .Set(p => p.User, process.User ?? existingProcess.User)
                 .Set(p => p.Department, process.Department ?? existingProcess.Department)
                 .Set(p => p.ProcessType, process.ProcessType ?? existingProcess.ProcessType)
+                .Set(p => p.Finished, process.Finished)
                 .Set(p => p.Machine, process.Machine ?? existingProcess.Machine);
 
             var result = await _processes.UpdateOneAsync(p => p.Id == id, updateDefinition);

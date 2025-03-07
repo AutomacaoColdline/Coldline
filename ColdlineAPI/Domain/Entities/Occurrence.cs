@@ -33,5 +33,7 @@ namespace ColdlineAPI.Domain.Entities
         public ReferenceEntity? Defect { get; set; } = new ReferenceEntity();
         [BsonElement("user")]
         public ReferenceEntity User { get; set; } = new ReferenceEntity();
+        [BsonElement("finished")]
+        public bool? Finished { get; set; }
     }
 }

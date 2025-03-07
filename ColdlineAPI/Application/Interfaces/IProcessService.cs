@@ -15,5 +15,6 @@ namespace ColdlineAPI.Application.Interfaces
         Task<List<Process>> SearchProcessAsync(ProcessFilter filter);
         Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId, string machineId, bool preIndustrialization);
         Task<bool> UpdateProcessTimeInDatabase(string processId, string processTime);
+        Task<bool> EndProcessAsync(string processId);
     }
 }

@@ -74,6 +74,7 @@ namespace ColdlineAPI.Application.Services
                 .Set(o => o.Process, occurrence.Process)
                 .Set(o => o.PauseType, occurrence.PauseType)
                 .Set(o => o.Defect, occurrence.Defect)
+                .Set(o => o.Finished, occurrence.Finished)
                 .Set(o => o.User, occurrence.User);
 
             var result = await _occurrences.UpdateOneAsync(filter, update);
@@ -131,6 +132,7 @@ namespace ColdlineAPI.Application.Services
                 Process = new ReferenceEntity { Id = process.Id, Name = process.IdentificationNumber },
                 PauseType = request.PauseType,
                 Defect = request.Defect,
+                Finished = false,
                 User = new ReferenceEntity { Id = user.Id, Name = user.Name }
             };
 
@@ -146,6 +148,41 @@ namespace ColdlineAPI.Application.Services
 
             return newOccurrence;
         }
+
+        public async Task<bool> EndOccurrenceAsync(string occurrenceId)
+        {
+            var occurrence = await _occurrences.Find(o => o.Id == occurrenceId).FirstOrDefaultAsync();
+            if (occurrence == null)
+            {
+                throw new ArgumentException("Ocorrência não encontrada.");
+            }
+
+            // 🔹 Busca o usuário associado à ocorrência
+            var user = await _users.Find(u => u.Id == occurrence.User.Id).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                throw new ArgumentException("Usuário da ocorrência não encontrado.");
+            }
+
+            // 🔹 Obtém a data e hora no fuso correto
+            TimeZoneInfo campoGrandeTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Campo_Grande");
+            DateTime campoGrandeTime = TimeZoneInfo.ConvertTime(DateTime.UtcNow, campoGrandeTimeZone);
+
+            // 🔹 Atualiza a ocorrência para finalizada
+            var updateOccurrence = Builders<Occurrence>.Update
+                .Set(o => o.Finished, true)
+                .Set(o => o.EndDate, campoGrandeTime); // Define a data de finalização
+
+            var resultOccurrence = await _occurrences.UpdateOneAsync(o => o.Id == occurrenceId, updateOccurrence);
+
+            // 🔹 Remove a ocorrência atual do usuário
+            var updateUser = Builders<User>.Update.Set(u => u.CurrentOccurrence, null);
+            var resultUser = await _users.UpdateOneAsync(u => u.Id == user.Id, updateUser);
+
+            return resultOccurrence.IsAcknowledged && resultOccurrence.ModifiedCount > 0 &&
+                resultUser.IsAcknowledged && resultUser.ModifiedCount > 0;
+        }
+
 
         public async Task<bool> UpdateOccurrenceTimeInDatabase(string occurrenceId, string processTime)
         {

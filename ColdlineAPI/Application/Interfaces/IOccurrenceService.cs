@@ -15,5 +15,6 @@ namespace ColdlineAPI.Application.Interfaces
         Task<bool> UpdateOccurrenceAsync(string id, Occurrence Occurrence);
         Task<bool> DeleteOccurrenceAsync(string id);
         Task<Occurrence> StartOccurrenceAsync(StartOccurrenceRequest request);
+        Task<bool> EndOccurrenceAsync(string occurrenceId);
     }
 }

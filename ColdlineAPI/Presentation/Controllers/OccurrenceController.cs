@@ -67,5 +67,19 @@ namespace ColdlineAPI.Presentation.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        [HttpPost("end-occurrence/{id}")]
+        public async Task<IActionResult> EndOccurrence(string id)
+        {
+            try
+            {
+                var result = await _occurrenceService.EndOccurrenceAsync(id);
+                return result ? Ok(new { message = "Ocorrência finalizada com sucesso." }) : BadRequest(new { message = "Falha ao finalizar a ocorrência." });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
     }
 }

@@ -77,5 +77,19 @@ namespace ColdlineAPI.Presentation.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        [HttpPost("end-process/{id}")]
+        public async Task<IActionResult> EndProcess(string id)
+        {
+            try
+            {
+                var result = await _processService.EndProcessAsync(id);
+                return result ? Ok(new { message = "Processo finalizado com sucesso." }) : BadRequest(new { message = "Falha ao finalizar o processo." });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
     }
 }

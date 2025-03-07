@@ -11,5 +11,6 @@ namespace ColdlineWeb.Models
         public ReferenceEntity PauseType { get; set; } = new();
         public ReferenceEntity? Defect { get; set; }
         public ReferenceEntity User { get; set; } = new();
+        public bool Finished { get; set; }
     }
 }

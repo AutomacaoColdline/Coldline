@@ -13,6 +13,7 @@ namespace ColdlineWeb.Models{
         public List<ReferenceEntity>? Occurrences { get; set; } = new();
         public bool InOccurrence { get; set; }
         public bool? PreIndustrialization { get; set; }
+        public bool Finished { get; set; }
     }
 
 

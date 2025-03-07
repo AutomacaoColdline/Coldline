@@ -15,6 +15,7 @@ namespace ColdlineWeb.Services
             _http = http;
         }
 
+        // 🔹 Buscar usuário pelo número de identificação
         public async Task<UserModel?> GetUserByIdentificationNumber(string identificationNumber)
         {
             try
@@ -27,6 +28,7 @@ namespace ColdlineWeb.Services
             }
         }
 
+        // 🔹 Buscar usuário pelo ID
         public async Task<UserModel?> GetUserById(string id)
         {
             try
@@ -39,6 +41,7 @@ namespace ColdlineWeb.Services
             }
         }
 
+        // 🔹 Buscar processo pelo ID
         public async Task<ProcessModel?> GetProcessById(string processId)
         {
             try
@@ -51,26 +54,31 @@ namespace ColdlineWeb.Services
             }
         }
 
+        // 🔹 Listar tipos de processos
         public async Task<List<ReferenceEntity>> GetProcessTypesAsync()
         {
             return await _http.GetFromJsonAsync<List<ReferenceEntity>>("api/ProcessType") ?? new List<ReferenceEntity>();
         }
 
+        // 🔹 Listar máquinas disponíveis
         public async Task<List<MachineModel>> GetMachinesAsync()
         {
             return await _http.GetFromJsonAsync<List<MachineModel>>("api/Machine") ?? new List<MachineModel>();
         }
 
+        // 🔹 Listar tipos de pausas disponíveis
         public async Task<List<ReferenceEntity>> GetPauseTypesAsync()
         {
             return await _http.GetFromJsonAsync<List<ReferenceEntity>>("api/PauseType") ?? new List<ReferenceEntity>();
         }
 
+        // 🔹 Listar tipos de defeitos disponíveis
         public async Task<List<ReferenceEntity>> GetDefectsAsync()
         {
             return await _http.GetFromJsonAsync<List<ReferenceEntity>>("api/Defect") ?? new List<ReferenceEntity>();
         }
 
+        // 🔹 Iniciar um novo processo
         public async Task<bool> StartProcessAsync(string identificationNumber, string processTypeId, bool preIndustrialization, string? machineId = null)
         {
             var request = new
@@ -85,12 +93,34 @@ namespace ColdlineWeb.Services
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<bool> StartOccurrenceAsync(StartOccurrenceModel occurrenceModel)
+        // 🔹 Finalizar um processo
+        public async Task<bool> EndProcessAsync(string processId)
         {
-            var response = await _http.PostAsJsonAsync("api/Occurrence/start-occurrence", occurrenceModel);
+            var response = await _http.PostAsJsonAsync($"api/Process/end-process/{processId}", new { });
             return response.IsSuccessStatusCode;
         }
 
+        // 🔹 Iniciar uma nova ocorrência
+        public async Task<OccurrenceModel?> StartOccurrenceAsync(StartOccurrenceModel occurrenceModel)
+        {
+            var response = await _http.PostAsJsonAsync("api/Occurrence/start-occurrence", occurrenceModel);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<OccurrenceModel>();
+            }
+
+            return null;
+        }
+
+        // 🔹 Finalizar uma ocorrência
+        public async Task<bool> EndOccurrenceAsync(string occurrenceId)
+        {
+            var response = await _http.PostAsJsonAsync($"api/Occurrence/end-occurrence/{occurrenceId}", new { });
+            return response.IsSuccessStatusCode;
+        }
+
+        // 🔹 Buscar todas as ocorrências de um processo
         public async Task<List<OccurrenceModel>> GetOccurrencesByProcessAsync(List<string> occurrenceIds)
         {
             var occurrences = new List<OccurrenceModel>();

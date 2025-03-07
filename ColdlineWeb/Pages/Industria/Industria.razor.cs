@@ -10,12 +10,14 @@ namespace ColdlineWeb.Pages.Industria
     public partial class Industria : ComponentBase
     {
         [Inject] private IndustriaService IndustriaService { get; set; } = default!;
+        
         private UserModel? user;
         private List<ReferenceEntity> processTypes = new();
         private List<MachineModel> machines = new();
         private List<OccurrenceModel> processOccurrences = new();
         private ProcessModel? processDetails;
         private string errorMessage = "";
+        private bool isLoading = true; // 🔹 Estado para evitar carregamento precoce
 
         protected override async Task OnInitializedAsync()
         {
@@ -39,6 +41,10 @@ namespace ColdlineWeb.Pages.Industria
             catch (Exception)
             {
                 errorMessage = "Erro ao carregar dados da indústria.";
+            }
+            finally
+            {
+                isLoading = false;
             }
         }
 
@@ -66,18 +72,12 @@ namespace ColdlineWeb.Pages.Industria
             catch (HttpRequestException)
             {
                 processDetails = null;
+                errorMessage = "Erro ao carregar detalhes do processo.";
             }
         }
 
-        private async Task LoadProcessTypes()
-        {
-            processTypes = await IndustriaService.GetProcessTypesAsync();
-        }
-
-        private async Task LoadMachines()
-        {
-            machines = await IndustriaService.GetMachinesAsync();
-        }
+        private async Task LoadProcessTypes() => processTypes = await IndustriaService.GetProcessTypesAsync();
+        private async Task LoadMachines() => machines = await IndustriaService.GetMachinesAsync();
 
         private async Task StartProcess(StartProcessModel processModel)
         {
@@ -96,7 +96,41 @@ namespace ColdlineWeb.Pages.Industria
 
             if (success)
             {
-                await LoadUser(user.Id);
+                await LoadUser(user.IdentificationNumber);
+            }
+        }
+
+        private async Task FinalizeOccurrence(string occurrenceId)
+        {
+            bool success = await IndustriaService.EndOccurrenceAsync(occurrenceId);
+            if (success)
+            {
+                // 🔹 Atualiza a lista de ocorrências
+                processOccurrences = await IndustriaService.GetOccurrencesByProcessAsync(processDetails!.Occurrences.Select(o => o.Id).ToList());
+            }
+            else
+            {
+                errorMessage = "Erro ao finalizar a ocorrência.";
+            }
+        }
+
+        private async Task FinalizeProcess()
+        {
+            if (processDetails == null || string.IsNullOrWhiteSpace(processDetails.Id))
+            {
+                errorMessage = "Processo inválido.";
+                return;
+            }
+
+            bool success = await IndustriaService.EndProcessAsync(processDetails.Id);
+            if (success)
+            {
+                processDetails = null; // 🔹 Reseta os detalhes do processo após finalizá-lo
+                processOccurrences.Clear();
+            }
+            else
+            {
+                errorMessage = "Erro ao finalizar o processo.";
             }
         }
 

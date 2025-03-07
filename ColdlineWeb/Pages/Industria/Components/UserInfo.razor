@@ -7,12 +7,13 @@
     [Parameter] public ProcessModel? ProcessDetails { get; set; }
     [Parameter] public List<OccurrenceModel> ProcessOccurrences { get; set; } = new();
     private bool showOccurrenceForm = false;
+    private string errorMessage = "";
 
     protected override async Task OnInitializedAsync()
     {
         if (ProcessDetails?.Id != null)
         {
-            // Obtém as ocorrências do processo
+            // Obtém as ocorrências mais recentes do servidor
             var occurrenceIds = ProcessDetails.Occurrences?.Select(o => o.Id).ToList() ?? new List<string>();
             ProcessOccurrences = await IndustriaService.GetOccurrencesByProcessAsync(occurrenceIds);
         }
@@ -22,22 +23,32 @@
     {
         if (IndustriaService == null) return;
 
-        var success = await IndustriaService.StartOccurrenceAsync(occurrenceModel);
-        if (success)
+        var newOccurrence = await IndustriaService.StartOccurrenceAsync(occurrenceModel);
+        if (newOccurrence != null)
         {
-            // Adiciona a nova ocorrência à lista e recarrega a exibição
-            ProcessOccurrences.Add(new OccurrenceModel
-            {
-                Id = occurrenceModel.Process.Id,
-                CodeOccurrence = occurrenceModel.CodeOccurrence,
-                Process = new ReferenceEntity { Id = occurrenceModel.Process.Id },
-                PauseType = occurrenceModel.PauseType,
-                Defect = occurrenceModel.Defect,
-                User = occurrenceModel.User
-            });
+            // 🔹 Atualiza a lista com a ID correta retornada pelo servidor
+            ProcessOccurrences.Add(newOccurrence);
+            ProcessDetails!.Occurrences.Add(new ReferenceEntity { Id = newOccurrence.Id, Name = newOccurrence.CodeOccurrence });
 
             showOccurrenceForm = false;
-            StateHasChanged(); // Atualiza a interface
+            StateHasChanged();
+        }
+    }
+
+    private async Task FinalizeOccurrence(string occurrenceId)
+    {
+        var success = await IndustriaService.EndOccurrenceAsync(occurrenceId);
+        if (success)
+        {
+            // 🔹 Remove a ocorrência da lista após finalizá-la
+            var occurrence = ProcessOccurrences.FirstOrDefault(o => o.Id == occurrenceId);
+            if (occurrence != null) occurrence.Finished = true;
+
+            StateHasChanged();
+        }
+        else
+        {
+            errorMessage = "Erro ao finalizar a ocorrência.";
         }
     }
 }
@@ -61,6 +72,11 @@
     <OccurrenceForm OnStartOccurrence="StartOccurrence" ProcessId="@ProcessDetails.Id" />
 }
 
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p class="text-danger">@errorMessage</p>
+}
+
 @if (ProcessOccurrences != null && ProcessOccurrences.Any())
 {
     <h5>Ocorrências Registradas</h5>
@@ -72,6 +88,15 @@
                 <span><strong>Tipo de Pausa:</strong> @occurrence.PauseType.Name</span>
                 <span><strong>Defeito:</strong> @(occurrence.Defect?.Name ?? "Não informado")</span>
                 <span><strong>Tempo:</strong> @occurrence.ProcessTime</span>
+
+                @if (!occurrence.Finished)
+                {
+                    <button class="btn btn-danger btn-sm" @onclick="() => FinalizeOccurrence(occurrence.Id)">Finalizar</button>
+                }
+                else
+                {
+                    <span class="badge bg-success">Finalizada</span>
+                }
             </div>
         }
     </div>

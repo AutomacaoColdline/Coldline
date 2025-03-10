@@ -168,3 +168,22 @@ select, input[type="text"] {
     width: 400px;
     text-align: center;
 }
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+/* Botão de Finalizar Processo */
+.btn-finalize-process {
+    background-color: #bdc3c7;
+    color: black;
+    border: 1px solid black;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-finalize-process:hover {
+    background-color: #95a5a6;
+}

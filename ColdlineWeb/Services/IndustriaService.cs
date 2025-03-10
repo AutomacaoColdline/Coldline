@@ -93,13 +93,6 @@ namespace ColdlineWeb.Services
             return response.IsSuccessStatusCode;
         }
 
-        // 🔹 Finalizar um processo
-        public async Task<bool> EndProcessAsync(string processId)
-        {
-            var response = await _http.PostAsJsonAsync($"api/Process/end-process/{processId}", new { });
-            return response.IsSuccessStatusCode;
-        }
-
         // 🔹 Iniciar uma nova ocorrência
         public async Task<OccurrenceModel?> StartOccurrenceAsync(StartOccurrenceModel occurrenceModel)
         {
@@ -119,6 +112,12 @@ namespace ColdlineWeb.Services
             var response = await _http.PostAsJsonAsync($"api/Occurrence/end-occurrence/{occurrenceId}", new { });
             return response.IsSuccessStatusCode;
         }
+        public async Task<bool> EndProcessAsync(string processId)
+        {
+            var response = await _http.PostAsJsonAsync($"api/Process/end-process/{processId}", new { });
+            return response.IsSuccessStatusCode;
+        }
+
 
         // 🔹 Buscar todas as ocorrências de um processo
         public async Task<List<OccurrenceModel>> GetOccurrencesByProcessAsync(List<string> occurrenceIds)

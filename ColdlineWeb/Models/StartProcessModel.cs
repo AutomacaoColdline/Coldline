@@ -5,5 +5,6 @@ namespace ColdlineWeb.Models
         public string ProcessTypeId { get; set; } = string.Empty;
         public string? MachineId { get; set; } = string.Empty;
         public bool PreIndustrialization { get; set; }
+        public bool ReWork { get; set; }
     }
 }

@@ -1,5 +1,7 @@
 @using ColdlineWeb.Models
 @using ColdlineWeb.Services
+@inject NavigationManager Navigation
+
 
 @inject IndustriaService IndustriaService
 
@@ -51,6 +53,24 @@
             errorMessage = "Erro ao finalizar a ocorrência.";
         }
     }
+    private async Task FinalizeProcess()
+    {
+        if (ProcessDetails == null || string.IsNullOrWhiteSpace(ProcessDetails.Id))
+        {
+            errorMessage = "Processo inválido.";
+            return;
+        }
+
+        bool success = await IndustriaService.EndProcessAsync(ProcessDetails.Id);
+        if (success)
+        {
+            Navigation.NavigateTo("/industria", forceLoad: true); // 🔹 Recarrega a página para mostrar o card de novo processo
+        }
+        else
+        {
+            errorMessage = "Erro ao finalizar o processo.";
+        }
+    }
 }
 
 <div class="process-header">
@@ -64,6 +84,10 @@
     
     <button class="btn-register-occurrence" @onclick="() => showOccurrenceForm = true">
         Registrar Ocorrência
+    </button>
+
+    <button class="btn-finalize-process" @onclick="FinalizeProcess">
+            Finalizar Processo
     </button>
 </div>
 

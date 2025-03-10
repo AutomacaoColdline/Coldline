@@ -8,6 +8,7 @@
     private string selectedProcessTypeId = "";
     private string selectedMachineId = "";
     private bool preIndustrialization = false;
+    private bool reWork = false;
 
     private bool CanStartProcess =>
         !string.IsNullOrWhiteSpace(selectedProcessTypeId) &&
@@ -21,7 +22,8 @@
         {
             ProcessTypeId = selectedProcessTypeId,
             PreIndustrialization = preIndustrialization,
-            MachineId = preIndustrialization ? null : selectedMachineId // Passa null se for pré-industrialização
+            ReWork = reWork,
+            MachineId = preIndustrialization ? null : selectedMachineId 
         };
 
         await OnStartProcess.InvokeAsync(processModel);
@@ -67,6 +69,10 @@
     <div class="form-group checkbox-group">
         <input type="checkbox" id="preIndustrialization" @bind="preIndustrialization" @bind:after="TogglePreIndustrialization" />
         <label for="preIndustrialization">Pré-industrialização</label>
+    </div>
+    <div class="form-group checkbox-group">
+        <input type="checkbox" id="reWork" @bind="reWork"/>
+        <label for="reWork">Re-Trabalho</label>
     </div>
 
     <button class="btn btn-primary mt-2" @onclick="HandleStartProcess" disabled="@(!CanStartProcess)">

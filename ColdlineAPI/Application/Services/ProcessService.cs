@@ -30,7 +30,7 @@ namespace ColdlineAPI.Application.Services
             _machines = database.GetCollection<Machine>("Machines");
         }
 
-        public async Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId, string? machineId, bool preIndustrialization)
+        public async Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId, string? machineId, bool preIndustrialization, bool reWork)
         {
             var user = await _users.Find(u => u.IdentificationNumber == identificationNumber).FirstOrDefaultAsync();
             if (user == null) throw new ArgumentException("Usuário não encontrado.");
@@ -55,15 +55,16 @@ namespace ColdlineAPI.Application.Services
             var newProcess = new Process
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                IdentificationNumber = identificationNumber,
+                IdentificationNumber = GenerateNumericCode(),
                 ProcessTime = "00:00:00",
                 StartDate = campoGrandeTime,
                 EndDate = null,
                 User = new ReferenceEntity { Id = user.Id, Name = user.Name },
                 Department = new ReferenceEntity { Id = user.Department.Id, Name = user.Department.Name },
                 ProcessType = new ReferenceEntity { Id = processType.Id, Name = processType.Name },
-                Machine = machineReference, // Pode ser null
+                Machine = machineReference, 
                 InOccurrence = false,
+                ReWork = reWork,
                 PreIndustrialization = preIndustrialization,
                 Finished = false
             };
@@ -201,6 +202,7 @@ namespace ColdlineAPI.Application.Services
                 .Set(p => p.Department, process.Department ?? existingProcess.Department)
                 .Set(p => p.ProcessType, process.ProcessType ?? existingProcess.ProcessType)
                 .Set(p => p.Finished, process.Finished)
+                .Set(p => p.ReWork, process.ReWork)
                 .Set(p => p.Machine, process.Machine ?? existingProcess.Machine);
 
             var result = await _processes.UpdateOneAsync(p => p.Id == id, updateDefinition);
@@ -257,8 +259,11 @@ namespace ColdlineAPI.Application.Services
 
             return $"{(int)totalTime.TotalHours:D2}:{totalTime.Minutes:D2}:{totalTime.Seconds:D2}";
         }
-
-
+        private static string GenerateNumericCode()
+        {
+            Random random = new Random();
+            return random.Next(100000, 999999).ToString(); // Gera um número entre 100000 e 999999
+        }
 
     }
 }

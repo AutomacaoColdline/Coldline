@@ -89,9 +89,9 @@ namespace ColdlineAPI.Application.Services
 
         public async Task<Occurrence> StartOccurrenceAsync(StartOccurrenceRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.CodeOccurrence) || request.PauseType == null)
+            if ( request.PauseType == null)
             {
-                throw new ArgumentException("CodeOccurrence e PauseType são obrigatórios.");
+                throw new ArgumentException(" PauseType são obrigatórios.");
             }
 
             if (request.User == null || string.IsNullOrWhiteSpace(request.User.Id))
@@ -125,7 +125,7 @@ namespace ColdlineAPI.Application.Services
             var newOccurrence = new Occurrence
             {
                 Id = ObjectId.GenerateNewId().ToString(),
-                CodeOccurrence = request.CodeOccurrence,
+                CodeOccurrence = GenerateNumericCode(),
                 ProcessTime = "00:00:00",
                 StartDate = campoGrandeTime,
                 EndDate = null,
@@ -233,8 +233,11 @@ namespace ColdlineAPI.Application.Services
 
             return $"{(int)totalTime.TotalHours:D2}:{totalTime.Minutes:D2}:{totalTime.Seconds:D2}";
         }
-
-
+        private static string GenerateNumericCode()
+        {
+            Random random = new Random();
+            return random.Next(100000, 999999).ToString(); // Gera um número entre 100000 e 999999
+        }
 
     }
 }

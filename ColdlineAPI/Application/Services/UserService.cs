@@ -92,6 +92,13 @@ namespace ColdlineAPI.Application.Services
             {
                 throw new ArgumentException("O email fornecido já está em uso.");
             }
+            if(string.IsNullOrEmpty(user.CurrentProcess.Id)){
+                user.CurrentProcess = null;
+                user.CurrentOccurrence = null;
+            }
+            else if(string.IsNullOrEmpty(user.CurrentOccurrence.Id)){
+                user.CurrentOccurrence = null;
+            }
 
             user.Password = UtilityHelper.Encrypt(user.Password);
             await _users.InsertOneAsync(user);

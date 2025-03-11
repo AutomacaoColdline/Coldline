@@ -1,0 +1,31 @@
+/* Card de Processo */
+/* Card de Processo */
+.process-card {
+    background-color: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    width: 420px;
+    text-align: center;
+    
+    /* Centraliza SOMENTE o ProcessCard */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+
+/* Formulário de Seleção */
+.form-group {
+    margin-top: 15px;
+    text-align: left;
+}
+
+select, input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 5px;
+}

@@ -13,6 +13,22 @@
       "PackagePath": "staticwebassets/css/Industria.css"
     },
     {
+      "Id": "/app/wwwroot/css/OccurrenceForm.css",
+      "PackagePath": "staticwebassets/css/OccurrenceForm.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/ProcessCard.css",
+      "PackagePath": "staticwebassets/css/ProcessCard.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/Sidebar.css",
+      "PackagePath": "staticwebassets/css/Sidebar.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/UserInfo.css",
+      "PackagePath": "staticwebassets/css/UserInfo.css"
+    },
+    {
       "Id": "/app/wwwroot/css/app.css",
       "PackagePath": "staticwebassets/css/app.css"
     },
@@ -23,6 +39,14 @@
     {
       "Id": "/app/wwwroot/icon-192.png",
       "PackagePath": "staticwebassets/icon-192.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/logo.png",
+      "PackagePath": "staticwebassets/img/logo.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/logofundo.png",
+      "PackagePath": "staticwebassets/img/logofundo.png"
     },
     {
       "Id": "/app/wwwroot/index.html",

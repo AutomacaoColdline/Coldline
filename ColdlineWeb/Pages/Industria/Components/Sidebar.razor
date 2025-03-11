@@ -8,7 +8,8 @@
     @if (User != null)
     {
         <div class="user-avatar">
-            <img src="@User.ProfilePictureUrl" alt="Foto do Usuário" onerror="this.onerror=null; this.src='https://via.placeholder.com/80';">
+            <img src="@User.ProfilePictureUrl" alt="Foto do Usuário" 
+                 onerror="this.onerror=null; this.src='https://via.placeholder.com/80';">
         </div>
 
         <div class="user-info">
@@ -33,9 +34,12 @@
                 <p>Não há ocorrência</p>
             }
         </div>
-
-        <button class="btn-circle" @onclick="() => OnLogout.InvokeAsync()">
-            <i class="fas fa-arrow-left"></i>
-        </button>
     }
+     <!-- Logo na sidebar -->
+
+
+    <!-- Botão de voltar posicionado sobre a logo -->
+    <button class="btn-circle" @onclick="() => OnLogout.InvokeAsync()">
+        <i class="fas fa-arrow-left"></i>
+    </button>
 </div>

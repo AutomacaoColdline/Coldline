@@ -5,15 +5,15 @@
 
 @code {
     [Parameter] public EventCallback<StartOccurrenceModel> OnStartOccurrence { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; } 
     [Parameter] public string ProcessId { get; set; } = string.Empty;
     [Parameter] public ProcessModel? ProcessDetails { get; set; }
 
-    private string codeOccurrence = "";
     private string selectedPauseTypeId = "";
     private string selectedDefectId = "";
     private List<ReferenceEntity> pauseTypes = new();
     private List<ReferenceEntity> defects = new();
-    private bool isLoading = true; // 🔹 Adiciona um estado de carregamento para evitar problemas
+    private bool isLoading = true; 
 
     protected override async Task OnInitializedAsync()
     {
@@ -25,15 +25,14 @@
             ProcessDetails = await IndustriaService.GetProcessById(ProcessId);
         }
 
-        isLoading = false; // 🔹 Marca o carregamento como concluído
-        StateHasChanged(); // 🔹 Garante que a interface seja atualizada corretamente
+        isLoading = false; 
+        StateHasChanged();
     }
 
     private bool CanStartOccurrence =>
-        !string.IsNullOrWhiteSpace(codeOccurrence) && 
         !string.IsNullOrWhiteSpace(selectedPauseTypeId) &&
         ProcessDetails?.User != null && 
-        !string.IsNullOrWhiteSpace(ProcessDetails.User.Id); // 🔹 Verificação reforçada para evitar problemas
+        !string.IsNullOrWhiteSpace(ProcessDetails.User.Id);
 
     private async Task HandleStartOccurrence()
     {
@@ -44,7 +43,7 @@
 
         var occurrenceModel = new StartOccurrenceModel
         {
-            CodeOccurrence = codeOccurrence,
+            CodeOccurrence = "",
             Process = new ReferenceEntity { Id = ProcessId.Trim() },
             PauseType = pauseType ?? new ReferenceEntity(),
             Defect = defect ?? new ReferenceEntity(),
@@ -57,6 +56,11 @@
 
         await OnStartOccurrence.InvokeAsync(occurrenceModel);
     }
+
+    private async Task CloseModal()
+    {
+        await OnClose.InvokeAsync();
+    }
 }
 
 @if (isLoading)
@@ -67,12 +71,11 @@ else
 {
     <div class="modal">
         <div class="modal-content">
-            <h5>Registrar Nova Ocorrência</h5>
+            <button class="btn-close" @onclick="CloseModal">
+                ✖
+            </button>
 
-            <div class="form-group">
-                <label>Código da Ocorrência</label>
-                <input type="text" @bind="codeOccurrence" class="form-control" />
-            </div>
+            <h5>Registrar Nova Ocorrência</h5>
 
             <div class="form-group">
                 <label>Tipo de Pausa</label>

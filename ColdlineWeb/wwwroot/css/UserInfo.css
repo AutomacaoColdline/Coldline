@@ -1,0 +1,94 @@
+/* 📌 Cabeçalho do Processo */
+.process-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    margin-bottom: 20px;
+}
+
+/* 📌 Container para alinhar os botões corretamente */
+.button-container {
+    display: flex;
+    gap: 10px; /* Espaço entre os botões */
+}
+
+/* 📌 Botões estilizados de forma idêntica */
+.btn-register-occurrence,
+.btn-finalize-process {
+    color: white !important;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 160px;
+    text-align: center;
+}
+
+/* 📌 Botão Registrar Ocorrência - Laranja */
+.btn-register-occurrence {
+    background-color: #f39c12 !important;
+    box-shadow: 0 4px 10px rgba(243, 156, 18, 0.3);
+}
+
+.btn-register-occurrence:hover {
+    background-color: #e67e22 !important;
+    box-shadow: 0 5px 15px rgba(230, 126, 34, 0.4);
+}
+
+/* 📌 Botão Finalizar Processo - Azul */
+.btn-finalize-process {
+    background-color: #007bff !important;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+}
+
+.btn-finalize-process:hover {
+    background-color: #0056b3 !important;
+    box-shadow: 0 5px 15px rgba(0, 86, 179, 0.4);
+}
+
+/* 📌 Lista de Ocorrências */
+.occurrence-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* 📌 Cada Ocorrência */
+.occurrence-item {
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 📌 Botão de Finalizar Ocorrência */
+.btn-danger {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(231, 76, 60, 0.3);
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+    box-shadow: 0 4px 12px rgba(192, 57, 43, 0.4);
+}

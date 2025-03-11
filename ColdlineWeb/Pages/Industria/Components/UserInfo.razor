@@ -1,8 +1,6 @@
 @using ColdlineWeb.Models
 @using ColdlineWeb.Services
 @inject NavigationManager Navigation
-
-
 @inject IndustriaService IndustriaService
 
 @code {
@@ -28,7 +26,7 @@
         var newOccurrence = await IndustriaService.StartOccurrenceAsync(occurrenceModel);
         if (newOccurrence != null)
         {
-            // 🔹 Atualiza a lista com a ID correta retornada pelo servidor
+            // Atualiza a lista com a ID correta retornada pelo servidor
             ProcessOccurrences.Add(newOccurrence);
             ProcessDetails!.Occurrences.Add(new ReferenceEntity { Id = newOccurrence.Id, Name = newOccurrence.CodeOccurrence });
 
@@ -42,7 +40,7 @@
         var success = await IndustriaService.EndOccurrenceAsync(occurrenceId);
         if (success)
         {
-            // 🔹 Remove a ocorrência da lista após finalizá-la
+            // Remove a ocorrência da lista após finalizá-la
             var occurrence = ProcessOccurrences.FirstOrDefault(o => o.Id == occurrenceId);
             if (occurrence != null) occurrence.Finished = true;
 
@@ -53,6 +51,7 @@
             errorMessage = "Erro ao finalizar a ocorrência.";
         }
     }
+
     private async Task FinalizeProcess()
     {
         if (ProcessDetails == null || string.IsNullOrWhiteSpace(ProcessDetails.Id))
@@ -64,18 +63,23 @@
         bool success = await IndustriaService.EndProcessAsync(ProcessDetails.Id);
         if (success)
         {
-            Navigation.NavigateTo("/industria", forceLoad: true); // 🔹 Recarrega a página para mostrar o card de novo processo
+            Navigation.NavigateTo("/industria", forceLoad: true); // Recarrega a página para mostrar o card de novo processo
         }
         else
         {
             errorMessage = "Erro ao finalizar o processo.";
         }
     }
+
+    private void CloseOccurrenceForm()
+    {
+        showOccurrenceForm = false;
+        StateHasChanged(); // Garante a atualização da interface
+    }
 }
 
 <div class="process-header">
     <div class="process-info">
-        <strong>Número do processo:</strong> @ProcessDetails.IdentificationNumber |
         <strong>Tipo:</strong> @ProcessDetails.ProcessType?.Name |
         <strong>Máquina:</strong> @(ProcessDetails.Machine?.Name ?? "Não aplicável") |
         <strong>Tempo decorrido:</strong> @ProcessDetails.ProcessTime |
@@ -87,13 +91,13 @@
     </button>
 
     <button class="btn-finalize-process" @onclick="FinalizeProcess">
-            Finalizar Processo
+        Finalizar Processo
     </button>
 </div>
 
 @if (showOccurrenceForm)
 {
-    <OccurrenceForm OnStartOccurrence="StartOccurrence" ProcessId="@ProcessDetails.Id" />
+    <OccurrenceForm OnStartOccurrence="StartOccurrence" ProcessId="@ProcessDetails.Id" OnClose="CloseOccurrenceForm" />
 }
 
 @if (!string.IsNullOrEmpty(errorMessage))
@@ -108,7 +112,6 @@
         @foreach (var occurrence in ProcessOccurrences)
         {
             <div class="occurrence-item">
-                <span><strong>Código:</strong> @occurrence.CodeOccurrence</span>
                 <span><strong>Tipo de Pausa:</strong> @occurrence.PauseType.Name</span>
                 <span><strong>Defeito:</strong> @(occurrence.Defect?.Name ?? "Não informado")</span>
                 <span><strong>Tempo:</strong> @occurrence.ProcessTime</span>

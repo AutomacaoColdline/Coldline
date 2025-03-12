@@ -13,6 +13,10 @@
       "PackagePath": "staticwebassets/css/Industria.css"
     },
     {
+      "Id": "/app/wwwroot/css/IndustriaLogin.css",
+      "PackagePath": "staticwebassets/css/IndustriaLogin.css"
+    },
+    {
       "Id": "/app/wwwroot/css/OccurrenceForm.css",
       "PackagePath": "staticwebassets/css/OccurrenceForm.css"
     },

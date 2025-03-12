@@ -13,8 +13,8 @@
 
 /* 📌 Indicador de Ocorrência */
 .status-indicator {
-    width: 12px;
-    height: 12px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     display: inline-block;
     margin-right: 10px;
@@ -97,11 +97,19 @@
 
 /* 📌 Cada Ocorrência */
 .occurrence-item {
-    background: white;
-    padding: 12px;
-    border-radius: 5px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    justify-content: space-between;
+    flex-wrap: wrap; /* Garante que os elementos se ajustem em telas menores */
+    background: #f8f9fa;
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+.occurrence-item span {
+    margin-right: 15px; /* Dá espaço entre os textos */
+    font-size: 14px;
+}
+.occurrence-item button {
+    margin-left: auto; /* Empurra o botão para a direita */
 }

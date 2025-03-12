@@ -72,8 +72,8 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kdXN0cmlhL0luZHVzdHJpYS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/IndustriaLogin.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kdXN0cmlhTG9naW4ucmF6b3I=
+[/app/Pages/Industria/IndustriaLogin.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kdXN0cmlhL0luZHVzdHJpYUxvZ2luLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/Login.razor]

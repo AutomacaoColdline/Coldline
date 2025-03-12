@@ -1,14 +1,14 @@
 /* 📌 Sidebar */
 .sidebar {
     width: 260px;
-    background-color: #2c3e50;
     height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding-top: 20px;
     box-shadow: 3px 0px 10px rgba(0, 0, 0, 0.2);
-    position: relative; /* Mantém a posição relativa para os elementos internos */
+    position: relative;
+    background: linear-gradient(180deg, #1B2845 0%, #2C67D7 100%);
 }
 
 /* 📌 Foto do Usuário */
@@ -30,7 +30,7 @@
 /* 📌 Botão de Voltar - Circular e no canto inferior */
 .btn-circle {
     position: absolute;
-    bottom: 120px; /* Ajustei para subir o botão e deixar espaço para a logo */
+    bottom: 60px;
     left: 50%;
     transform: translateX(-50%);
     background-color: white;
@@ -40,10 +40,24 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
     cursor: pointer;
     border: none;
-    transition: background-color 0.3s ease-in-out;
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+/* 📌 Ícone dentro do botão de voltar */
+.btn-circle::before {
+    content: '\2B05'; /* Código Unicode para seta grossa */
+    font-size: 26px;
+    color: #1B2845;
+    font-weight: bold;
+}
+
+/* 📌 Efeito de hover no botão */
+.btn-circle:hover {
+    background-color: #f8f9fa;
+    transform: translateX(-50%) scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* 📌 Efeito de hover no botão */
@@ -53,14 +67,14 @@
 
 /* 📌 Ícone dentro do botão */
 .btn-circle i {
-    color: #2c3e50;
+    color: #1B2845;
     font-size: 18px;
 }
 
 /* 📌 Imagem da Logo abaixo do botão de voltar */
 .sidebar-logo {
     position: absolute;
-    bottom: 80px; /* Define a posição abaixo do botão */
+    bottom: 10px; /* Define a posição abaixo do botão */
     left: 50%;
     transform: translateX(-50%);
 }

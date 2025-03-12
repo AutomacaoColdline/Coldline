@@ -48,11 +48,29 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>reb9dl3a28</Fingerprint>
-      <Integrity>A/PQ0Mzr6QQ8FqSvsbLw3Gi1ao+fjJqQOwgoCppd9mU=</Integrity>
+      <Fingerprint>uem7b4045p</Fingerprint>
+      <Integrity>NugroIHzsChUSAzCqE36IlVK9aft/NfjKlaphrQWIS8=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\Industria.css'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\IndustriaLogin.css'))">
+      <SourceType>Package</SourceType>
+      <SourceId>ColdlineWeb</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>/</BasePath>
+      <RelativePath>css/IndustriaLogin.css</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>91e8yu5lv1</Fingerprint>
+      <Integrity>89zJBQp8tebF77uD+DARkjWq35zaWup+TKQIN0P6iR0=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\IndustriaLogin.css'))</OriginalItemSpec>
     </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\OccurrenceForm.css'))">
       <SourceType>Package</SourceType>
@@ -102,8 +120,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>bi286crk9s</Fingerprint>
-      <Integrity>TRsE0Sd6lMqtmfCPeHLVBryKNDAGXsq/7aLAq1r1yVc=</Integrity>
+      <Fingerprint>narzvhvu4d</Fingerprint>
+      <Integrity>70dPnpZBMqwRhim01Wdu1xrSJ4LkJKCC4oATLQYX66E=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\Sidebar.css'))</OriginalItemSpec>
@@ -120,8 +138,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>uv7awyyqzk</Fingerprint>
-      <Integrity>as7aGNkvjGIYV5wR5GH7pLDAOiSPf5iKrlTE717RrAg=</Integrity>
+      <Fingerprint>3rrqsieq1k</Fingerprint>
+      <Integrity>/5I2P70pDfg4iNpu3goRO+2LCLuzZJ3WAQqBRFFbEKc=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\UserInfo.css'))</OriginalItemSpec>

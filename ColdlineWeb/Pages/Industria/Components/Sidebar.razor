@@ -8,8 +8,12 @@
     @if (User != null)
     {
         <div class="user-avatar">
-            <img src="@User.ProfilePictureUrl" alt="Foto do Usuário" 
-                 onerror="this.onerror=null; this.src='https://via.placeholder.com/80';">
+            <div class="user-avatar">
+        <img src="@($"http://10.0.0.44:5000/uploads/{User.UrlPhoto}")" 
+             alt="Foto do Usuário" 
+             width="80" 
+             onerror="this.onerror=null; this.src='https://via.placeholder.com/80';">
+    </div>
         </div>
 
         <div class="user-info">

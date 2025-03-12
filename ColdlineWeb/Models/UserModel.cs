@@ -4,12 +4,12 @@ namespace ColdlineWeb.Models{
         public string Id { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public string ProfilePictureUrl { get; set; } = "https://via.placeholder.com/80";
         public ReferenceEntity UserType { get; set; } = new();
         public ReferenceEntity Department { get; set; } = new();
         public ReferenceEntity? CurrentProcess { get; set; }
         public ReferenceEntity? CurrentOccurrence { get; set; }
         public string IdentificationNumber { get; set; } = string.Empty;
+        public string UrlPhoto { get; set; } = string.Empty;
     }
 
 

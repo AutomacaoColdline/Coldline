@@ -2,36 +2,17 @@
 @layout EmptyLayout
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@using ColdlineWeb.Models
 
-<style>
-    .login-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background-color: #f8f9fa;
-    }
 
-    .login-card {
-        width: 400px;
-        padding: 20px;
-        background: white;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
-        text-align: center;
-    }
-</style>
-
+<link rel="stylesheet" href="css/Industria.css">
+<img src="img/logofundo.png" class="background-image-login" alt="Logo Fundo">
 <div class="login-container">
     <div class="login-card">
-        <h3 class="mb-4">Login Industrial</h3>
-        
         @if (!string.IsNullOrEmpty(errorMessage))
         {
             <div class="alert alert-danger text-center">@errorMessage</div>
         }
-
-        <label class="form-label">Número de Identificação:</label>
         <input class="form-control text-center" @bind="identificationNumber" placeholder="Digite seu número de identificação" />
 
         <button class="btn btn-primary w-100 mt-3" @onclick="Login">Login</button>
@@ -69,8 +50,4 @@
         }
     }
 
-    private class UserModel
-    {
-        public string IdentificationNumber { get; set; } = string.Empty;
-    }
 }

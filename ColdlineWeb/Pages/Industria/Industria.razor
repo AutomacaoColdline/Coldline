@@ -13,6 +13,8 @@
     <Sidebar User="user" OnLogout="Logout" />
 
     <div class="main-content">
+        <img src="img/logofundo.png" class="background-image" alt="Logo Fundo">
+
         @if (!string.IsNullOrEmpty(errorMessage))
         {
             <p class="error-message">@errorMessage</p>
@@ -30,5 +32,6 @@
             <!-- Exibir os detalhes do processo -->
             <UserInfo ProcessDetails="processDetails" />
         }
+        
     </div>
 </div>

@@ -1,4 +1,4 @@
-/* Sidebar */
+/* 📌 Sidebar */
 .sidebar {
     width: 260px;
     background-color: #2c3e50;
@@ -11,7 +11,7 @@
     position: relative; /* Mantém a posição relativa para os elementos internos */
 }
 
-/* Foto do Usuário */
+/* 📌 Foto do Usuário */
 .user-avatar img {
     width: 90px;
     height: 90px;
@@ -20,17 +20,17 @@
     border: 3px solid #fff;
 }
 
-/* Informações do Usuário */
+/* 📌 Informações do Usuário */
 .user-info {
     text-align: center;
     margin-top: 15px;
     color: white;
 }
 
-/* Botão de Voltar - Circular e no canto inferior */
+/* 📌 Botão de Voltar - Circular e no canto inferior */
 .btn-circle {
     position: absolute;
-    bottom: 20px; /* Posiciona no canto inferior */
+    bottom: 120px; /* Ajustei para subir o botão e deixar espaço para a logo */
     left: 50%;
     transform: translateX(-50%);
     background-color: white;
@@ -46,12 +46,27 @@
     transition: background-color 0.3s ease-in-out;
 }
 
+/* 📌 Efeito de hover no botão */
 .btn-circle:hover {
     background-color: #f8f9fa;
 }
 
-/* Ícone dentro do botão */
+/* 📌 Ícone dentro do botão */
 .btn-circle i {
     color: #2c3e50;
     font-size: 18px;
+}
+
+/* 📌 Imagem da Logo abaixo do botão de voltar */
+.sidebar-logo {
+    position: absolute;
+    bottom: 80px; /* Define a posição abaixo do botão */
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.sidebar-logo img {
+    width: 120px; /* Aumentei o tamanho da imagem */
+    height: auto; /* Mantém a proporção original */
+    opacity: 0.8; /* Deixa um pouco transparente */
 }

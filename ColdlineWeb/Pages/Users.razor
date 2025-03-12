@@ -1,5 +1,8 @@
 @page "/users"
+@using ColdlineWeb.Models
+@using ColdlineWeb.Services
 @inject HttpClient Http
+@inject NavigationManager Navigation
 
 <h3>Gerenciamento de Usuários</h3>
 
@@ -18,13 +21,12 @@ else
     <table class="table table-striped">
         <thead>
             <tr>
+                <th>Foto</th>
                 <th>Nome</th>
                 <th>Email</th>
                 <th>Tipo de Usuário</th>
                 <th>Departamento</th>
                 <th>Número de Identificação</th>
-                <th>Processo Atual</th>
-                <th>Ocorrência Atual</th>
                 <th>Ações</th>
             </tr>
         </thead>
@@ -32,13 +34,18 @@ else
             @foreach (var user in users)
             {
                 <tr>
+                    <td>
+                        @if (!string.IsNullOrEmpty(user.UrlPhoto))
+                            {
+                                <img src="@($"http://10.0.0.44:5000/uploads/{user.UrlPhoto}")" alt="Foto do Usuário" width="50" />
+                            }
+
+                    </td>
                     <td>@user.Name</td>
                     <td>@user.Email</td>
                     <td>@(user.UserType?.Name ?? "Sem Tipo")</td>
                     <td>@(user.Department?.Name ?? "Sem Departamento")</td>
                     <td>@user.IdentificationNumber</td>
-                    <td>@(user.CurrentProcess?.Name ?? "Nenhum")</td>
-                    <td>@(user.CurrentOccurrence?.Name ?? "Nenhuma")</td>
                     <td>
                         <button class="btn btn-warning btn-sm" @onclick="() => OpenEditUserModal(user)">Editar</button>
                         <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(user.Id)">Excluir</button>
@@ -65,6 +72,9 @@ else
                     <label>Email:</label>
                     <input class="form-control" @bind="currentUser.Email" />
 
+                    <label>Identificação:</label>
+                    <input class="form-control" @bind="currentUser.IdentificationNumber" />
+
                     <label>Tipo de Usuário:</label>
                     <select class="form-control" @bind="currentUser.UserType.Id">
                         <option value="">Selecione...</option>
@@ -83,26 +93,9 @@ else
                         }
                     </select>
 
-                    <label>Número de Identificação:</label>
-                    <input class="form-control" @bind="currentUser.IdentificationNumber" />
-
-                    <label>Processo Atual:</label>
-                    <select class="form-control" @bind="currentUser.CurrentProcess.Id">
-                        <option value="">Nenhum</option>
-                        @foreach (var process in processes)
-                        {
-                            <option value="@process.Id">@process.IdentificationNumber</option>
-                        }
-                    </select>
-
-                    <label>Ocorrência Atual:</label>
-                    <select class="form-control" @bind="currentUser.CurrentOccurrence.Id">
-                        <option value="">Nenhuma</option>
-                        @foreach (var occurrence in occurrences)
-                        {
-                            <option value="@occurrence.Id">@occurrence.CodeOccurrence</option>
-                        }
-                    </select>
+                    <label>Foto do Usuário:</label>
+                    <InputFile OnChange="UploadImage" class="form-control" />
+                    
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
@@ -117,13 +110,12 @@ else
     private List<UserModel> users = new();
     private List<ReferenceEntity> userTypes = new();
     private List<ReferenceEntity> departments = new();
-    private List<ProcessModel> processes = new();
-    private List<OccurrenceModel> occurrences = new();
-    private UserModel currentUser = new();
     private bool isLoading = true;
     private bool showModal = false;
     private bool isEditing = false;
     private string? errorMessage;
+    private IBrowserFile? selectedFile;
+    private UserModel currentUser = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -137,13 +129,10 @@ else
             users = await Http.GetFromJsonAsync<List<UserModel>>("api/User") ?? new();
             userTypes = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/UserType") ?? new();
             departments = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Department") ?? new();
-            processes = await Http.GetFromJsonAsync<List<ProcessModel>>("api/Process") ?? new();
-            occurrences = await Http.GetFromJsonAsync<List<OccurrenceModel>>("api/Occurrence") ?? new();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             errorMessage = "Erro ao carregar dados.";
-            Console.WriteLine(ex);
         }
         finally
         {
@@ -151,51 +140,54 @@ else
         }
     }
 
-    private void OpenAddUserModal()
+    private async Task UploadImage(InputFileChangeEventArgs e)
     {
-        currentUser = new UserModel
+        var file = e.File;
+        if (file == null)
         {
-            UserType = new ReferenceEntity(),
-            Department = new ReferenceEntity(),
-            CurrentProcess = new ReferenceEntity(),
-            CurrentOccurrence = new ReferenceEntity()
-        };
-        showModal = true;
-        isEditing = false;
-    }
+            errorMessage = "Nenhum arquivo foi selecionado.";
+            return;
+        }
 
-    private void OpenEditUserModal(UserModel user)
-    {
-        currentUser = new UserModel
+        // O nome do arquivo será exatamente o nome do usuário + ".png"
+        var fileName = $"{currentUser.Name}.png";
+
+        var uploadUrl = $"http://10.0.0.44:5000/api/User/upload-image?fileName={fileName}";
+
+        var content = new MultipartFormDataContent();
+        content.Add(new StreamContent(file.OpenReadStream()), "file", fileName);
+
+        var response = await Http.PostAsync(uploadUrl, content);
+        if (response.IsSuccessStatusCode)
         {
-            Id = user.Id,
-            Name = user.Name,
-            Email = user.Email,
-            IdentificationNumber = user.IdentificationNumber,
-            UserType = userTypes.FirstOrDefault(ut => ut.Id == user.UserType.Id) ?? new ReferenceEntity(),
-            Department = departments.FirstOrDefault(d => d.Id == user.Department.Id) ?? new ReferenceEntity(),
-            CurrentProcess = user.CurrentProcess ?? new ReferenceEntity(),
-            CurrentOccurrence = user.CurrentOccurrence ?? new ReferenceEntity()
-        };
-        showModal = true;
-        isEditing = true;
-    }
-
-    private async Task SaveUser()
-    {
-        currentUser.UserType.Name = userTypes.FirstOrDefault(ut => ut.Id == currentUser.UserType.Id)?.Name ?? "";
-        currentUser.Department.Name = departments.FirstOrDefault(d => d.Id == currentUser.Department.Id)?.Name ?? "";
-
-        if (isEditing)
-        {
-            await Http.PutAsJsonAsync($"api/User/{currentUser.Id}", currentUser);
+            // Apenas salva o nome do arquivo, sem path
+            currentUser.UrlPhoto = fileName;
         }
         else
         {
-            await Http.PostAsJsonAsync("api/User", currentUser);
+            errorMessage = "Erro ao enviar a imagem.";
         }
-        showModal = false;
-        await LoadData();
+    }
+
+
+
+
+    private async Task SaveUser()
+    {
+        // Atualiza nomes do departamento e tipo de usuário antes de enviar para a API
+        currentUser.UserType.Name = userTypes.FirstOrDefault(ut => ut.Id == currentUser.UserType.Id)?.Name ?? "";
+        currentUser.Department.Name = departments.FirstOrDefault(d => d.Id == currentUser.Department.Id)?.Name ?? "";
+
+        var response = await Http.PostAsJsonAsync("api/User", currentUser);
+        if (response.IsSuccessStatusCode)
+        {
+            showModal = false;
+            await LoadData();
+        }
+        else
+        {
+            errorMessage = "Erro ao salvar usuário.";
+        }
     }
 
     private async Task DeleteUser(string id)
@@ -204,9 +196,28 @@ else
         await LoadData();
     }
 
+    private void OpenAddUserModal()
+    {
+        currentUser = new UserModel();
+        showModal = true;
+        isEditing = false;
+    }
+
+    private void OpenEditUserModal(UserModel user)
+    {
+        currentUser = user;
+        showModal = true;
+        isEditing = true;
+    }
+
     private void CloseModal()
     {
         showModal = false;
+    }
+
+    private class UploadResponse
+    {
+        public string Url { get; set; } = string.Empty;
     }
 
     private class UserModel
@@ -214,11 +225,13 @@ else
         public string Id { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
         public ReferenceEntity UserType { get; set; } = new();
         public ReferenceEntity Department { get; set; } = new();
         public string IdentificationNumber { get; set; } = string.Empty;
         public ReferenceEntity CurrentProcess { get; set; } = new();
         public ReferenceEntity CurrentOccurrence { get; set; } = new();
+        public string UrlPhoto { get; set; } = string.Empty;
     }
 
     private class ProcessModel

@@ -13,7 +13,6 @@
     {
         if (ProcessDetails?.Id != null)
         {
-            // Obtém as ocorrências mais recentes do servidor
             var occurrenceIds = ProcessDetails.Occurrences?.Select(o => o.Id).ToList() ?? new List<string>();
             ProcessOccurrences = await IndustriaService.GetOccurrencesByProcessAsync(occurrenceIds);
         }
@@ -26,7 +25,6 @@
         var newOccurrence = await IndustriaService.StartOccurrenceAsync(occurrenceModel);
         if (newOccurrence != null)
         {
-            // Atualiza a lista com a ID correta retornada pelo servidor
             ProcessOccurrences.Add(newOccurrence);
             ProcessDetails!.Occurrences.Add(new ReferenceEntity { Id = newOccurrence.Id, Name = newOccurrence.CodeOccurrence });
 
@@ -40,7 +38,6 @@
         var success = await IndustriaService.EndOccurrenceAsync(occurrenceId);
         if (success)
         {
-            // Remove a ocorrência da lista após finalizá-la
             var occurrence = ProcessOccurrences.FirstOrDefault(o => o.Id == occurrenceId);
             if (occurrence != null) occurrence.Finished = true;
 
@@ -63,7 +60,7 @@
         bool success = await IndustriaService.EndProcessAsync(ProcessDetails.Id);
         if (success)
         {
-            Navigation.NavigateTo("/industria", forceLoad: true); // Recarrega a página para mostrar o card de novo processo
+            Navigation.NavigateTo("/industria", forceLoad: true);
         }
         else
         {
@@ -74,11 +71,24 @@
     private void CloseOccurrenceForm()
     {
         showOccurrenceForm = false;
-        StateHasChanged(); // Garante a atualização da interface
+        StateHasChanged();
+    }
+
+    private string GetOccurrenceStatusClass()
+    {
+        if (ProcessOccurrences == null || !ProcessOccurrences.Any()) 
+            return "indicator-green"; // Nenhuma ocorrência → Verde
+        
+        bool hasActiveOccurrence = ProcessOccurrences.Any(o => !o.Finished);
+
+        return hasActiveOccurrence ? "indicator-red" : "indicator-green"; 
     }
 }
 
 <div class="process-header">
+    <!-- 📌 Indicador de Ocorrência -->
+    <div class="status-indicator @(GetOccurrenceStatusClass())"></div>
+
     <div class="process-info">
         <strong>Tipo:</strong> @ProcessDetails.ProcessType?.Name |
         <strong>Máquina:</strong> @(ProcessDetails.Machine?.Name ?? "Não aplicável") |

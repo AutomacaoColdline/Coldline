@@ -27,5 +27,7 @@ namespace ColdlineAPI.Domain.Entities
         public ReferenceEntity? Quality { get; set; } = new ReferenceEntity();
         [BsonElement("monitoring")]
         public ReferenceEntity? Monitoring { get; set; } = new ReferenceEntity();
+        [BsonElement("finished")]
+        public bool? Finished { get; set; }
     }
 }

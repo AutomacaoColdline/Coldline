@@ -140,6 +140,7 @@ namespace ColdlineAPI.Application.Services
                 .Set(u => u.Department, user.Department ?? existingUser.Department)
                 .Set(u => u.CurrentProcess, user.CurrentProcess)
                 .Set(u => u.CurrentOccurrence, user.CurrentOccurrence)
+                .Set(u => u.UrlPhoto, user.UrlPhoto ?? existingUser.UrlPhoto)
                 .Set(u => u.IdentificationNumber, user.IdentificationNumber ?? existingUser.IdentificationNumber);
 
             // 🔹 Atualização no banco

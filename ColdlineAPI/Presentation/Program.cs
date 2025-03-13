@@ -46,20 +46,21 @@ if (app.Environment.IsDevelopment())
 }
 
 // ✅ 5. Configurar arquivos estáticos corretamente
-var staticFilesPath = Path.Combine(Directory.GetCurrentDirectory(), "ColdlineWeb", "wwwroot");
+var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
 
-if (Directory.Exists(staticFilesPath))
+if (!Directory.Exists(uploadsPath))
 {
-    app.UseStaticFiles(new StaticFileOptions
-    {
-        FileProvider = new PhysicalFileProvider(staticFilesPath),
-        RequestPath = "/static"
-    });
+    Directory.CreateDirectory(uploadsPath);
 }
-else
+
+// ✅ Garante que a API sirva corretamente os arquivos na pasta `wwwroot/uploads`
+app.UseStaticFiles(new StaticFileOptions
 {
-    Console.WriteLine($"⚠️ Diretório de arquivos estáticos não encontrado: {staticFilesPath}");
-}
+    FileProvider = new PhysicalFileProvider(uploadsPath),
+    RequestPath = "/uploads"
+});
+
+
 
 // ✅ 6. Ordem correta dos middlewares
 app.UseHttpsRedirection();

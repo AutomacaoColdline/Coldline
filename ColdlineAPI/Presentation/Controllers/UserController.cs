@@ -16,14 +16,12 @@ namespace ColdlineAPI.Presentation.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly string _staticFilesPath;
         private readonly string _uploadsPath;
 
         public UserController(IUserService userService)
         {
             _userService = userService;
-            _staticFilesPath = Path.Combine(Directory.GetCurrentDirectory(), "../../ColdlineWeb/wwwroot");
-            _uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "../../ColdlineWeb/wwwroot/uploads");
+            _uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
         }
 
         /// <summary>
@@ -163,65 +161,59 @@ namespace ColdlineAPI.Presentation.Controllers
 
             return Ok(new { Message = "Senha alterada com sucesso!" });
         }
-        [HttpGet("{fileName}")]
+
+        [HttpGet("uploads/{fileName}")]
         [AllowAnonymous]
         public IActionResult GetStaticFile(string fileName)
         {
-            // Verifica se o arquivo existe
-            var filePath = Path.Combine(_staticFilesPath, fileName);
+            var filePath = Path.Combine(_uploadsPath, fileName);
+
             if (!System.IO.File.Exists(filePath))
             {
-                return NotFound(new { message = "Arquivo não encontrado." });
+                return NotFound(new { Message = "Arquivo não encontrado!" });
             }
 
-            // Obtém o MIME type automaticamente
             var provider = new FileExtensionContentTypeProvider();
             if (!provider.TryGetContentType(fileName, out var contentType))
             {
-                contentType = "application/octet-stream"; // Tipo genérico caso não seja identificado
+                contentType = "application/octet-stream";
             }
 
-            // Retorna o arquivo físico como resposta HTTP
             return PhysicalFile(filePath, contentType);
         }
 
+
         [HttpPost("upload-image")]
         [AllowAnonymous]
-        public async Task<IActionResult> UploadImage([FromForm] IFormFile file)
+        public async Task<IActionResult> UploadImage(IFormFile file, [FromQuery] string? fileName = null)
         {
             if (file == null || file.Length == 0)
             {
-                return BadRequest(new { message = "Arquivo inválido." });
+                return BadRequest(new { Message = "Arquivo inválido." });
             }
 
-            try
+            // Definir o novo caminho dentro do projeto da API
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+
+            if (!Directory.Exists(uploadsFolder))
             {
-                // ✅ Nome do arquivo único
-                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-                var filePath = Path.Combine(_uploadsPath, fileName);
-
-                // ✅ Criar a pasta "uploads" caso não exista
-                if (!Directory.Exists(_uploadsPath))
-                {
-                    Directory.CreateDirectory(_uploadsPath);
-                }
-
-                // ✅ Salvar o arquivo no servidor
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                // ✅ Retornar a URL do arquivo para acesso
-                var fileUrl = $"{Request.Scheme}://{Request.Host}/static/uploads/{fileName}";
-                return Ok(new { message = "Upload realizado com sucesso!", url = fileUrl });
+                Directory.CreateDirectory(uploadsFolder);
             }
-            catch (Exception ex)
+
+            // Se o usuário não forneceu um nome, gerar um GUID
+            fileName = string.IsNullOrWhiteSpace(fileName) 
+                ? $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}"
+                : $"{fileName}{Path.GetExtension(file.FileName)}";
+
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                return StatusCode(500, new { message = "Erro ao salvar a imagem.", error = ex.Message });
+                await file.CopyToAsync(stream);
             }
+
+            var fileUrl = $"/uploads/{fileName}"; // Caminho acessível via URL
+            return Ok(new { url = fileUrl });
         }
-
-
     }
 }

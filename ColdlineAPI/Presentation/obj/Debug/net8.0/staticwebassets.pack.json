@@ -1,0 +1,45 @@
+{
+  "Files": [
+    {
+      "Id": "/app/Presentation/wwwroot/uploads/.png.png",
+      "PackagePath": "staticwebassets/uploads/.png.png"
+    },
+    {
+      "Id": "/app/Presentation/wwwroot/uploads/0cebf4ed-be62-441e-a0f9-92d905b3ea75.png",
+      "PackagePath": "staticwebassets/uploads/0cebf4ed-be62-441e-a0f9-92d905b3ea75.png"
+    },
+    {
+      "Id": "/app/Presentation/wwwroot/uploads/b4d2ef1e-b4c5-4ca4-915e-3b36ac104fc9.png",
+      "PackagePath": "staticwebassets/uploads/b4d2ef1e-b4c5-4ca4-915e-3b36ac104fc9.png"
+    },
+    {
+      "Id": "/app/Presentation/wwwroot/uploads/d43eb201-e485-460e-a9bb-dadeceb3877d.png",
+      "PackagePath": "staticwebassets/uploads/d43eb201-e485-460e-a9bb-dadeceb3877d.png"
+    },
+    {
+      "Id": "/app/Presentation/wwwroot/uploads/eduardo.png",
+      "PackagePath": "staticwebassets/uploads/eduardo.png"
+    },
+    {
+      "Id": "/app/Presentation/wwwroot/uploads/eduardo.png.png",
+      "PackagePath": "staticwebassets/uploads/eduardo.png.png"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.Presentation.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.Presentation.props",
+      "PackagePath": "build\\Presentation.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.Presentation.props",
+      "PackagePath": "buildMultiTargeting\\Presentation.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.Presentation.props",
+      "PackagePath": "buildTransitive\\Presentation.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

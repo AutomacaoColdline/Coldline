@@ -208,3 +208,4 @@
 /app/Presentation/obj/Debug/net8.0/Presentation.pdb
 /app/Presentation/obj/Debug/net8.0/Presentation.genruntimeconfig.cache
 /app/Presentation/obj/Debug/net8.0/ref/Presentation.dll
+/app/Presentation/bin/Debug/net8.0/Presentation.staticwebassets.runtime.json

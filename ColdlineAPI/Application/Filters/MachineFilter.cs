@@ -12,5 +12,6 @@ namespace ColdlineAPI.Application.Filters
         public string? ProcessId { get; set; }
         public string? QualityId { get; set; }
         public string? MonitoringId { get; set; }
+        public bool? Finished { get; set; }
     }
 }

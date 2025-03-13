@@ -57,7 +57,8 @@ namespace ColdlineAPI.Application.Services
                 .Set(m => m.Voltage, machine.Voltage ?? existingMachine.Voltage)
                 .Set(m => m.Process, machine.Process ?? existingMachine.Process)
                 .Set(m => m.Quality, machine.Quality ?? existingMachine.Quality)
-                .Set(m => m.Monitoring, machine.Monitoring ?? existingMachine.Monitoring);
+                .Set(m => m.Monitoring, machine.Monitoring ?? existingMachine.Monitoring)
+                .Set(p => p.Finished, existingMachine.Finished);
 
             var result = await _machines.UpdateOneAsync(m => m.Id == id, updateDefinition);
             return result.IsAcknowledged && result.ModifiedCount > 0;
@@ -87,6 +88,9 @@ namespace ColdlineAPI.Application.Services
             
             if (!string.IsNullOrEmpty(filter.Phase))
                 filters.Add(builder.Eq(m => m.Phase, filter.Phase));
+            
+            if (filter.Finished != null)
+                filters.Add(builder.Eq(m => m.Finished, filter.Finished));
             
             if (!string.IsNullOrEmpty(filter.Voltage))
                 filters.Add(builder.Eq(m => m.Voltage, filter.Voltage));

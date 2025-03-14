@@ -9,6 +9,10 @@
       "PackagePath": "staticwebassets/ColdlineWeb.styles.css"
     },
     {
+      "Id": "/app/wwwroot/css/Home.css",
+      "PackagePath": "staticwebassets/css/Home.css"
+    },
+    {
       "Id": "/app/wwwroot/css/Industria.css",
       "PackagePath": "staticwebassets/css/Industria.css"
     },

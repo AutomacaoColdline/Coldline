@@ -1,0 +1,53 @@
+﻿@page "/home"
+@inherits HomeComponent
+@using ColdlineWeb.Models
+@using ColdlineWeb.Services
+
+<link rel="stylesheet" href="css/Home.css">
+
+<PageTitle>Home</PageTitle>
+
+<h3>Bem-vindo à Dashboard!</h3>
+
+@if (isLoading)
+{
+    <p>Carregando usuários e máquinas...</p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <h4>Usuários</h4>
+    <div class="user-list">
+        @foreach (var user in users)
+        {
+            <div class="user-card">
+                <div class="user-card-header">
+                    <img src="@($"http://10.0.0.44:5000/uploads/{user.UrlPhoto}")" alt="Foto de @user.Name">
+                </div>
+                <div class="user-card-body">
+                    <h5>@user.Name</h5>
+                    <p><strong>Processo Atual:</strong> @(user.CurrentProcess?.Name ?? "Nenhum")</p>
+                    <p><strong>Ocorrência Atual:</strong> @(user.CurrentOccurrence?.Name ?? "Nenhuma")</p>
+                </div>
+            </div>
+        }
+    </div>
+
+    <h4>Máquinas</h4>
+    <div class="machine-list">
+        @foreach (var machine in machines)
+        {
+            <div class="machine-card">
+                <div class="machine-card-body">
+                    <p><strong>Identificação:</strong> @machine.IdentificationNumber</p>
+                    <p><strong>Nome:</strong> @machine.MachineType.Name</p>
+                    <p><strong>Status:</strong> @machine.Status?.ToString() ?? "Desconhecido"</p>
+                    <p><strong>Processo:</strong> @(machine.Process?.Name ?? "Nenhum")</p>
+                </div>
+            </div>
+        }
+    </div>
+}

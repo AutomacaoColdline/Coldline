@@ -1,0 +1,105 @@
+@page "/users"
+@using ColdlineWeb.Models
+@using ColdlineWeb.Services
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<h3>Gerenciamento de Usuários</h3>
+
+@if (isLoading)
+{
+    <p>Carregando...</p>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <button class="btn btn-primary mb-3" @onclick="OpenAddUserModal">Adicionar Usuário</button>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Foto</th>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Tipo de Usuário</th>
+                <th>Departamento</th>
+                <th>Número de Identificação</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in users)
+            {
+                <tr>
+                    <td>
+                        @if (!string.IsNullOrEmpty(user.UrlPhoto))
+                        {
+                            <img src="@($"http://10.0.0.44:5000/uploads/{user.UrlPhoto}")" alt="Foto do Usuário" width="50" />
+                        }
+                    </td>
+                    <td>@user.Name</td>
+                    <td>@user.Email</td>
+                    <td>@(user.UserType?.Name ?? "Sem Tipo")</td>
+                    <td>@(user.Department?.Name ?? "Sem Departamento")</td>
+                    <td>@user.IdentificationNumber</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => OpenEditUserModal(user)">Editar</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(user.Id)">Excluir</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (showModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(isEditing ? "Editar Usuário" : "Adicionar Usuário")</h5>
+                    <button class="close" @onclick="CloseModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <label>Nome:</label>
+                    <input class="form-control" @bind="currentUser.Name" />
+
+                    <label>Email:</label>
+                    <input class="form-control" @bind="currentUser.Email" />
+
+                    <label>Identificação:</label>
+                    <input class="form-control" @bind="currentUser.IdentificationNumber" />
+
+                    <label>Tipo de Usuário:</label>
+                    <select class="form-control" @bind="currentUser.UserType.Id">
+                        <option value="">Selecione...</option>
+                        @foreach (var userType in userTypes)
+                        {
+                            <option value="@userType.Id">@userType.Name</option>
+                        }
+                    </select>
+
+                    <label>Departamento:</label>
+                    <select class="form-control" @bind="currentUser.Department.Id">
+                        <option value="">Selecione...</option>
+                        @foreach (var department in departments)
+                        {
+                            <option value="@department.Id">@department.Name</option>
+                        }
+                    </select>
+
+                    <label>Foto do Usuário:</label>
+                    <InputFile OnChange="UploadImage" class="form-control" />
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
+                    <button class="btn btn-success" @onclick="SaveUser">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

@@ -48,8 +48,8 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRGVwYXJ0bWVudC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Home.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSG9tZS5yYXpvcg==
+[/app/Pages/Home/Home.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSG9tZS9Ib21lLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/Industria/Components/OccurrenceForm.razor]
@@ -80,8 +80,12 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTG9naW4ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Machine.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZS5yYXpvcg==
+[/app/Pages/Machine/Machine.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZS9NYWNoaW5lLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/MachineType.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZVR5cGUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/Monitoring.razor]
@@ -116,8 +120,8 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Users.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlcnMucmF6b3I=
+[/app/Pages/User/Users.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9Vc2Vycy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/UserTypes.razor]

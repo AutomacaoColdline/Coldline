@@ -60,7 +60,7 @@
                 <option value="">Selecione uma máquina</option>
                 @foreach (var machine in Machines)
                 {
-                    <option value="@machine.Id">@($"{machine.Name} - {machine.IdentificationNumber}")</option>
+                    <option value="@machine.Id">@($"{machine.MachineType.Name} - {machine.IdentificationNumber}")</option>
                 }
             </select>
         </div>

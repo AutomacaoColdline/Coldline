@@ -77,14 +77,6 @@ else
                     <label>Voltagem:</label>
                     <input class="form-control" @bind="currentMachine.Voltage" />
 
-                    <label>Processo:</label>
-                    <select class="form-control" @bind="currentMachine.Process.Id">
-                        @foreach (var process in processes)
-                        {
-                            <option value="@process.Id">@process.Name</option>
-                        }
-                    </select>
-
                     <label>Tipo de Máquina:</label>
                     <select class="form-control" @bind="currentMachine.MachineType.Id">
                         @foreach (var machineType in machineTypes)
@@ -138,13 +130,42 @@ else
 
     private void OpenAddMachineModal()
     {
-        currentMachine = new MachineModel();
+        currentMachine = new MachineModel
+        {
+            MachineType = new ReferenceEntity(),
+            Process = new ReferenceEntity(),
+            Quality = new ReferenceEntity(),
+            Monitoring = new ReferenceEntity()
+        };
         showModal = true;
         isEditing = false;
     }
 
+    private void OpenEditMachineModal(MachineModel machine)
+    {
+        currentMachine = new MachineModel
+        {
+            Id = machine.Id,
+            CustomerName = machine.CustomerName,
+            IdentificationNumber = machine.IdentificationNumber,
+            Phase = machine.Phase,
+            Voltage = machine.Voltage,
+            Process = machine.Process ?? new ReferenceEntity(),
+            Quality = machine.Quality ?? new ReferenceEntity(),
+            Monitoring = machine.Monitoring ?? new ReferenceEntity(),
+            MachineType = machine.MachineType ?? new ReferenceEntity()
+        };
+        showModal = true;
+        isEditing = true;
+    }
+
     private async Task SaveMachine()
     {
+        var fetchedMachineType = await Http.GetFromJsonAsync<ReferenceEntity>($"api/MachineType/{currentMachine.MachineType.Id}");
+        currentMachine.MachineType.Name = fetchedMachineType.Name;
+        currentMachine.Process = null;
+        currentMachine.Monitoring = null;
+        currentMachine.Quality = null;
         if (isEditing)
         {
             await Http.PutAsJsonAsync($"api/Machine/{currentMachine.Id}", currentMachine);

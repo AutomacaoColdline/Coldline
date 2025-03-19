@@ -8,9 +8,9 @@ namespace ColdlineWeb.Models{
         public string IdentificationNumber { get; set; } = string.Empty;
         public string Phase { get; set; } = string.Empty;
         public string Voltage { get; set; } = string.Empty;
-        public ReferenceEntity Process { get; set; } = new();
-        public ReferenceEntity Quality { get; set; } = new();
-        public ReferenceEntity Monitoring { get; set; } = new(); 
+        public ReferenceEntity? Process { get; set; } 
+        public ReferenceEntity? Quality { get; set; } 
+        public ReferenceEntity? Monitoring { get; set; } 
         public ReferenceEntity MachineType { get; set; } = new();
         public MachineStatus? Status { get; set; }
     }

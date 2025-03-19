@@ -1,3 +1,5 @@
+using ColdlineWeb.Helpers;
+
 namespace ColdlineWeb.Models.Enum
 {
     public enum MachineStatus

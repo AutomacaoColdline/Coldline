@@ -46,12 +46,22 @@ namespace ColdlineWeb.Pages.User
 
         private async Task SaveUser()
         {
+            currentUser.Id = null;
             currentUser.UserType.Name = userTypes.Find(ut => ut.Id == currentUser.UserType.Id)?.Name ?? "";
             currentUser.Department.Name = departments.Find(d => d.Id == currentUser.Department.Id)?.Name ?? "";
-
+            currentUser.UrlPhoto = currentUser.Name + ".png";
+            
+            // ✅ 1. Salvar usuário primeiro
             bool success = await UserService.SaveUserAsync(currentUser);
+            
             if (success)
             {
+                string? uploadedFileName = await UserService.UploadImageAsync(selectedFile, currentUser.Name);
+                if (uploadedFileName == null)
+                {
+                    errorMessage = "Erro ao enviar a imagem.";
+                }
+
                 showModal = false;
                 await LoadData();
             }
@@ -60,6 +70,7 @@ namespace ColdlineWeb.Pages.User
                 errorMessage = "Erro ao salvar usuário.";
             }
         }
+
 
         private async Task DeleteUser(string id)
         {

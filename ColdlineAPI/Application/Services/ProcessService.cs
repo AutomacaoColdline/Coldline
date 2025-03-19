@@ -1,6 +1,7 @@
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Domain.Entities;
+using ColdlineAPI.Domain.Enum;
 using ColdlineAPI.Domain.Common;
 using ColdlineAPI.Infrastructure.Settings;
 using Microsoft.Extensions.Options;
@@ -46,7 +47,7 @@ namespace ColdlineAPI.Application.Services
                 var machine = await _machines.Find(m => m.Id == machineId).FirstOrDefaultAsync();
                 if (machine == null) throw new ArgumentException("Máquina não encontrada.");
 
-                machineReference = new ReferenceEntity { Id = machine.Id, Name = machine.Name };
+                machineReference = new ReferenceEntity { Id = machine.Id, Name = machine.MachineType.Name };
             }
 
             TimeZoneInfo campoGrandeTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Campo_Grande");
@@ -78,6 +79,7 @@ namespace ColdlineAPI.Application.Services
             if (machineReference != null)
             {
                 var updateMachine = Builders<Machine>.Update
+                    .Set(m => m.Status, MachineStatus.InProgress)
                     .Set(m => m.Process, new ReferenceEntity { Id = newProcess.Id, Name = newProcess.IdentificationNumber });
                 await _machines.UpdateOneAsync(m => m.Id == machineReference.Id, updateMachine);
             }

@@ -53,6 +53,7 @@ namespace ColdlineAPI.Presentation.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> CreateUser([FromBody] User user)
         {
+            ModelState.Remove("Id");
             try
             {
                 var createdUser = await _userService.CreateUserAsync(user);

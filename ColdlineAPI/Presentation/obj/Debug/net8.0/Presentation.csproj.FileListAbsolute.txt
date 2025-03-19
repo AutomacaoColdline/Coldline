@@ -1,5 +1,6 @@
 /app/Presentation/bin/Debug/net8.0/appsettings.Development.json
 /app/Presentation/bin/Debug/net8.0/appsettings.json
+/app/Presentation/bin/Debug/net8.0/Presentation.staticwebassets.runtime.json
 /app/Presentation/bin/Debug/net8.0/LatoFont/Lato-Black.ttf
 /app/Presentation/bin/Debug/net8.0/LatoFont/Lato-BlackItalic.ttf
 /app/Presentation/bin/Debug/net8.0/LatoFont/Lato-Bold.ttf
@@ -208,4 +209,3 @@
 /app/Presentation/obj/Debug/net8.0/Presentation.pdb
 /app/Presentation/obj/Debug/net8.0/Presentation.genruntimeconfig.cache
 /app/Presentation/obj/Debug/net8.0/ref/Presentation.dll
-/app/Presentation/bin/Debug/net8.0/Presentation.staticwebassets.runtime.json

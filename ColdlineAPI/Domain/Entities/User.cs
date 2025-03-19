@@ -8,7 +8,7 @@ namespace ColdlineAPI.Domain.Entities
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; } = string.Empty;
+        public string? Id { get; set; }
 
         [BsonElement("name")]
         public string Name { get; set; } = string.Empty;
@@ -20,10 +20,10 @@ namespace ColdlineAPI.Domain.Entities
         public string Password { get; set; } = string.Empty;
 
         [BsonElement("userType")]
-        public ReferenceEntity UserType { get; set; } = new ReferenceEntity(); 
+        public ReferenceEntity? UserType { get; set; } = new ReferenceEntity(); 
 
         [BsonElement("department")]
-        public ReferenceEntity Department { get; set; } = new ReferenceEntity(); 
+        public ReferenceEntity? Department { get; set; } = new ReferenceEntity(); 
 
         [BsonElement("currentProcess")]
         [BsonIgnoreIfNull] // 🔹 Se for NULL, MongoDB ignora esse campo

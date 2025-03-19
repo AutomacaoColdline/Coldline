@@ -1,6 +1,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using ColdlineAPI.Domain.Common;
+using ColdlineAPI.Domain.Enum;
 
 namespace ColdlineAPI.Domain.Entities
 {
@@ -9,9 +10,6 @@ namespace ColdlineAPI.Domain.Entities
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; } 
-
-        [BsonElement("name")]
-        public string Name { get; set; } = string.Empty;
 
         [BsonElement("customer name")]
         public string CustomerName { get; set; } = string.Empty;
@@ -27,7 +25,11 @@ namespace ColdlineAPI.Domain.Entities
         public ReferenceEntity? Quality { get; set; } = new ReferenceEntity();
         [BsonElement("monitoring")]
         public ReferenceEntity? Monitoring { get; set; } = new ReferenceEntity();
-        [BsonElement("finished")]
-        public bool? Finished { get; set; }
+        [BsonElement("status")]
+        public MachineStatus Status { get; set; }
+        [BsonElement("machineType")]
+        public ReferenceEntity? MachineType { get; set; } = new ReferenceEntity();
+        [BsonElement("time")]
+        public string Time { get; set; } = "00:00:00";
     }
 }

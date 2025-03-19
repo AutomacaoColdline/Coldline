@@ -82,6 +82,11 @@ namespace ColdlineAPI.Application.Services
 
         public async Task<User> CreateUserAsync(User user)
         {
+            if (string.IsNullOrEmpty(user.Id) || !ObjectId.TryParse(user.Id, out _))
+            {
+                user.Id = ObjectId.GenerateNewId().ToString();
+            }
+
             if (!UtilityHelper.IsValidEmail(user.Email))
             {
                 throw new ArgumentException("O email fornecido não é válido.");
@@ -91,13 +96,6 @@ namespace ColdlineAPI.Application.Services
             if (emailExists)
             {
                 throw new ArgumentException("O email fornecido já está em uso.");
-            }
-            if(string.IsNullOrEmpty(user.CurrentProcess.Id)){
-                user.CurrentProcess = null;
-                user.CurrentOccurrence = null;
-            }
-            else if(string.IsNullOrEmpty(user.CurrentOccurrence.Id)){
-                user.CurrentOccurrence = null;
             }
 
             user.Password = UtilityHelper.Encrypt(user.Password);

@@ -1,6 +1,7 @@
 using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Domain.Entities;
+using ColdlineAPI.Domain.Enum;
 using ColdlineAPI.Domain.Common;
 using ColdlineAPI.Infrastructure.Settings;
 using Microsoft.Extensions.Options;
@@ -30,6 +31,7 @@ namespace ColdlineAPI.Application.Services
 
         public async Task<Machine> CreateMachineAsync(Machine machine)
         {
+            machine.Status = MachineStatus.WaitingProduction;
             if (string.IsNullOrEmpty(machine.Id))
             {
                 machine.Id = MongoDB.Bson.ObjectId.GenerateNewId().ToString();
@@ -50,7 +52,6 @@ namespace ColdlineAPI.Application.Services
             if (existingMachine == null) return false;
 
             var updateDefinition = Builders<Machine>.Update
-                .Set(m => m.Name, machine.Name ?? existingMachine.Name)
                 .Set(m => m.CustomerName, machine.CustomerName ?? existingMachine.CustomerName)
                 .Set(m => m.IdentificationNumber, machine.IdentificationNumber ?? existingMachine.IdentificationNumber)
                 .Set(m => m.Phase, machine.Phase ?? existingMachine.Phase)
@@ -58,7 +59,8 @@ namespace ColdlineAPI.Application.Services
                 .Set(m => m.Process, machine.Process ?? existingMachine.Process)
                 .Set(m => m.Quality, machine.Quality ?? existingMachine.Quality)
                 .Set(m => m.Monitoring, machine.Monitoring ?? existingMachine.Monitoring)
-                .Set(p => p.Finished, existingMachine.Finished);
+                .Set(m => m.MachineType, machine.MachineType ?? existingMachine.MachineType)
+                .Set(p => p.Status, existingMachine.Status);
 
             var result = await _machines.UpdateOneAsync(m => m.Id == id, updateDefinition);
             return result.IsAcknowledged && result.ModifiedCount > 0;
@@ -77,9 +79,6 @@ namespace ColdlineAPI.Application.Services
             var filters = new List<FilterDefinition<Machine>>();
             var builder = Builders<Machine>.Filter;
 
-            if (!string.IsNullOrEmpty(filter.Name))
-                filters.Add(builder.Regex(m => m.Name, new MongoDB.Bson.BsonRegularExpression(filter.Name, "i")));
-            
             if (!string.IsNullOrEmpty(filter.CustomerName))
                 filters.Add(builder.Regex(m => m.CustomerName, new MongoDB.Bson.BsonRegularExpression(filter.CustomerName, "i")));
             
@@ -89,14 +88,17 @@ namespace ColdlineAPI.Application.Services
             if (!string.IsNullOrEmpty(filter.Phase))
                 filters.Add(builder.Eq(m => m.Phase, filter.Phase));
             
-            if (filter.Finished != null)
-                filters.Add(builder.Eq(m => m.Finished, filter.Finished));
+            if (filter.Status != null)
+                filters.Add(builder.Eq(m => m.Status, filter.Status));
             
             if (!string.IsNullOrEmpty(filter.Voltage))
                 filters.Add(builder.Eq(m => m.Voltage, filter.Voltage));
             
             if (!string.IsNullOrEmpty(filter.ProcessId))
                 filters.Add(builder.Eq(m => m.Process.Id, filter.ProcessId));
+            
+            if (!string.IsNullOrEmpty(filter.MachineTypeId))
+                filters.Add(builder.Eq(m => m.MachineType.Id, filter.MachineTypeId));
             
             if (!string.IsNullOrEmpty(filter.QualityId))
                 filters.Add(builder.Eq(m => m.Quality.Id, filter.QualityId));

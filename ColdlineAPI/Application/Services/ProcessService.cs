@@ -1,5 +1,6 @@
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Application.Filters;
+using ColdlineAPI.Application.DTOs;
 using ColdlineAPI.Domain.Entities;
 using ColdlineAPI.Domain.Enum;
 using ColdlineAPI.Domain.Common;
@@ -223,6 +224,52 @@ namespace ColdlineAPI.Application.Services
             var result = await _processes.UpdateOneAsync(p => p.Id == processId, update);
             return result.IsAcknowledged && result.ModifiedCount > 0;
         }
+
+        public async Task<ProcessStatisticsDto> GetProcessStatisticsAsync(string processId, string processTypeId)
+        {
+            var filteredProcesses = await _processes
+                .Find(p => p.Finished == true && p.ProcessType.Id == processTypeId && !string.IsNullOrEmpty(p.ProcessTime))
+                .ToListAsync();
+
+            if (!filteredProcesses.Any())
+            {
+                return new ProcessStatisticsDto();
+            }
+
+            var durations = new List<TimeSpan>();
+            foreach (var p in filteredProcesses)
+            {
+                if (TimeSpan.TryParseExact(p.ProcessTime, @"hh\:mm\:ss", null, out var duration))
+                {
+                    durations.Add(duration);
+                }
+            }
+
+            if (!durations.Any())
+            {
+                return new ProcessStatisticsDto();
+            }
+
+            // 🔹 Calcula a Média
+            TimeSpan total = durations.Aggregate(TimeSpan.Zero, (sum, next) => sum + next);
+            TimeSpan averageTime = TimeSpan.FromTicks(total.Ticks / durations.Count);
+
+            // 🔹 Calcula o Desvio Padrão Populacional
+            double meanTicks = durations.Average(d => d.Ticks);
+            double variance = durations.Average(d => Math.Pow(d.Ticks - meanTicks, 2));
+            TimeSpan standardDeviation = TimeSpan.FromTicks((long)Math.Sqrt(variance));
+
+            // 🔹 Define o Limite Superior com 2 desvios padrão
+            TimeSpan upperLimit = averageTime + (standardDeviation * 2);
+
+            return new ProcessStatisticsDto
+            {
+                AverageProcessTime = averageTime.ToString(@"hh\:mm\:ss"),
+                StandardDeviation = standardDeviation.ToString(@"hh\:mm\:ss"),
+                UpperLimit = upperLimit.ToString(@"hh\:mm\:ss") // Novo cálculo do limite superior
+            };
+        }
+
 
         private string CalculateProcessTime(DateTime startDate)
         {

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "E0aJphTdnPB5B3uS5WpyBUtCnyNczrF3nfjgShNuOjk=",
+  "Hash": "ZABpFlzze5hvStCtLXln6Few8/nqhvSYlv5nsWkCjOw=",
   "Source": "Presentation",
   "BasePath": "_content/Presentation",
   "Mode": "Default",
@@ -17,12 +17,12 @@
   ],
   "Assets": [
     {
-      "Identity": "/app/Presentation/wwwroot/uploads/.png.png",
+      "Identity": "/app/Presentation/wwwroot/uploads/adao.png",
       "SourceId": "Presentation",
       "SourceType": "Discovered",
       "ContentRoot": "/app/Presentation/wwwroot/",
       "BasePath": "_content/Presentation",
-      "RelativePath": "uploads/.png.png",
+      "RelativePath": "uploads/adao.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -33,15 +33,15 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/uploads/.png.png"
+      "OriginalItemSpec": "wwwroot/uploads/adao.png"
     },
     {
-      "Identity": "/app/Presentation/wwwroot/uploads/0cebf4ed-be62-441e-a0f9-92d905b3ea75.png",
+      "Identity": "/app/Presentation/wwwroot/uploads/Bruno.png",
       "SourceId": "Presentation",
       "SourceType": "Discovered",
       "ContentRoot": "/app/Presentation/wwwroot/",
       "BasePath": "_content/Presentation",
-      "RelativePath": "uploads/0cebf4ed-be62-441e-a0f9-92d905b3ea75.png",
+      "RelativePath": "uploads/Bruno.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -52,15 +52,15 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/uploads/0cebf4ed-be62-441e-a0f9-92d905b3ea75.png"
+      "OriginalItemSpec": "wwwroot/uploads/Bruno.png"
     },
     {
-      "Identity": "/app/Presentation/wwwroot/uploads/b4d2ef1e-b4c5-4ca4-915e-3b36ac104fc9.png",
+      "Identity": "/app/Presentation/wwwroot/uploads/Caio.png",
       "SourceId": "Presentation",
       "SourceType": "Discovered",
       "ContentRoot": "/app/Presentation/wwwroot/",
       "BasePath": "_content/Presentation",
-      "RelativePath": "uploads/b4d2ef1e-b4c5-4ca4-915e-3b36ac104fc9.png",
+      "RelativePath": "uploads/Caio.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -71,15 +71,15 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/uploads/b4d2ef1e-b4c5-4ca4-915e-3b36ac104fc9.png"
+      "OriginalItemSpec": "wwwroot/uploads/Caio.png"
     },
     {
-      "Identity": "/app/Presentation/wwwroot/uploads/d43eb201-e485-460e-a9bb-dadeceb3877d.png",
+      "Identity": "/app/Presentation/wwwroot/uploads/Daniel.png",
       "SourceId": "Presentation",
       "SourceType": "Discovered",
       "ContentRoot": "/app/Presentation/wwwroot/",
       "BasePath": "_content/Presentation",
-      "RelativePath": "uploads/d43eb201-e485-460e-a9bb-dadeceb3877d.png",
+      "RelativePath": "uploads/Daniel.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -90,7 +90,7 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/uploads/d43eb201-e485-460e-a9bb-dadeceb3877d.png"
+      "OriginalItemSpec": "wwwroot/uploads/Daniel.png"
     },
     {
       "Identity": "/app/Presentation/wwwroot/uploads/eduardo.png",
@@ -112,12 +112,12 @@
       "OriginalItemSpec": "wwwroot/uploads/eduardo.png"
     },
     {
-      "Identity": "/app/Presentation/wwwroot/uploads/eduardo.png.png",
+      "Identity": "/app/Presentation/wwwroot/uploads/Fabio.png",
       "SourceId": "Presentation",
       "SourceType": "Discovered",
       "ContentRoot": "/app/Presentation/wwwroot/",
       "BasePath": "_content/Presentation",
-      "RelativePath": "uploads/eduardo.png.png",
+      "RelativePath": "uploads/Fabio.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -128,7 +128,64 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/uploads/eduardo.png.png"
+      "OriginalItemSpec": "wwwroot/uploads/Fabio.png"
+    },
+    {
+      "Identity": "/app/Presentation/wwwroot/uploads/Gabriel.png",
+      "SourceId": "Presentation",
+      "SourceType": "Discovered",
+      "ContentRoot": "/app/Presentation/wwwroot/",
+      "BasePath": "_content/Presentation",
+      "RelativePath": "uploads/Gabriel.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/uploads/Gabriel.png"
+    },
+    {
+      "Identity": "/app/Presentation/wwwroot/uploads/Heitor.png",
+      "SourceId": "Presentation",
+      "SourceType": "Discovered",
+      "ContentRoot": "/app/Presentation/wwwroot/",
+      "BasePath": "_content/Presentation",
+      "RelativePath": "uploads/Heitor.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/uploads/Heitor.png"
+    },
+    {
+      "Identity": "/app/Presentation/wwwroot/uploads/Ingrid.png",
+      "SourceId": "Presentation",
+      "SourceType": "Discovered",
+      "ContentRoot": "/app/Presentation/wwwroot/",
+      "BasePath": "_content/Presentation",
+      "RelativePath": "uploads/Ingrid.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/uploads/Ingrid.png"
     }
   ]
 }

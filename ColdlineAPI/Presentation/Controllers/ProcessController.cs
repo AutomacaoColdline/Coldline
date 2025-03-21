@@ -1,5 +1,6 @@
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Application.Filters;
+using ColdlineAPI.Application.DTOs;
 using ColdlineAPI.Domain.Entities;
 using ColdlineAPI.Application.DTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -90,6 +91,22 @@ namespace ColdlineAPI.Presentation.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet("statistics/{processId}/{processTypeId}")]
+        public async Task<IActionResult> GetProcessStatistics(string processId, string processTypeId)
+        {
+            try
+            {
+                var statistics = await _processService.GetProcessStatisticsAsync(processId, processTypeId);
+                return Ok(statistics);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
 
     }
 }

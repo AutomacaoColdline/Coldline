@@ -72,8 +72,16 @@ namespace ColdlineAPI.Presentation.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] User user)
         {
-            var updated = await _userService.UpdateUserAsync(id, user);
-            return updated ? NoContent() : NotFound(new { Message = "Usuário não encontrado para atualização!" });
+            var (updated, message) = await _userService.UpdateUserAsync(id, user);
+            
+            if (updated)
+            {
+                return Ok(new { Message = "Usuário atualizado com sucesso!" });
+            }
+            else
+            {
+                return BadRequest(new { Message = message });
+            }
         }
 
         /// <summary>
@@ -186,35 +194,83 @@ namespace ColdlineAPI.Presentation.Controllers
 
         [HttpPost("upload-image")]
         [AllowAnonymous]
-        public async Task<IActionResult> UploadImage(IFormFile file, [FromQuery] string? fileName = null)
+        public async Task<IActionResult> UploadImage(IFormFile? file, [FromQuery] string? oldFileName, [FromQuery] string newFileName)
         {
-            if (file == null || file.Length == 0)
+            try
             {
-                return BadRequest(new { Message = "Arquivo inválido." });
+                // 🔹 Define o diretório de uploads dentro do projeto
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+
+                // 🔹 Garante que a pasta existe
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                // 🔹 Define os caminhos dos arquivos
+                var oldFilePath = string.IsNullOrWhiteSpace(oldFileName) ? null : Path.Combine(uploadsFolder, $"{oldFileName}.png");
+                var newFilePath = Path.Combine(uploadsFolder, $"{newFileName}.png");
+
+                // ✅ Caso 1: Criando uma nova imagem (nunca existiu antes)
+                if (file != null && string.IsNullOrWhiteSpace(oldFileName))
+                {
+                    using (var stream = new FileStream(newFilePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+                    return Ok(new { url = $"/uploads/{newFileName}.png" });
+                }
+
+                // ✅ Caso 2: Apenas renomeando a imagem (sem upload de novo arquivo)
+                if (file == null && !string.IsNullOrWhiteSpace(oldFileName))
+                {
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        System.IO.File.Move(oldFilePath, newFilePath);
+                        return Ok(new { url = $"/uploads/{newFileName}.png" });
+                    }
+                    return NotFound(new { Message = "Imagem anterior não encontrada para renomeação." });
+                }
+
+                // ✅ Caso 3: Atualizando a imagem, mas mantendo o nome
+                if (file != null && !string.IsNullOrWhiteSpace(oldFileName) && oldFileName == newFileName)
+                {
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        System.IO.File.Delete(oldFilePath); // 🔹 Remove a antiga antes de salvar a nova
+                    }
+
+                    using (var stream = new FileStream(newFilePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    return Ok(new { url = $"/uploads/{newFileName}.png" });
+                }
+
+                // ✅ Caso 4: Atualizando a imagem e alterando o nome ao mesmo tempo
+                if (file != null && !string.IsNullOrWhiteSpace(oldFileName) && oldFileName != newFileName)
+                {
+                    if (System.IO.File.Exists(oldFilePath))
+                    {
+                        System.IO.File.Delete(oldFilePath); // 🔹 Apaga a antiga antes de salvar a nova
+                    }
+
+                    using (var stream = new FileStream(newFilePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    return Ok(new { url = $"/uploads/{newFileName}.png" });
+                }
+
+                return BadRequest(new { Message = "Nenhuma operação foi realizada. Verifique os parâmetros enviados." });
             }
-
-            // Definir o novo caminho dentro do projeto da API
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-
-            if (!Directory.Exists(uploadsFolder))
+            catch (Exception ex)
             {
-                Directory.CreateDirectory(uploadsFolder);
+                return StatusCode(500, new { Message = "Erro ao processar a imagem.", Error = ex.Message });
             }
-
-            // Se o usuário não forneceu um nome, gerar um GUID
-            fileName = string.IsNullOrWhiteSpace(fileName) 
-                ? $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}"
-                : $"{fileName}{Path.GetExtension(file.FileName)}";
-
-            var filePath = Path.Combine(uploadsFolder, fileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            var fileUrl = $"/uploads/{fileName}"; // Caminho acessível via URL
-            return Ok(new { url = fileUrl });
         }
+
     }
 }

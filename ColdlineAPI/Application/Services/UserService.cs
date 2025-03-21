@@ -103,48 +103,43 @@ namespace ColdlineAPI.Application.Services
             return user;
         }
 
-        public async Task<bool> UpdateUserAsync(string id, User user)
+        public async Task<(bool Success, string Message)> UpdateUserAsync(string id, User user)
         {
-            // 🔹 Validação do ID como ObjectId
-            if (!ObjectId.TryParse(id, out ObjectId objectId))
+            try
             {
-                throw new ArgumentException("O ID fornecido não é um ObjectId válido.");
-            }
+                if (!ObjectId.TryParse(id, out _))
+                {
+                    return (false, "O ID fornecido não é um ObjectId válido.");
+                }
 
-            // 🔹 Busca o usuário no banco para verificar se ele existe
-            var existingUser = await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
-            if (existingUser == null)
+                var existingUser = await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
+                if (existingUser == null)
+                {
+                    return (false, "Usuário não encontrado.");
+                }
+
+                // 🔹 Se a senha estiver preenchida, criptografá-la antes de salvar.
+                var updatedPassword = string.IsNullOrEmpty(user.Password) ? existingUser.Password : UtilityHelper.Encrypt(user.Password);
+
+                var updateDefinition = Builders<User>.Update
+                    .Set(u => u.Name, user.Name ?? existingUser.Name)
+                    .Set(u => u.Email, user.Email ?? existingUser.Email)
+                    .Set(u => u.Password, updatedPassword)
+                    .Set(u => u.UserType, user.UserType ?? existingUser.UserType)
+                    .Set(u => u.Department, user.Department ?? existingUser.Department)
+                    .Set(u => u.CurrentProcess, user.CurrentProcess)
+                    .Set(u => u.CurrentOccurrence, user.CurrentOccurrence)
+                    .Set(u => u.UrlPhoto, user.UrlPhoto ?? existingUser.UrlPhoto)
+                    .Set(u => u.IdentificationNumber, user.IdentificationNumber ?? existingUser.IdentificationNumber);
+
+                var result = await _users.UpdateOneAsync(u => u.Id == id, updateDefinition);
+
+                return (true, "Usuário atualizado com sucesso.");
+            }
+            catch (Exception ex)
             {
-                return false; // Usuário não encontrado
+                return (false, $"Erro ao atualizar usuário: {ex.Message}");
             }
-
-            // 🔹 Verificação e ajuste de campos `null`
-            if (user.CurrentProcess?.Id == null || string.IsNullOrWhiteSpace(user.CurrentProcess.Id))
-            {
-                user.CurrentProcess = null;
-            }
-
-            if (user.CurrentOccurrence?.Id == null || string.IsNullOrWhiteSpace(user.CurrentOccurrence.Id))
-            {
-                user.CurrentOccurrence = null;
-            }
-
-            // 🔹 Criação do UpdateDefinition para modificar apenas os campos enviados
-            var updateDefinition = Builders<User>.Update
-                .Set(u => u.Name, user.Name ?? existingUser.Name)
-                .Set(u => u.Email, user.Email ?? existingUser.Email)
-                .Set(u => u.Password, string.IsNullOrEmpty(user.Password) ? existingUser.Password : user.Password)
-                .Set(u => u.UserType, user.UserType ?? existingUser.UserType)
-                .Set(u => u.Department, user.Department ?? existingUser.Department)
-                .Set(u => u.CurrentProcess, user.CurrentProcess)
-                .Set(u => u.CurrentOccurrence, user.CurrentOccurrence)
-                .Set(u => u.UrlPhoto, user.UrlPhoto ?? existingUser.UrlPhoto)
-                .Set(u => u.IdentificationNumber, user.IdentificationNumber ?? existingUser.IdentificationNumber);
-
-            // 🔹 Atualização no banco
-            var result = await _users.UpdateOneAsync(u => u.Id == id, updateDefinition);
-
-            return result.IsAcknowledged && result.ModifiedCount > 0;
         }
 
 

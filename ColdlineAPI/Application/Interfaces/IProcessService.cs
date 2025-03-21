@@ -1,4 +1,5 @@
 using ColdlineAPI.Application.Filters;
+using ColdlineAPI.Application.DTOs;
 using ColdlineAPI.Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,5 +17,6 @@ namespace ColdlineAPI.Application.Interfaces
         Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId, string? machineId, bool preIndustrialization, bool reWork);
         Task<bool> UpdateProcessTimeInDatabase(string processId, string processTime);
         Task<bool> EndProcessAsync(string processId);
+        Task<ProcessStatisticsDto> GetProcessStatisticsAsync(string processId, string processTypeId);
     }
 }

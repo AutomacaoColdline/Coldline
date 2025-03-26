@@ -61,20 +61,72 @@ namespace ColdlineWeb.Services
         /// <summary>
         /// Faz o upload da imagem do usuário e retorna o nome do arquivo salvo.
         /// </summary>
-        public async Task<string?> UploadImageAsync(IBrowserFile file, string userName)
+        public async Task<string?> UploadImageAsync(IBrowserFile file, string oldFileName, string newFileName)
         {
             if (file == null)
+            {
+                Console.WriteLine("⚠ Nenhum arquivo foi selecionado para upload.");
                 return null;
+            }
 
-            var fileName = $"{userName}.png";
-            var uploadUrl = $"http://10.0.0.44:5000/api/User/upload-image?fileName={fileName}";
+            long maxFileSize = 20 * 1024 * 1024; // 20MB
 
-            var content = new MultipartFormDataContent();
-            content.Add(new StreamContent(file.OpenReadStream()), "file", fileName);
+            try
+            {
+                using var stream = file.OpenReadStream(maxFileSize);
 
-            var response = await _http.PostAsync(uploadUrl, content);
-            return response.IsSuccessStatusCode ? fileName : null;
+                var uploadUrl = $"http://10.0.0.44:5000/api/User/upload-image?oldFileName={oldFileName}&newFileName={newFileName}";
+
+                var content = new MultipartFormDataContent();
+                content.Add(new StreamContent(stream), "file", newFileName);
+
+                var response = await _http.PostAsync(uploadUrl, content);
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"✅ Upload bem-sucedido: {newFileName}");
+                    return newFileName;
+                }
+                else
+                {
+                    Console.WriteLine($"❌ Falha no upload. Código: {response.StatusCode}");
+                    return null;
+                }
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"❌ Erro: O arquivo excede o tamanho permitido de {maxFileSize / 1024 / 1024}MB. Detalhes: {ex.Message}");
+                return null;
+            }
         }
+
+        /// <summary>
+        /// Faz busca paginada de usuários com filtros opcionais de nome, email, departamento e tipo de usuário.
+        /// </summary>
+        public async Task<PagedResult<UserModel>> SearchUsersAsync(
+            string? name,
+            string? email,
+            string? departmentId,
+            string? userTypeId,
+            int pageNumber,
+            int pageSize)
+        {
+            // Monta a query string
+            // Observação: se algum parâmetro estiver vazio, não colocar na URL (ou colocar vazio).
+            var url = "api/User/search?" +
+                      $"name={name}&" +
+                      $"email={email}&" +
+                      $"departmentId={departmentId}&" +
+                      $"userTypeId={userTypeId}&" +
+                      $"pageNumber={pageNumber}&" +
+                      $"pageSize={pageSize}";
+
+            // Faz a requisição GET
+            var result = await _http.GetFromJsonAsync<PagedResult<UserModel>>(url);
+
+            // Retorna o objeto ou um PagedResult vazio
+            return result ?? new PagedResult<UserModel>();
+        }
+
 
         /// <summary>
         /// Busca um usuário pelo número de identificação.

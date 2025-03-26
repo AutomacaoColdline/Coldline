@@ -1,0 +1,53 @@
+@using ColdlineWeb.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+@if (ShowModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@((IsEditing) ? "Editar Departamento" : "Adicionar Departamento")</h5>
+                    <button class="close" @onclick="CloseModalInternal">&times;</button>
+                </div>
+                <EditForm Model="DepartmentModel" OnValidSubmit="OnValidSubmitInternal">
+                    <DataAnnotationsValidator />
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="deptName" class="form-label">Nome</label>
+                            <InputText id="deptName" class="form-control" @bind-Value="DepartmentModel.Name" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="deptDescription" class="form-label">Descrição</label>
+                            <InputText id="deptDescription" class="form-control" @bind-Value="DepartmentModel.Description" required />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CloseModalInternal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">
+                            @((IsEditing) ? "Salvar" : "Criar")
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool ShowModal { get; set; }
+    [Parameter] public bool IsEditing { get; set; }
+    [Parameter] public DepartmentModel DepartmentModel { get; set; } = new DepartmentModel();
+    [Parameter] public EventCallback CloseModal { get; set; }
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+
+    private async Task CloseModalInternal()
+    {
+        await CloseModal.InvokeAsync();
+    }
+
+    private async Task OnValidSubmitInternal()
+    {
+        await OnValidSubmit.InvokeAsync();
+    }
+}

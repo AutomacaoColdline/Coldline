@@ -15,5 +15,6 @@ builder.Services.AddScoped(sp => new HttpClient
 builder.Services.AddScoped<IndustriaService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<MachineService>();
+builder.Services.AddScoped<ProcessService>();
 
 await builder.Build().RunAsync();

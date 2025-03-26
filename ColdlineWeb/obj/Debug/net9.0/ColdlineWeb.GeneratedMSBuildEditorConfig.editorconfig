@@ -120,8 +120,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/app/Pages/User/DepartmentModal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9EZXBhcnRtZW50TW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/User/UserModal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9Vc2VyTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [/app/Pages/User/Users.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9Vc2Vycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/User/UserTypeModal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9Vc2VyVHlwZU1vZGFsLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/UserTypes.razor]

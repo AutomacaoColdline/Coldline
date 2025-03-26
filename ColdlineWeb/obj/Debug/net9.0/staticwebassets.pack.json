@@ -33,6 +33,10 @@
       "PackagePath": "staticwebassets/css/Sidebar.css"
     },
     {
+      "Id": "/app/wwwroot/css/User.css",
+      "PackagePath": "staticwebassets/css/User.css"
+    },
+    {
       "Id": "/app/wwwroot/css/UserInfo.css",
       "PackagePath": "staticwebassets/css/UserInfo.css"
     },
@@ -49,12 +53,44 @@
       "PackagePath": "staticwebassets/icon-192.png"
     },
     {
+      "Id": "/app/wwwroot/img/adicionar-ficheiro.png",
+      "PackagePath": "staticwebassets/img/adicionar-ficheiro.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/adicionar-foto.png",
+      "PackagePath": "staticwebassets/img/adicionar-foto.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/editar.png",
+      "PackagePath": "staticwebassets/img/editar.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/lixeira.png",
+      "PackagePath": "staticwebassets/img/lixeira.png"
+    },
+    {
       "Id": "/app/wwwroot/img/logo.png",
       "PackagePath": "staticwebassets/img/logo.png"
     },
     {
       "Id": "/app/wwwroot/img/logofundo.png",
       "PackagePath": "staticwebassets/img/logofundo.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/lupa.png",
+      "PackagePath": "staticwebassets/img/lupa.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/novo-usuario.png",
+      "PackagePath": "staticwebassets/img/novo-usuario.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/seta-direita.png",
+      "PackagePath": "staticwebassets/img/seta-direita.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/seta-esquerda.png",
+      "PackagePath": "staticwebassets/img/seta-esquerda.png"
     },
     {
       "Id": "/app/wwwroot/index.html",

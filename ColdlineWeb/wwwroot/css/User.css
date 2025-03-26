@@ -1,0 +1,144 @@
+/* ====== FUNDO DA PÁGINA ====== */
+.page {
+    /* Cor de fundo principal (você escolheu #ecf0f1) */
+    background-color: #ecf0f1;
+}
+
+/* ====== CARD DE FILTROS ====== */
+.filter-card {
+    margin: 2rem auto;
+    width: 90%;
+    background-color: #FAFCFF; /* Azul muito claro */
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    padding: 1rem;
+    border: 1px solid #DCEAFB;
+}
+
+/* Layout interno do card de filtros */
+.search-filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    
+    /* 
+       Sobrescrevendo estilos de .btn-success, .btn-primary, etc. 
+       somente dentro do .search-filters, para não afetar outros lugares.
+    */
+}
+
+.search-filters .form-control,
+.search-filters .btn {
+    height: 44px;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0 !important; /* remove mb-3 para alinhar na horizontal */
+}
+
+/* Ajuste de largura mínima e padrão dos inputs */
+.search-filters .form-control {
+    width: 200px;
+    min-width: 120px;
+}
+
+/* ====== Ajustes de posição (espacamentos) nos botões específicos ====== */
+/* Botão "Adicionar Usuário" – empurra um pouco para o lado direito */
+.search-filters .btn.btn-success:first-of-type {
+    margin-right: 1.5rem; /* ajuste conforme desejar */
+}
+
+/* Botão "Buscar" – dar espaçamento para a esquerda */
+.search-filters .btn.btn-primary {
+    margin-left: 1rem; /* ajuste conforme desejar */
+}
+
+/* ====== Tornar todos os botões do filtro em um tom de azul claro ====== */
+.search-filters .btn-success,
+.search-filters .btn-primary {
+    background-color: #cce4f6 !important; /* azul bem claro */
+    border-color: #99c9ed !important;
+    color: #000 !important;
+}
+
+/* 
+    Se quiser diferenciar levemente o "Buscar" (btn-primary) do "Adicionar" (btn-success),
+    basta dar cores diferentes a cada classe. Mas, como pedido,
+    todos do filtro ficam "azul bem claro".
+*/
+
+/* ====== CARD PARA TABELA ====== */
+.table-card {
+    margin: 2rem auto;
+    width: 90%;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    padding: 1rem;
+    border: 1px solid #DCEAFB;
+}
+
+.table-card table {
+    width: 100%;
+    margin: 0 auto;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+/* ====== CABEÇALHO DA TABELA ====== */
+.table thead {
+    background-color: #142c59;  
+    color: #ffffff;
+}
+
+.table thead th {
+    font-weight: bold;
+    text-align: center;
+    padding: 0.75rem;
+}
+
+/* ====== CORPO DA TABELA ====== */
+.table tbody tr {
+    background-color: #ffffff;
+}
+
+.table tbody td {
+    vertical-align: middle;
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+    text-align: center;
+}
+
+/* ====== PAGINAÇÃO ====== */
+.pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+/* ====== BOTÕES DE EDIÇÃO/EXCLUSÃO NO CARD TABELA ====== */
+/* Sobrescreve o .btn-warning e .btn-danger somente dentro de .table-card */
+.table-card .btn-warning {
+    background-color: #fff9c4 !important; /* amarelo bem clarinho */
+    border-color: #fff59d !important;
+    color: #000 !important;
+}
+
+.table-card .btn-danger {
+    background-color: #ffcdd2 !important; /* rosa/avermelhado claro */
+    border-color: #ef9a9a !important;
+    color: #000 !important;
+}
+
+/* ====== MODAL ====== */
+.modal {
+    background-color: rgba(0,0,0,0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}

@@ -4,7 +4,7 @@
 @inject HttpClient Http
 @inject NavigationManager Navigation
 
-<h3>Gerenciamento de Usuários</h3>
+<link rel="stylesheet" href="css/User.css" />
 
 @if (isLoading)
 {
@@ -16,90 +16,127 @@ else if (!string.IsNullOrEmpty(errorMessage))
 }
 else
 {
-    <button class="btn btn-primary mb-3" @onclick="OpenAddUserModal">Adicionar Usuário</button>
+    <!-- Card de Filtros -->
+    <div class="filter-card">
+        <div class="search-filters">
+            <button class="btn btn-success mb-3" @onclick="OpenAddUserModal">
+                <img src="img/novo-usuario.png" alt="Novo Usuário" style="width: 16px; height: 16px;" />
+            </button>
+            <input class="form-control" placeholder="Nome" @bind="filterName" />
+            <input class="form-control" placeholder="Email" @bind="filterEmail" />
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Foto</th>
-                <th>Nome</th>
-                <th>Email</th>
-                <th>Tipo de Usuário</th>
-                <th>Departamento</th>
-                <th>Número de Identificação</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in users)
-            {
-                <tr>
-                    <td>
-                        @if (!string.IsNullOrEmpty(user.UrlPhoto))
-                        {
-                            <img src="@($"http://10.0.0.44:5000/uploads/{user.UrlPhoto}")" alt="Foto do Usuário" width="50" />
-                        }
-                    </td>
-                    <td>@user.Name</td>
-                    <td>@user.Email</td>
-                    <td>@(user.UserType?.Name ?? "Sem Tipo")</td>
-                    <td>@(user.Department?.Name ?? "Sem Departamento")</td>
-                    <td>@user.IdentificationNumber</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm" @onclick="() => OpenEditUserModal(user)">Editar</button>
-                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(user.Id)">Excluir</button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+            <select class="form-control" @bind="filterDepartmentId">
+                <option value="">Todos Departamentos</option>
+                @foreach (var dept in departments)
+                {
+                    <option value="@dept.Id">@dept.Name</option>
+                }
+            </select>
+            <button class="btn btn-success mb-3"  @onclick="OpenDepartmentModal" >
+                <img src="img/adicionar-ficheiro.png" alt="Departamento" style="width: 16px; height: 16px;" />
+            </button>
+            <select class="form-control" @bind="filterUserTypeId">
+                <option value="">Todos Tipos</option>
+                @foreach (var ut in userTypes)
+                {
+                    <option value="@ut.Id">@ut.Name</option>
+                }
+            </select>
+            <button class="btn btn-success mb-3"  @onclick="OpenUserTypeModal" >
+                <img src="img/adicionar-ficheiro.png" alt="Novo tipo de usuario" style="width: 16px; height: 16px;" />
+            </button>
 
-@if (showModal)
-{
-    <div class="modal d-block">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">@(isEditing ? "Editar Usuário" : "Adicionar Usuário")</h5>
-                    <button class="close" @onclick="CloseModal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <label>Nome:</label>
-                    <input class="form-control" @bind="currentUser.Name" />
-
-                    <label>Email:</label>
-                    <input class="form-control" @bind="currentUser.Email" />
-
-                    <label>Identificação:</label>
-                    <input class="form-control" @bind="currentUser.IdentificationNumber" />
-
-                    <label>Tipo de Usuário:</label>
-                    <select class="form-control" @bind="currentUser.UserType.Id">
-                        <option value="">Selecione...</option>
-                        @foreach (var userType in userTypes)
-                        {
-                            <option value="@userType.Id">@userType.Name</option>
-                        }
-                    </select>
-
-                    <label>Departamento:</label>
-                    <select class="form-control" @bind="currentUser.Department.Id">
-                        <option value="">Selecione...</option>
-                        @foreach (var department in departments)
-                        {
-                            <option value="@department.Id">@department.Name</option>
-                        }
-                    </select>
-
-                    <label>Foto do Usuário:</label>
-                    <InputFile OnChange="UploadImage" class="form-control" />
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
-                    <button class="btn btn-success" @onclick="SaveUser">Salvar</button>
-                </div>
-            </div>
+            <button class="btn btn-primary" @onclick="ApplyFilters" aria-label="Buscar">
+                <img src="img/lupa.png" alt="Buscar" style="width: 16px; height: 16px;" />
+            </button>
         </div>
     </div>
+
+    <!-- Card para a Tabela de usuários -->
+    <div class="table-card">
+        <table class="table"> 
+            <!-- Removido "table-striped" para que a listagem tenha cor única -->
+            <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Tipo de Usuário</th>
+                    <th>Departamento</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in users)
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(user.UrlPhoto))
+                            {
+                                <img src="@($"http://10.0.0.44:5000/uploads/{user.UrlPhoto}?t={DateTime.UtcNow.Ticks}")"
+                                     alt="Foto" width="50" />
+                            }
+                        </td>
+                        <td>@user.IdentificationNumber</td>
+                        <td>@user.Name</td>
+                        <td>@user.Email</td>
+                        <td>@(user.UserType?.Name ?? "Sem Tipo")</td>
+                        <td>@(user.Department?.Name ?? "Sem Departamento")</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" @onclick="() => OpenEditUserModal(user)">
+                                <img src="img/editar.png" alt="Editar" style="width: 16px; height: 16px;" />
+                            </button>
+                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(user.Id)">
+                                <img src="img/lixeira.png" alt="Excluir" style="width: 16px; height: 16px;" />
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Controles de paginação -->
+    <div class="pagination-container">
+        <button class="btn btn-secondary"
+                @onclick="GoToPreviousPage"
+                disabled="@(!CanGoPrevious)">
+            <img src="img/seta-esquerda.png" alt="Anterior" style="width: 16px; height: 16px;" />
+        </button>
+
+        <span> @pageNumber de @totalPages</span>
+
+        <button class="btn btn-secondary"
+                @onclick="GoToNextPage"
+                disabled="@(!CanGoNext)">
+            <img src="img/seta-direita.png" alt="Próxima" style="width: 16px; height: 16px;" />
+        </button>
+    </div>
 }
+
+<UserModal
+    ShowModal="@showModal"
+    IsEditing="@isEditing"
+    CurrentUser="@currentUser"
+    UserTypes="@userTypes"
+    Departments="@departments"
+    CloseModal="CloseModal"
+    SaveUser="SaveUser"
+    UpdateUser="UpdateUser"
+    OnUploadImage="UploadImage"
+/>
+
+<UserTypeModal
+    ShowModal="@showUserTypeModal"
+    IsEditing="false"
+    UserTypeModel="@newUserType"
+    CloseModal="CloseUserTypeModal"
+    OnValidSubmit="SaveUserType" />
+
+<DepartmentModal
+    ShowModal="@showDepartmentModal"
+    IsEditing="false"
+    DepartmentModel="@newDepartment"
+    CloseModal="CloseDepartmentModal"
+    OnValidSubmit="SaveDepartment" />

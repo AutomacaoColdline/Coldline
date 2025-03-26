@@ -9,8 +9,6 @@
 
 <PageTitle>Home</PageTitle>
 
-<h3>Bem-vindo à Dashboard!</h3>
-
 @if (isLoading)
 {
     <p>Carregando usuários e máquinas...</p>
@@ -21,83 +19,114 @@ else if (!string.IsNullOrEmpty(errorMessage))
 }
 else
 {
+    <!-- Barra fixa de estatísticas de máquinas -->
     <div class="machine-stats">
-        <div class="stat-card">Total de Máquinas: <strong>@totalMachines</strong></div>
-        <div class="stat-card">Aguardando Produção: <strong>@machinesWaitingProduction</strong></div>
-        <div class="stat-card">Em Progresso: <strong>@machinesInProgress</strong></div>
-        <div class="stat-card">Em Ocorrência: <strong>@machinesInOccurrence</strong></div>
-        <div class="stat-card">Finalizadas: <strong>@machinesFinished</strong></div>
+        <div class="stat-card">
+            Total de Máquinas: <strong>@totalMachines</strong>
+        </div>
+        <div class="stat-card">
+            Aguardando Produção: <strong>@machinesWaitingProduction</strong>
+        </div>
+        <div class="stat-card">
+            Em Progresso: <strong>@machinesInProgress</strong>
+        </div>
+        <div class="stat-card">
+            Em Ocorrência: <strong>@machinesInOccurrence</strong>
+        </div>
+        <div class="stat-card">
+            Finalizadas: <strong>@machinesFinished</strong>
+        </div>
     </div>
 
-    <h4>Usuários</h4>
+    <!-- Wrapper com três colunas (esquerda, tabela, direita) -->
+    <div class="user-table-wrapper">
 
-    <div class="user-pagination">
-        <button class="nav-button" @onclick="PreviousPage" disabled="@isFirstPage">⬅</button>
-
-        <div class="user-table-container">
-            <div class="user-table-card">
-                <table class="user-table">
-                    <thead>
-                        <tr>
-                            <th>Foto</th>
-                            <th>Nome</th>
-                            <th>Processo Atual</th>
-                            <th>Ocorrência Atual</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var user in PaginatedUsers.Take(4)) 
-                        {
-                            <tr>
-                                <td><img class="user-photo" src="@($"http://10.0.0.44:5000/uploads/{user.UrlPhoto}")" alt="Foto de @user.Name"></td>
-                                <td>@user.Name</td>
-                                <td>@(user.CurrentProcess?.Name ?? "Nenhum")</td>
-                                <td>@(user.CurrentOccurrence?.Name ?? "Nenhuma")</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="user-table-card">
-                <table class="user-table">
-                    <thead>
-                        <tr>
-                            <th>Foto</th>
-                            <th>Nome</th>
-                            <th>Processo Atual</th>
-                            <th>Ocorrência Atual</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var user in PaginatedUsers.Skip(4).Take(4)) 
-                        {
-                            <tr>
-                                <td><img class="user-photo" src="@($"http://10.0.0.44:5000/uploads/{user.UrlPhoto}")" alt="Foto de @user.Name"></td>
-                                <td>@user.Name</td>
-                                <td>@(user.CurrentProcess?.Name ?? "Nenhum")</td>
-                                <td>@(user.CurrentOccurrence?.Name ?? "Nenhuma")</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+        <!-- Coluna da ESQUERDA: retângulo + botão de navegação -->
+        <div class="nav-area">
+            <button class="nav-button" @onclick="PreviousPage" disabled="@isFirstPage">⬅</button>
         </div>
 
-        <button class="nav-button" @onclick="NextPage" disabled="@isLastPage">➡</button>
-    </div>
+        <!-- Coluna do MEIO: tabela de usuários -->
+        <div class="user-table-card">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Foto</th>
+                        <th>Nome</th>
+                        <th>Processo Atual</th>
+                        <th>Tempo de Processo</th>
+                        <th>Tempo Médio</th>
+                        <th>Desvio Padrão</th>
+                        <th>Limite Superior</th>
+                        <th>Ocorrência Atual</th>
+                        <th>Indicador</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in PaginatedUsers.Take(4))
+                    {
+                        <tr>
+                            <td>
+                                <img class="user-photo"
+                                     src="@($"http://10.0.0.44:5000/uploads/{user.UrlPhoto}")"
+                                     alt="Foto de @user.Name" />
+                            </td>
+                            <td>@user.Name</td>
+                            <td>@(user.CurrentProcess?.Name ?? "Nenhum")</td>
+                            @if (ProcessStatsByUserId.TryGetValue(user.Id, out var stat))
+                            {
+                                <td>@stat.ProcessTime</td>
+                                <td>@stat.Avg</td>
+                                <td>@stat.Std</td>
+                                <td>@stat.Upper</td>
+                            }
+                            else
+                            {
+                                <td>Nenhum</td>
+                                <td>Nenhum</td>
+                                <td>Nenhum</td>
+                                <td>Nenhum</td>
+                            }
+                            <td>@(user.CurrentOccurrence?.Name ?? "Nenhuma")</td>
+                            <td>
+                                @if (ProcessStatsByUserId.TryGetValue(user.Id, out var st))
+                                {
+                                    @RenderIndicator(user, st)
+                                }
+                                else
+                                {
+                                    @RenderIndicator(user, null)
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
-    <h4>Máquinas</h4>
+        <!-- Coluna da DIREITA: retângulo + botão de navegação -->
+        <div class="nav-area">
+            <button class="nav-button" @onclick="NextPage" disabled="@isLastPage">➡</button>
+        </div>
+
+    </div>
     <div class="machine-list">
         @foreach (var machine in machines)
         {
             <div class="machine-card">
+
+                <!-- Título do card -->
+                <div class="machine-card-header">
+                    Numero de serie da máquina: @machine.IdentificationNumber
+                </div>
+
+                <!-- Corpo do card -->
                 <div class="machine-card-body">
-                    <p><strong>Identificação:</strong> @machine.IdentificationNumber</p>
                     <p><strong>Nome:</strong> @machine.MachineType.Name</p>
-                    <p><strong>Status:</strong> @machine.Status?.GetTranslatedStatus()</p> 
+                    <p><strong>Status:</strong> @machine.Status?.GetTranslatedStatus()</p>
                     <p><strong>Processo:</strong> @(machine.Process?.Name ?? "Nenhum")</p>
                 </div>
+
             </div>
         }
     </div>

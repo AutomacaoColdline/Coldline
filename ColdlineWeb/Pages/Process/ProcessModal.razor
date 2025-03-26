@@ -1,0 +1,83 @@
+@using ColdlineWeb.Models
+@if (ShowModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@((IsEditing ? "Editar Processo" : "Adicionar Processo"))</h5>
+                    <button class="close" @onclick="OnClose">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <label>Número de Identificação:</label>
+                    <input class="form-control" @bind="CurrentProcess.IdentificationNumber" />
+                    <label>Tempo do Processo:</label>
+                    <input class="form-control" @bind="CurrentProcess.ProcessTime" />
+                    <label>Data de Início:</label>
+                    <input type="datetime-local" class="form-control" @bind="CurrentProcess.StartDate" />
+                    <label>Data de Término:</label>
+                    <input type="datetime-local" class="form-control" @bind="CurrentProcess.EndDate" />
+                    <label>Usuário:</label>
+                    <select class="form-control" @bind="CurrentProcess.User.Id">
+                        @foreach (var user in UsersRef)
+                        {
+                            <option value="@user.Id">@user.Name</option>
+                        }
+                    </select>
+                    <label>Departamento:</label>
+                    <select class="form-control" @bind="CurrentProcess.Department.Id">
+                        @foreach (var dept in Departments)
+                        {
+                            <option value="@dept.Id">@dept.Name</option>
+                        }
+                    </select>
+                    <label>Tipo de Processo:</label>
+                    <select class="form-control" @bind="CurrentProcess.ProcessType.Id">
+                        @foreach (var pt in ProcessTypes)
+                        {
+                            <option value="@pt.Id">@pt.Name</option>
+                        }
+                    </select>
+                    <label>Máquina:</label>
+                    <select class="form-control" @bind="CurrentProcess.Machine.Id">
+                        @foreach (var machine in Machines)
+                        {
+                            <option value="@machine.Id">@machine.Name</option>
+                        }
+                    </select>
+                    <label>Ocorrências:</label>
+                    <select multiple class="form-control" @onchange="OnOccurrenceSelection">
+                        @foreach (var occ in Occurrences)
+                        {
+                            <option value="@occ.Id" selected="@SelectedOccurrences.Contains(occ.Id)">
+                                @occ.Name
+                            </option>
+                        }
+                    </select>
+                    <label>Em Ocorrência:</label>
+                    <input type="checkbox" @bind="CurrentProcess.InOccurrence" />
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="OnClose">Cancelar</button>
+                    <button class="btn btn-success" @onclick="OnSave">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool ShowModal { get; set; }
+    [Parameter] public bool IsEditing { get; set; }
+    [Parameter] public ProcessModel CurrentProcess { get; set; } = new ProcessModel();
+    [Parameter] public IEnumerable<ReferenceEntity> UsersRef { get; set; } = new List<ReferenceEntity>();
+    [Parameter] public IEnumerable<ReferenceEntity> Departments { get; set; } = new List<ReferenceEntity>();
+    [Parameter] public IEnumerable<ReferenceEntity> ProcessTypes { get; set; } = new List<ReferenceEntity>();
+    [Parameter] public IEnumerable<ReferenceEntity> Machines { get; set; } = new List<ReferenceEntity>();
+    [Parameter] public IEnumerable<ReferenceEntity> Occurrences { get; set; } = new List<ReferenceEntity>();
+    [Parameter] public List<string> SelectedOccurrences { get; set; } = new List<string>();
+
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback<ChangeEventArgs> OnOccurrenceSelection { get; set; }
+}

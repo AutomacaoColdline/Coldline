@@ -100,13 +100,13 @@
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\User.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
       <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"0qea2l1epe"},{"Name":"integrity","Value":"sha256-CK9hOqU34lZI\u002BoE12W8ZEEOjDoMBTYagsLMzZcmcI1E="},{"Name":"label","Value":"css/User.css"}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"3513"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022CK9hOqU34lZI\u002BoE12W8ZEEOjDoMBTYagsLMzZcmcI1E=\u0022"},{"Name":"Last-Modified","Value":"Tue, 25 Mar 2025 19:15:23 GMT"}]]]></ResponseHeaders>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"3513"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022CK9hOqU34lZI\u002BoE12W8ZEEOjDoMBTYagsLMzZcmcI1E=\u0022"},{"Name":"Last-Modified","Value":"Wed, 26 Mar 2025 13:20:08 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="css/User.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\User.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
       <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-CK9hOqU34lZI\u002BoE12W8ZEEOjDoMBTYagsLMzZcmcI1E="}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"3513"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022CK9hOqU34lZI\u002BoE12W8ZEEOjDoMBTYagsLMzZcmcI1E=\u0022"},{"Name":"Last-Modified","Value":"Tue, 25 Mar 2025 19:15:23 GMT"}]]]></ResponseHeaders>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"3513"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022CK9hOqU34lZI\u002BoE12W8ZEEOjDoMBTYagsLMzZcmcI1E=\u0022"},{"Name":"Last-Modified","Value":"Wed, 26 Mar 2025 13:20:08 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="css/UserInfo.3rrqsieq1k.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\UserInfo.css'))</AssetFile>

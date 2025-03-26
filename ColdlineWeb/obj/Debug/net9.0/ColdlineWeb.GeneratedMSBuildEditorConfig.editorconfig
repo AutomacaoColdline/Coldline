@@ -108,8 +108,12 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGF1c2VUeXBlcy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Process.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvY2Vzcy5yYXpvcg==
+[/app/Pages/Process/ProcessModal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvY2Vzcy9Qcm9jZXNzTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Process/ProcessPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvY2Vzcy9Qcm9jZXNzUGFnZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/ProcessType.razor]

@@ -1,0 +1,81 @@
+@page "/processes"
+@inherits ProcessPageBase
+
+<link rel="stylesheet" href="css/Process.css" />
+
+<h3>Gerenciamento de Processos</h3>
+
+@if (IsLoading)
+{
+    <p>Carregando...</p>
+}
+else if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+else
+{
+    <button class="btn btn-primary mb-3" @onclick="OpenAddProcessModal">Adicionar Processo</button>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Número de Identificação</th>
+                <th>Tempo do Processo</th>
+                <th>Data de Início</th>
+                <th>Data de Término</th>
+                <th>Usuário</th>
+                <th>Departamento</th>
+                <th>Tipo de Processo</th>
+                <th>Máquina</th>
+                <th>Ocorrências</th>
+                <th>Em Ocorrência</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var process in ProcessList)
+            {
+                <tr>
+                    <td>@process.IdentificationNumber</td>
+                    <td>@process.ProcessTime</td>
+                    <td>@process.StartDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    <td>@(process.EndDate.HasValue ? process.EndDate.Value.ToString("yyyy-MM-dd HH:mm:ss") : "Não finalizado")</td>
+                    <td>@(process.User?.Name ?? "Não informado")</td>
+                    <td>@(process.Department?.Name ?? "Não informado")</td>
+                    <td>@(process.ProcessType?.Name ?? "Não informado")</td>
+                    <td>@(process.Machine?.Name ?? "Não informado")</td>
+                    <td>
+                        @if (process.Occurrences != null && process.Occurrences.Any())
+                        {
+                            @string.Join(", ", process.Occurrences.Select(o => o.Name))
+                        }
+                        else
+                        {
+                            <span>Sem ocorrências</span>
+                        }
+                    </td>
+                    <td>@(process.InOccurrence ? "Sim" : "Não")</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" @onclick="() => OpenEditProcessModal(process)">Editar</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteProcess(process.Id)">Excluir</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<!-- Utilização do componente modal para adicionar/editar processo -->
+<ProcessModal ShowModal="ShowModal"
+              IsEditing="IsEditing"
+              CurrentProcess="CurrentProcess"
+              UsersRef="UsersRef"
+              Departments="Departments"
+              ProcessTypes="ProcessTypes"
+              Machines="Machines"
+              Occurrences="Occurrences"
+              SelectedOccurrences="SelectedOccurrences"
+              OnOccurrenceSelection="HandleOccurrenceSelection"
+              OnSave="SaveProcess"
+              OnClose="CloseProcessModal" />

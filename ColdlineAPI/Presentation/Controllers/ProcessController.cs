@@ -105,8 +105,22 @@ namespace ColdlineAPI.Presentation.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
-
-
+        [HttpGet("user-data/{userId}")]
+        public async Task<ActionResult<UserProcessDetailsDto>> GetUserProcessData(string userId)
+        {
+            try
+            {
+                var result = await _processService.GetUserProcessDataAsync(userId);
+                return Ok(result);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

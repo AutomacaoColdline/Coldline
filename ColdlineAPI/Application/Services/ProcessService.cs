@@ -224,9 +224,64 @@ namespace ColdlineAPI.Application.Services
             var result = await _processes.UpdateOneAsync(p => p.Id == processId, update);
             return result.IsAcknowledged && result.ModifiedCount > 0;
         }
+        public async Task<UserProcessDetailsDto> GetUserProcessDataAsync(string userId)
+        {
+            // 1) Acha o usuário
+            var user = await _users.Find(u => u.Id == userId).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                throw new ArgumentException($"Usuário com ID {userId} não encontrado.");
+            }
+
+            // Cria um DTO base com infos do usuário
+            var dto = new UserProcessDetailsDto
+            {
+                UserId = user.Id!,
+                UserName = user.Name,
+                UrlPhoto = user.UrlPhoto,
+                CurrentOccurrenceName = user.CurrentOccurrence?.Name ?? "Nenhuma"
+            };
+
+            // 2) Verifica se há CurrentProcess
+            if (string.IsNullOrWhiteSpace(user.CurrentProcess?.Id))
+            {
+                // Retorna com ProcessTime = "00:00:00" e etc. (pode customizar se quiser)
+                dto.CurrentProcessId = "Nenhum processo atual";
+                return dto;
+            }
+
+            // 3) Carrega o processo atual
+            var process = await _processes.Find(p => p.Id == user.CurrentProcess.Id).FirstOrDefaultAsync();
+            if (process == null)
+            {
+                // Se não achar o processo, devolve sem stats
+                dto.CurrentProcessId = "Processo não encontrado";
+                return dto;
+            }
+
+            // Atribui o ID (caso precise exibir no front)
+            dto.CurrentProcessId = process.Id!;
+            dto.TypeProcessName = process.ProcessType.Name;
+
+            // 4) Carrega as estatísticas (se quiser, pode chamar seu método existente de estatísticas)
+            // Ex: var statsDto = await GetProcessStatisticsAsync(process.Id, process.ProcessType.Id);
+            // Supondo que esse método retorne as 4 infos que você quer (ProcessTime, Avg, Std, Upper).
+            var stats = await GetProcessStatisticsAsync(process.Id!, process.ProcessType!.Id!);
+            
+            // 5) Ajusta os valores no DTO
+            dto.ProcessTime = stats.ProcessTime; 
+            dto.AverageProcessTime = stats.AverageProcessTime;
+            dto.StandardDeviation = stats.StandardDeviation;
+            dto.UpperLimit = stats.UpperLimit;
+
+            // 6) Retorna DTO completo
+            return dto;
+        }
+
 
         public async Task<ProcessStatisticsDto> GetProcessStatisticsAsync(string processId, string processTypeId)
         {
+            var process = await _processes.Find(process => process.Id == processId).FirstOrDefaultAsync();
             var filteredProcesses = await _processes
                 .Find(p => p.Finished == true && p.ProcessType.Id == processTypeId && !string.IsNullOrEmpty(p.ProcessTime))
                 .ToListAsync();
@@ -264,6 +319,7 @@ namespace ColdlineAPI.Application.Services
 
             return new ProcessStatisticsDto
             {
+                ProcessTime = process.ProcessTime,
                 AverageProcessTime = averageTime.ToString(@"hh\:mm\:ss"),
                 StandardDeviation = standardDeviation.ToString(@"hh\:mm\:ss"),
                 UpperLimit = upperLimit.ToString(@"hh\:mm\:ss") // Novo cálculo do limite superior

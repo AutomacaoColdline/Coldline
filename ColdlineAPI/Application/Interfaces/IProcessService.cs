@@ -18,5 +18,6 @@ namespace ColdlineAPI.Application.Interfaces
         Task<bool> UpdateProcessTimeInDatabase(string processId, string processTime);
         Task<bool> EndProcessAsync(string processId);
         Task<ProcessStatisticsDto> GetProcessStatisticsAsync(string processId, string processTypeId);
+        Task<UserProcessDetailsDto> GetUserProcessDataAsync(string userId);
     }
 }

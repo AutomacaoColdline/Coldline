@@ -99,16 +99,40 @@ namespace ColdlineAPI.Presentation.Controllers
         /// Busca usuários com filtros opcionais.
         /// </summary>
         [HttpGet("search")]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> SearchUsers(
             [FromQuery] string? name,
             [FromQuery] string? email,
             [FromQuery] string? departmentId,
-            [FromQuery] string? userTypeId)
+            [FromQuery] string? userTypeId,
+            [FromQuery] int pageNumber = 1,  // Valor padrão
+            [FromQuery] int pageSize = 10    // Valor padrão
+        )
         {
-            var users = await _userService.SearchUsersAsync(name, email, departmentId, userTypeId);
-            return Ok(users);
+            // Chamando serviço que faz a busca e devolve (lista + totalCount)
+            var (items, totalCount) = await _userService.SearchUsersAsync(
+                name,
+                email,
+                departmentId,
+                userTypeId,
+                pageNumber,
+                pageSize
+            );
+
+            // Retornando a lista, a contagem total, e outras informações úteis para o cliente
+            // (Ex: quantas páginas existem, página atual, etc.).
+            var response = new
+            {
+                totalCount = totalCount,
+                pageNumber = pageNumber,
+                pageSize = pageSize,
+                totalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                items = items
+            };
+
+            return Ok(response);
         }
+
 
         /// <summary>
         /// Realiza login e retorna um token JWT.

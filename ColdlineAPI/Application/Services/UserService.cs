@@ -59,7 +59,13 @@ namespace ColdlineAPI.Application.Services
         public async Task<User?> GetUserByIdAsync(string id) =>
             await _users.Find(user => user.Id == id).FirstOrDefaultAsync();
 
-        public async Task<List<User>> SearchUsersAsync(string? name, string? email, string? departmentId, string? userTypeId)
+        public async Task<(List<User> Items, long TotalCount)> SearchUsersAsync(
+            string? name,
+            string? email,
+            string? departmentId,
+            string? userTypeId,
+            int pageNumber,
+            int pageSize)
         {
             var filterBuilder = Builders<User>.Filter;
             var filters = new List<FilterDefinition<User>>();
@@ -76,9 +82,26 @@ namespace ColdlineAPI.Application.Services
             if (!string.IsNullOrEmpty(userTypeId))
                 filters.Add(filterBuilder.Eq(u => u.UserType.Id, userTypeId));
 
-            var finalFilter = filters.Count > 0 ? filterBuilder.And(filters) : filterBuilder.Empty;
-            return await _users.Find(finalFilter).ToListAsync();
+            var finalFilter = filters.Count > 0
+                ? filterBuilder.And(filters)
+                : filterBuilder.Empty;
+
+            // Consulta sem paginação para contar o total de documentos.
+            // Você pode também usar CountDocumentsAsync, dependendo da versão do driver.
+            var totalCount = await _users.CountDocumentsAsync(finalFilter);
+
+            // Aplicando paginação (Skip e Limit):
+            // Se pageNumber for 1 e pageSize for 10, por exemplo, skip = 0, limit = 10
+            // Se pageNumber for 2, skip = 10, limit = 10, e assim por diante.
+            var items = await _users
+                .Find(finalFilter)
+                .Skip((pageNumber - 1) * pageSize)
+                .Limit(pageSize)
+                .ToListAsync();
+
+            return (items, totalCount);
         }
+
 
         public async Task<User> CreateUserAsync(User user)
         {

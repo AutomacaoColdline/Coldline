@@ -1,0 +1,49 @@
+@using ColdlineWeb.Models
+
+@if (ShowModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(IsEditing ? "Editar Máquina" : "Adicionar Máquina")</h5>
+                    <button class="close" @onclick="@OnClose">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <label>Nome do Cliente:</label>
+                    <input class="form-control" @bind="CurrentMachine.CustomerName" />
+
+                    <label>Número de Identificação:</label>
+                    <input class="form-control" @bind="CurrentMachine.IdentificationNumber" />
+
+                    <label>Fase:</label>
+                    <input class="form-control" @bind="CurrentMachine.Phase" />
+
+                    <label>Voltagem:</label>
+                    <input class="form-control" @bind="CurrentMachine.Voltage" />
+
+                    <label>Tipo de Máquina:</label>
+                    <select class="form-control" @bind="CurrentMachine.MachineType.Id">
+                        @foreach (var machineType in MachineTypes)
+                        {
+                            <option value="@machineType.Id">@machineType.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="@OnClose">Cancelar</button>
+                    <button class="btn btn-success" @onclick="@OnSave">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool ShowModal { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public MachineModel CurrentMachine { get; set; } = default!;
+    [Parameter] public bool IsEditing { get; set; }
+    [Parameter] public List<ReferenceEntity> MachineTypes { get; set; } = new();
+}

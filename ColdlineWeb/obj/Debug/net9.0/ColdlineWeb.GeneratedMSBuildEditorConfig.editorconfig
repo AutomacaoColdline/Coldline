@@ -84,6 +84,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZS9NYWNoaW5lLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/app/Pages/Machine/MachineModal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZS9NYWNoaW5lTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [/app/Pages/MachineType.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZVR5cGUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -120,8 +124,8 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvY2Vzc1R5cGUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS5yYXpvcg==
+[/app/Pages/Quality/Quality.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9RdWFsaXR5LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/User/DepartmentModal.razor]

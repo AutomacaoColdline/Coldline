@@ -13,6 +13,7 @@ namespace ColdlineWeb.Models{
         public ReferenceEntity? Monitoring { get; set; } 
         public ReferenceEntity MachineType { get; set; } = new();
         public MachineStatus? Status { get; set; }
+        public string Time { get; set; } = "00:00:00";
     }
 
 }

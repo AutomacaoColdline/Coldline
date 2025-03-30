@@ -16,5 +16,13 @@ builder.Services.AddScoped<IndustriaService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<MachineService>();
 builder.Services.AddScoped<ProcessService>();
+builder.Services.AddScoped<DefectService>();
+builder.Services.AddScoped<DepartmentService>();
+builder.Services.AddScoped<UserTypeService>();
+builder.Services.AddScoped<PauseTypeService>();
+builder.Services.AddScoped<ProcessTypeService>();
+builder.Services.AddScoped<QualityService>();
+builder.Services.AddScoped<TypeDefectService>();
+
 
 await builder.Build().RunAsync();

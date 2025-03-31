@@ -1,7 +1,6 @@
 @page "/machines"
 @inherits MachinesPage
-
-<h3>Gerenciamento de Máquinas</h3>
+<link rel="stylesheet" href="css/Machine.css" />
 
 @if (isLoading)
 {
@@ -13,42 +12,81 @@ else if (!string.IsNullOrEmpty(errorMessage))
 }
 else
 {
-    <button class="btn btn-primary mb-3" @onclick="OpenAddMachineModal">Adicionar Máquina</button>
+    <!-- CARD DE FILTRO -->
+    <div class="filter-card">
+        <div class="search-filters">
+            <input class="form-control filter-large" placeholder="Nome do Cliente" @bind="filter.CustomerName" />
+            <input class="form-control filter-small" placeholder="Número de Identificação" @bind="filter.IdentificationNumber" />
+            <input class="form-control filter-xs" placeholder="Fase" @bind="filter.Phase" />
+            <input class="form-control filter-xs" placeholder="Voltagem" @bind="filter.Voltage" />
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Tipo de Máquina</th>
-                <th>Nome do Cliente</th>
-                <th>Número de Identificação</th>
-                <th>Fase</th>
-                <th>Voltagem</th>
-                <th>Processo</th>
-                <th>Qualidade</th>
-                <th>Monitoramento</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var machine in machines)
-            {
+            <select class="form-control filter-medium" @bind="filter.MachineTypeId">
+                <option value="">Todos os Tipos</option>
+                @foreach (var type in machineTypes)
+                {
+                    <option value="@type.Id">@type.Name</option>
+                }
+            </select>
+
+            <button class="btn btn-filter" @onclick="ApplyFilters">
+                <img src="img/lupa.png" alt="Buscar" class="btn-icon" />
+            </button>
+
+            <button class="btn btn-filter" @onclick="ResetFilters">
+                <img src="img/limpar-limpo.png" alt="Limpar" class="btn-icon" />
+            </button>
+
+            <button class="btn btn-filter" @onclick="OpenAddMachineModal">
+                <img src="img/adicionar-maquina.png" alt="Adicionar máquina" class="btn-icon" />
+            </button>
+
+            <button class="btn btn-filter" @onclick="OpenMachineTypeModal">
+                <img src="img/adicionar-ficheiro.png" alt="Novo tipo" class="btn-icon" />
+            </button>
+        </div>
+    </div>
+
+    <!-- TABELA -->
+    <div class="table-card">
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@(machine.MachineType?.Name ?? "Sem Tipo")</td>
-                    <td>@machine.CustomerName</td>
-                    <td>@machine.IdentificationNumber</td>
-                    <td>@machine.Phase</td>
-                    <td>@machine.Voltage</td>
-                    <td>@(machine.Process?.Name ?? "Sem Processo")</td>
-                    <td>@(machine.Quality?.Name ?? "Sem Qualidade")</td>
-                    <td>@(machine.Monitoring?.Name ?? "Sem Monitoramento")</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm" @onclick="() => OpenEditMachineModal(machine)">Editar</button>
-                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteMachine(machine.Id)">Excluir</button>
-                    </td>
+                    <th>Tipo de Máquina</th>
+                    <th>Nome do Cliente</th>
+                    <th>Número de Identificação</th>
+                    <th>Fase</th>
+                    <th>Voltagem</th>
+                    <th>Processo</th>
+                    <th>Qualidade</th>
+                    <th>Monitoramento</th>
+                    <th>Ações</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var machine in machines)
+                {
+                    <tr>
+                        <td>@(machine.MachineType?.Name ?? "Sem Tipo")</td>
+                        <td>@machine.CustomerName</td>
+                        <td>@machine.IdentificationNumber</td>
+                        <td>@machine.Phase</td>
+                        <td>@machine.Voltage</td>
+                        <td>@(machine.Process?.Name ?? "Sem Processo")</td>
+                        <td>@(machine.Quality?.Name ?? "Sem Qualidade")</td>
+                        <td>@(machine.Monitoring?.Name ?? "Sem Monitoramento")</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" @onclick="() => OpenEditMachineModal(machine)">
+                                <img src="img/editar.png" alt="Editar" style="width: 20px;" />
+                            </button>
+                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteMachine(machine.Id)">
+                                <img src="img/lixeira.png" alt="Excluir" style="width: 20px;" />
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 <MachineModal ShowModal="@showModal"
@@ -57,3 +95,9 @@ else
               CurrentMachine="@currentMachine"
               IsEditing="@isEditing"
               MachineTypes="@machineTypes" />
+
+<!-- Novo modal de tipo de máquina -->
+<MachineTypeModal ShowModal="@showMachineTypeModal"
+                  CloseModal="CloseMachineTypeModal"
+                  OnSaved="ReloadMachineTypes" />
+

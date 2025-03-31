@@ -1,0 +1,47 @@
+@using ColdlineWeb.Models
+@inject HttpClient Http
+
+@if (ShowModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Adicionar Tipo de Máquina</h5>
+                    <button class="close" @onclick="CloseModalInternal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <label>Nome do Tipo:</label>
+                    <input class="form-control" @bind="NewType.Name" />
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModalInternal">Cancelar</button>
+                    <button class="btn btn-success" @onclick="Save">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool ShowModal { get; set; }
+    [Parameter] public EventCallback CloseModal { get; set; }
+    [Parameter] public EventCallback OnSaved { get; set; }
+
+    private MachineTypeModel NewType { get; set; } = new();
+
+    private async Task Save()
+    {
+        var response = await Http.PostAsJsonAsync("api/MachineType", NewType);
+        if (response.IsSuccessStatusCode)
+        {
+            await OnSaved.InvokeAsync();
+            await CloseModal.InvokeAsync();
+        }
+    }
+
+    private async Task CloseModalInternal()
+    {
+        await CloseModal.InvokeAsync();
+    }
+}

@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "ColdlineWeb",
   "resources": {
-    "hash": "sha256-VEH6sn5gRdaHNjLpnTSH0+TZVrk88i3Pk1VmiyIT6Yg=",
+    "hash": "sha256-fBHpumdneUC6auYoXIkkIszE35DeOOb83wPYaoDnexQ=",
     "fingerprinting": {
       "Microsoft.AspNetCore.Authorization.n41ua9ceve.wasm": "Microsoft.AspNetCore.Authorization.wasm",
       "Microsoft.AspNetCore.Components.h4ild4sjod.wasm": "Microsoft.AspNetCore.Components.wasm",
@@ -203,8 +203,8 @@
       "icudt_CJK.tjcz0u77k5.dat": "icudt_CJK.dat",
       "icudt_EFIGS.tptq2av103.dat": "icudt_EFIGS.dat",
       "icudt_no_CJK.lfu7j35m59.dat": "icudt_no_CJK.dat",
-      "ColdlineWeb.5ppxplcrul.wasm": "ColdlineWeb.wasm",
-      "ColdlineWeb.jh6s7fppv3.pdb": "ColdlineWeb.pdb"
+      "ColdlineWeb.jlrlizc0od.wasm": "ColdlineWeb.wasm",
+      "ColdlineWeb.jzifxa37us.pdb": "ColdlineWeb.pdb"
     },
     "jsModuleNative": {
       "dotnet.native.8o8n7iomrf.js": "sha256-WIUiy49hHQ3kOAtRdCtUzm3Yg5BnOqCC+Q+kri9Fi1g="
@@ -416,10 +416,10 @@
       "WindowsBase.ovqw333kan.wasm": "sha256-7LCr4nX9JSGuwzMr8Rk8TGvC6ApzQNxCDiMV/0I9JlI=",
       "mscorlib.l6md3pggqy.wasm": "sha256-jZgH0LixLeQKqaq33akQgDGhfE7vbXbHtvCId5HC0Yo=",
       "netstandard.lij9csiyuf.wasm": "sha256-DeeBl9s8G34N3IfYRQ+MoY807amodj8cvpuvUSNaWE4=",
-      "ColdlineWeb.5ppxplcrul.wasm": "sha256-p1JAptvGdE/q6bCrTeumGOHg9jW85m3fAvVMv00f4YI="
+      "ColdlineWeb.jlrlizc0od.wasm": "sha256-CQOu0bQ8OIDtzUhH5vVN3Cuhbwgpe2xXpuWbLj7LFDM="
     },
     "pdb": {
-      "ColdlineWeb.jh6s7fppv3.pdb": "sha256-1+LOZJkiY5cyD9tteIkptJdnTk/zNOUycq7Nil+RBbc="
+      "ColdlineWeb.jzifxa37us.pdb": "sha256-3ybygf09XFxW47SuZU6T2qSNrdd0qOlK/q7xishMPns="
     }
   },
   "cacheBootResources": true,

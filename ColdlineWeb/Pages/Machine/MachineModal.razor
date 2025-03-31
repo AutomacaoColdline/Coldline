@@ -24,6 +24,7 @@
 
                     <label>Tipo de Máquina:</label>
                     <select class="form-control" @bind="CurrentMachine.MachineType.Id">
+                        <option value="">Selecione...</option>
                         @foreach (var machineType in MachineTypes)
                         {
                             <option value="@machineType.Id">@machineType.Name</option>

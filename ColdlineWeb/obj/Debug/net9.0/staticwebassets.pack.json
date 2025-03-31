@@ -21,6 +21,10 @@
       "PackagePath": "staticwebassets/css/IndustriaLogin.css"
     },
     {
+      "Id": "/app/wwwroot/css/Machine.css",
+      "PackagePath": "staticwebassets/css/Machine.css"
+    },
+    {
       "Id": "/app/wwwroot/css/OccurrenceForm.css",
       "PackagePath": "staticwebassets/css/OccurrenceForm.css"
     },
@@ -61,8 +65,16 @@
       "PackagePath": "staticwebassets/img/adicionar-foto.png"
     },
     {
+      "Id": "/app/wwwroot/img/adicionar-maquina.png",
+      "PackagePath": "staticwebassets/img/adicionar-maquina.png"
+    },
+    {
       "Id": "/app/wwwroot/img/editar.png",
       "PackagePath": "staticwebassets/img/editar.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/limpar-limpo.png",
+      "PackagePath": "staticwebassets/img/limpar-limpo.png"
     },
     {
       "Id": "/app/wwwroot/img/lixeira.png",

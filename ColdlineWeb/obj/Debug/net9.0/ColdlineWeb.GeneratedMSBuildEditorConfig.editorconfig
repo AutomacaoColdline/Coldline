@@ -88,6 +88,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZS9NYWNoaW5lTW9kYWwucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[/app/Pages/Machine/MachineTypeModal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZS9NYWNoaW5lVHlwZU1vZGFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [/app/Pages/MachineType.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZVR5cGUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 

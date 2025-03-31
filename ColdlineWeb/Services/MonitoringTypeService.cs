@@ -15,25 +15,25 @@ namespace ColdlineWeb.Services
             _http = http;
         }
 
-        public async Task<List<MonitoringType>> GetAllAsync()
+        public async Task<List<MonitoringTypeModel>> GetAllAsync()
         {
-            return await _http.GetFromJsonAsync<List<MonitoringType>>("api/MonitoringType") ?? new();
+            return await _http.GetFromJsonAsync<List<MonitoringTypeModel>>("api/MonitoringType") ?? new();
         }
 
-        public async Task<MonitoringType?> GetByIdAsync(string id)
+        public async Task<MonitoringTypeModel?> GetByIdAsync(string id)
         {
-            return await _http.GetFromJsonAsync<MonitoringType>($"api/MonitoringType/{id}");
+            return await _http.GetFromJsonAsync<MonitoringTypeModel>($"api/MonitoringType/{id}");
         }
 
-        public async Task<MonitoringType?> CreateAsync(MonitoringType monitoringType)
+        public async Task<MonitoringTypeModel?> CreateAsync(MonitoringTypeModel monitoringType)
         {
             var response = await _http.PostAsJsonAsync("api/MonitoringType", monitoringType);
             return response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<MonitoringType>()
+                ? await response.Content.ReadFromJsonAsync<MonitoringTypeModel>()
                 : null;
         }
 
-        public async Task<bool> UpdateAsync(string id, MonitoringType monitoringType)
+        public async Task<bool> UpdateAsync(string id, MonitoringTypeModel monitoringType)
         {
             var response = await _http.PutAsJsonAsync($"api/MonitoringType/{id}", monitoringType);
             return response.IsSuccessStatusCode;

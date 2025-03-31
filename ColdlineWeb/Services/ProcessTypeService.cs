@@ -15,21 +15,21 @@ namespace ColdlineWeb.Services
             _http = http;
         }
 
-        public async Task<List<ProcessType>> GetAllAsync() =>
-            await _http.GetFromJsonAsync<List<ProcessType>>("api/ProcessType") ?? new();
+        public async Task<List<ProcessTypeModel>> GetAllAsync() =>
+            await _http.GetFromJsonAsync<List<ProcessTypeModel>>("api/ProcessType") ?? new();
 
-        public async Task<ProcessType?> GetByIdAsync(string id) =>
-            await _http.GetFromJsonAsync<ProcessType>($"api/ProcessType/{id}");
+        public async Task<ProcessTypeModel?> GetByIdAsync(string id) =>
+            await _http.GetFromJsonAsync<ProcessTypeModel>($"api/ProcessType/{id}");
 
-        public async Task<ProcessType?> CreateAsync(ProcessType processType)
+        public async Task<ProcessTypeModel?> CreateAsync(ProcessTypeModel processType)
         {
             var response = await _http.PostAsJsonAsync("api/ProcessType", processType);
             return response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<ProcessType>()
+                ? await response.Content.ReadFromJsonAsync<ProcessTypeModel>()
                 : null;
         }
 
-        public async Task<bool> UpdateAsync(string id, ProcessType processType)
+        public async Task<bool> UpdateAsync(string id, ProcessTypeModel processType)
         {
             var response = await _http.PutAsJsonAsync($"api/ProcessType/{id}", processType);
             return response.IsSuccessStatusCode;

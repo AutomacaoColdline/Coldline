@@ -15,25 +15,25 @@ namespace ColdlineWeb.Services
             _http = http;
         }
 
-        public async Task<List<Part>> GetAllAsync()
+        public async Task<List<PartModel>> GetAllAsync()
         {
-            return await _http.GetFromJsonAsync<List<Part>>("api/Part") ?? new();
+            return await _http.GetFromJsonAsync<List<PartModel>>("api/Part") ?? new();
         }
 
-        public async Task<Part?> GetByIdAsync(string id)
+        public async Task<PartModel?> GetByIdAsync(string id)
         {
-            return await _http.GetFromJsonAsync<Part>($"api/Part/{id}");
+            return await _http.GetFromJsonAsync<PartModel>($"api/Part/{id}");
         }
 
-        public async Task<Part?> CreateAsync(Part part)
+        public async Task<PartModel?> CreateAsync(PartModel part)
         {
             var response = await _http.PostAsJsonAsync("api/Part", part);
             return response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<Part>()
+                ? await response.Content.ReadFromJsonAsync<PartModel>()
                 : null;
         }
 
-        public async Task<bool> UpdateAsync(string id, Part part)
+        public async Task<bool> UpdateAsync(string id, PartModel part)
         {
             var response = await _http.PutAsJsonAsync($"api/Part/{id}", part);
             return response.IsSuccessStatusCode;

@@ -15,25 +15,25 @@ namespace ColdlineWeb.Services
             _http = http;
         }
 
-        public async Task<List<Occurrence>> GetAllAsync()
+        public async Task<List<OccurrenceModel>> GetAllAsync()
         {
-            return await _http.GetFromJsonAsync<List<Occurrence>>("api/Occurrence") ?? new();
+            return await _http.GetFromJsonAsync<List<OccurrenceModel>>("api/Occurrence") ?? new();
         }
 
-        public async Task<Occurrence?> GetByIdAsync(string id)
+        public async Task<OccurrenceModel?> GetByIdAsync(string id)
         {
-            return await _http.GetFromJsonAsync<Occurrence>($"api/Occurrence/{id}");
+            return await _http.GetFromJsonAsync<OccurrenceModel>($"api/Occurrence/{id}");
         }
 
-        public async Task<Occurrence?> CreateAsync(Occurrence occurrence)
+        public async Task<OccurrenceModel?> CreateAsync(OccurrenceModel occurrence)
         {
             var response = await _http.PostAsJsonAsync("api/Occurrence", occurrence);
             return response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<Occurrence>()
+                ? await response.Content.ReadFromJsonAsync<OccurrenceModel>()
                 : null;
         }
 
-        public async Task<bool> UpdateAsync(string id, Occurrence occurrence)
+        public async Task<bool> UpdateAsync(string id, OccurrenceModel occurrence)
         {
             var response = await _http.PutAsJsonAsync($"api/Occurrence/{id}", occurrence);
             return response.IsSuccessStatusCode;
@@ -45,11 +45,11 @@ namespace ColdlineWeb.Services
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<Occurrence?> StartOccurrenceAsync(StartOccurrenceRequest request)
+        public async Task<OccurrenceModel?> StartOccurrenceAsync(StartOccurrenceModel request)
         {
             var response = await _http.PostAsJsonAsync("api/Occurrence/start-occurrence", request);
             return response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<Occurrence>()
+                ? await response.Content.ReadFromJsonAsync<OccurrenceModel>()
                 : null;
         }
 

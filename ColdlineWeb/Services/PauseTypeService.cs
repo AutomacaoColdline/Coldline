@@ -15,21 +15,21 @@ namespace ColdlineWeb.Services
             _http = http;
         }
 
-        public async Task<List<PauseType>> GetAllAsync() =>
-            await _http.GetFromJsonAsync<List<PauseType>>("api/PauseType") ?? new();
+        public async Task<List<PauseTypeModel>> GetAllAsync() =>
+            await _http.GetFromJsonAsync<List<PauseTypeModel>>("api/PauseType") ?? new();
 
-        public async Task<PauseType?> GetByIdAsync(string id) =>
-            await _http.GetFromJsonAsync<PauseType>($"api/PauseType/{id}");
+        public async Task<PauseTypeModel?> GetByIdAsync(string id) =>
+            await _http.GetFromJsonAsync<PauseTypeModel>($"api/PauseType/{id}");
 
-        public async Task<PauseType?> CreateAsync(PauseType pauseType)
+        public async Task<PauseTypeModel?> CreateAsync(PauseTypeModel pauseType)
         {
             var response = await _http.PostAsJsonAsync("api/PauseType", pauseType);
             return response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<PauseType>()
+                ? await response.Content.ReadFromJsonAsync<PauseTypeModel>()
                 : null;
         }
 
-        public async Task<bool> UpdateAsync(string id, PauseType pauseType)
+        public async Task<bool> UpdateAsync(string id, PauseTypeModel pauseType)
         {
             var response = await _http.PutAsJsonAsync($"api/PauseType/{id}", pauseType);
             return response.IsSuccessStatusCode;

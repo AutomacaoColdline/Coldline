@@ -15,21 +15,21 @@ namespace ColdlineWeb.Services
             _http = http;
         }
 
-        public async Task<List<Defect>> GetAllAsync() =>
-            await _http.GetFromJsonAsync<List<Defect>>("api/Defect") ?? new();
+        public async Task<List<DefectModel>> GetAllAsync() =>
+            await _http.GetFromJsonAsync<List<DefectModel>>("api/Defect") ?? new();
 
-        public async Task<Defect?> GetByIdAsync(string id) =>
-            await _http.GetFromJsonAsync<Defect>($"api/Defect/{id}");
+        public async Task<DefectModel?> GetByIdAsync(string id) =>
+            await _http.GetFromJsonAsync<DefectModel>($"api/Defect/{id}");
 
-        public async Task<Defect?> CreateAsync(Defect defect)
+        public async Task<DefectModel?> CreateAsync(DefectModel defect)
         {
             var response = await _http.PostAsJsonAsync("api/Defect", defect);
             return response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<Defect>()
+                ? await response.Content.ReadFromJsonAsync<DefectModel>()
                 : null;
         }
 
-        public async Task<bool> UpdateAsync(string id, Defect defect)
+        public async Task<bool> UpdateAsync(string id, DefectModel defect)
         {
             var response = await _http.PutAsJsonAsync($"api/Defect/{id}", defect);
             return response.IsSuccessStatusCode;

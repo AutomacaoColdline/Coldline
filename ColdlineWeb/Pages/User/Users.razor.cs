@@ -45,7 +45,7 @@ namespace ColdlineWeb.Pages.User
 
         // Controle do modal de Tipo de Usuário
         private bool showUserTypeModal = false; 
-        private UserType newUserType = new UserType();
+        private UserTypeModel newUserType = new UserTypeModel();
 
         // Controle do modal de Departamento
         private bool showDepartmentModal = false;
@@ -278,7 +278,7 @@ namespace ColdlineWeb.Pages.User
         // Métodos para o modal de Tipo de Usuário
         private void OpenUserTypeModal()
         {
-            newUserType = new UserType();
+            newUserType = new UserTypeModel();
             showUserTypeModal = true;
         }
 

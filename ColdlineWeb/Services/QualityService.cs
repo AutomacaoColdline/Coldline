@@ -16,21 +16,21 @@ namespace ColdlineWeb.Services
             _http = http;
         }
 
-        public async Task<List<Quality>> GetAllAsync() =>
-            await _http.GetFromJsonAsync<List<Quality>>("api/Quality") ?? new();
+        public async Task<List<QualityModel>> GetAllAsync() =>
+            await _http.GetFromJsonAsync<List<QualityModel>>("api/Quality") ?? new();
 
-        public async Task<Quality?> GetByIdAsync(string id) =>
-            await _http.GetFromJsonAsync<Quality>($"api/Quality/{id}");
+        public async Task<QualityModel?> GetByIdAsync(string id) =>
+            await _http.GetFromJsonAsync<QualityModel>($"api/Quality/{id}");
 
-        public async Task<Quality?> CreateAsync(Quality quality)
+        public async Task<QualityModel?> CreateAsync(QualityModel quality)
         {
             var response = await _http.PostAsJsonAsync("api/Quality", quality);
             return response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<Quality>()
+                ? await response.Content.ReadFromJsonAsync<QualityModel>()
                 : null;
         }
 
-        public async Task<bool> UpdateAsync(string id, Quality quality)
+        public async Task<bool> UpdateAsync(string id, QualityModel quality)
         {
             var response = await _http.PutAsJsonAsync($"api/Quality/{id}", quality);
             return response.IsSuccessStatusCode;
@@ -42,11 +42,11 @@ namespace ColdlineWeb.Services
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<List<Quality>> SearchAsync(QualityFilter filter)
+        public async Task<List<QualityModel>> SearchAsync(QualityFilterModel filter)
         {
             var response = await _http.PostAsJsonAsync("api/Quality/search", filter);
             return response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<List<Quality>>() ?? new()
+                ? await response.Content.ReadFromJsonAsync<List<QualityModel>>() ?? new()
                 : new();
         }
     }

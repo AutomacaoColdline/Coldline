@@ -15,21 +15,21 @@ namespace ColdlineWeb.Services
             _http = http;
         }
 
-        public async Task<List<Department>> GetAllAsync() =>
-            await _http.GetFromJsonAsync<List<Department>>("api/Department") ?? new();
+        public async Task<List<DepartmentModel>> GetAllAsync() =>
+            await _http.GetFromJsonAsync<List<DepartmentModel>>("api/Department") ?? new();
 
-        public async Task<Department?> GetByIdAsync(string id) =>
-            await _http.GetFromJsonAsync<Department>($"api/Department/{id}");
+        public async Task<DepartmentModel?> GetByIdAsync(string id) =>
+            await _http.GetFromJsonAsync<DepartmentModel>($"api/Department/{id}");
 
-        public async Task<Department?> CreateAsync(Department department)
+        public async Task<DepartmentModel?> CreateAsync(DepartmentModel department)
         {
             var response = await _http.PostAsJsonAsync("api/Department", department);
             return response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<Department>()
+                ? await response.Content.ReadFromJsonAsync<DepartmentModel>()
                 : null;
         }
 
-        public async Task<bool> UpdateAsync(string id, Department department)
+        public async Task<bool> UpdateAsync(string id, DepartmentModel department)
         {
             var response = await _http.PutAsJsonAsync($"api/Department/{id}", department);
             return response.IsSuccessStatusCode;

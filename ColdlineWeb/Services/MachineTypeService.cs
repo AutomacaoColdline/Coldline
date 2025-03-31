@@ -15,25 +15,25 @@ namespace ColdlineWeb.Services
             _http = http;
         }
 
-        public async Task<List<MachineType>> GetAllAsync()
+        public async Task<List<MachineTypeModel>> GetAllAsync()
         {
-            return await _http.GetFromJsonAsync<List<MachineType>>("api/MachineType") ?? new();
+            return await _http.GetFromJsonAsync<List<MachineTypeModel>>("api/MachineType") ?? new();
         }
 
-        public async Task<MachineType?> GetByIdAsync(string id)
+        public async Task<MachineTypeModel?> GetByIdAsync(string id)
         {
-            return await _http.GetFromJsonAsync<MachineType>($"api/MachineType/{id}");
+            return await _http.GetFromJsonAsync<MachineTypeModel>($"api/MachineType/{id}");
         }
 
-        public async Task<MachineType?> CreateAsync(MachineType machineType)
+        public async Task<MachineTypeModel?> CreateAsync(MachineTypeModel machineType)
         {
             var response = await _http.PostAsJsonAsync("api/MachineType", machineType);
             return response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<MachineType>()
+                ? await response.Content.ReadFromJsonAsync<MachineTypeModel>()
                 : null;
         }
 
-        public async Task<bool> UpdateAsync(string id, MachineType machineType)
+        public async Task<bool> UpdateAsync(string id, MachineTypeModel machineType)
         {
             var response = await _http.PutAsJsonAsync($"api/MachineType/{id}", machineType);
             return response.IsSuccessStatusCode;

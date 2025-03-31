@@ -15,21 +15,21 @@ namespace ColdlineWeb.Services
             _http = http;
         }
 
-        public async Task<List<UserType>> GetAllAsync() =>
-            await _http.GetFromJsonAsync<List<UserType>>("api/UserType") ?? new();
+        public async Task<List<UserTypeModel>> GetAllAsync() =>
+            await _http.GetFromJsonAsync<List<UserTypeModel>>("api/UserType") ?? new();
 
-        public async Task<UserType?> GetByIdAsync(string id) =>
-            await _http.GetFromJsonAsync<UserType>($"api/UserType/{id}");
+        public async Task<UserTypeModel?> GetByIdAsync(string id) =>
+            await _http.GetFromJsonAsync<UserTypeModel>($"api/UserType/{id}");
 
-        public async Task<UserType?> CreateAsync(UserType userType)
+        public async Task<UserTypeModel?> CreateAsync(UserTypeModel userType)
         {
             var response = await _http.PostAsJsonAsync("api/UserType", userType);
             return response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<UserType>()
+                ? await response.Content.ReadFromJsonAsync<UserTypeModel>()
                 : null;
         }
 
-        public async Task<bool> UpdateAsync(string id, UserType userType)
+        public async Task<bool> UpdateAsync(string id, UserTypeModel userType)
         {
             var response = await _http.PutAsJsonAsync($"api/UserType/{id}", userType);
             return response.IsSuccessStatusCode;

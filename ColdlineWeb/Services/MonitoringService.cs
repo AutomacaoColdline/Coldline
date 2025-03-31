@@ -15,25 +15,25 @@ namespace ColdlineWeb.Services
             _http = http;
         }
 
-        public async Task<List<Monitoring>> GetAllAsync()
+        public async Task<List<MonitoringModel>> GetAllAsync()
         {
-            return await _http.GetFromJsonAsync<List<Monitoring>>("api/Monitoring") ?? new();
+            return await _http.GetFromJsonAsync<List<MonitoringModel>>("api/Monitoring") ?? new();
         }
 
-        public async Task<Monitoring?> GetByIdAsync(string id)
+        public async Task<MonitoringModel?> GetByIdAsync(string id)
         {
-            return await _http.GetFromJsonAsync<Monitoring>($"api/Monitoring/{id}");
+            return await _http.GetFromJsonAsync<MonitoringModel>($"api/Monitoring/{id}");
         }
 
-        public async Task<Monitoring?> CreateAsync(Monitoring monitoring)
+        public async Task<MonitoringModel?> CreateAsync(MonitoringModel monitoring)
         {
             var response = await _http.PostAsJsonAsync("api/Monitoring", monitoring);
             return response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<Monitoring>()
+                ? await response.Content.ReadFromJsonAsync<MonitoringModel>()
                 : null;
         }
 
-        public async Task<bool> UpdateAsync(string id, Monitoring monitoring)
+        public async Task<bool> UpdateAsync(string id, MonitoringModel monitoring)
         {
             var response = await _http.PutAsJsonAsync($"api/Monitoring/{id}", monitoring);
             return response.IsSuccessStatusCode;

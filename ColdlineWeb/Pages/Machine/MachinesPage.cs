@@ -27,6 +27,14 @@ namespace ColdlineWeb.Pages
         // Filtros
         protected MachineFilterModel filter = new();
 
+        // Paginação
+        protected int pageNumber = 1;
+        protected int totalPages = 1;
+        protected const int defaultPageSize = 10;
+
+        protected bool CanGoNext => pageNumber < totalPages;
+        protected bool CanGoPrevious => pageNumber > 1;
+
         // Modal de MachineType
         protected bool showMachineTypeModal = false;
         protected bool isEditingMachineType = false;
@@ -42,9 +50,13 @@ namespace ColdlineWeb.Pages
             try
             {
                 isLoading = true;
-                machines = await Http.GetFromJsonAsync<List<MachineModel>>("api/Machine") ?? new();
+
+                // Buscar tipos e processos
                 processes = await Http.GetFromJsonAsync<List<ProcessModel>>("api/Process") ?? new();
                 machineTypes = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/MachineType") ?? new();
+
+                // Aplicar filtros com paginação
+                await ApplyFilters();
             }
             catch (Exception ex)
             {
@@ -55,6 +67,47 @@ namespace ColdlineWeb.Pages
             {
                 isLoading = false;
             }
+        }
+
+        protected async Task ApplyFilters()
+        {
+            try
+            {
+                filter.Page = pageNumber;
+                filter.PageSize = defaultPageSize;
+
+                var response = await Http.PostAsJsonAsync("api/Machine/search", filter);
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<List<MachineModel>>() ?? new();
+                    machines = result;
+
+                    // Atualiza total de páginas com base em suposição de total fixo (simples)
+                    // Ideal: trazer TotalCount na resposta da API
+                    totalPages = result.Count < defaultPageSize && pageNumber > 1 ? pageNumber : pageNumber + (result.Count == defaultPageSize ? 1 : 0);
+                }
+                else
+                {
+                    errorMessage = "Erro ao aplicar os filtros.";
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = "Erro inesperado ao aplicar filtros.";
+                Console.WriteLine($"[ERRO] {ex.Message}");
+            }
+        }
+
+        protected async Task ResetFilters()
+        {
+            filter = new MachineFilterModel();
+            pageNumber = 1;
+            await ApplyFilters();
+        }
+
+        protected void CloseModal()
+        {
+            showModal = false;
         }
 
         protected void OpenAddMachineModal()
@@ -103,7 +156,7 @@ namespace ColdlineWeb.Pages
                 else
                     await Http.PostAsJsonAsync("api/Machine", currentMachine);
 
-                await LoadData();
+                await ApplyFilters();
                 showModal = false;
             }
             catch (Exception ex)
@@ -118,7 +171,7 @@ namespace ColdlineWeb.Pages
             try
             {
                 await Http.DeleteAsync($"api/Machine/{id}");
-                await LoadData();
+                await ApplyFilters();
             }
             catch (Exception ex)
             {
@@ -127,32 +180,23 @@ namespace ColdlineWeb.Pages
             }
         }
 
-        protected async Task ApplyFilters()
+        // Paginação
+        protected async Task GoToNextPage()
         {
-            try
+            if (CanGoNext)
             {
-                var response = await Http.PostAsJsonAsync("api/Machine/search", filter);
-                if (response.IsSuccessStatusCode)
-                    machines = await response.Content.ReadFromJsonAsync<List<MachineModel>>() ?? new();
-                else
-                    errorMessage = "Erro ao aplicar os filtros.";
-            }
-            catch (Exception ex)
-            {
-                errorMessage = "Erro inesperado ao aplicar filtros.";
-                Console.WriteLine($"[ERRO] {ex.Message}");
+                pageNumber++;
+                await ApplyFilters();
             }
         }
 
-        protected async Task ResetFilters()
+        protected async Task GoToPreviousPage()
         {
-            filter = new MachineFilterModel();
-            await ApplyFilters();
-        }
-
-        protected void CloseModal()
-        {
-            showModal = false;
+            if (CanGoPrevious)
+            {
+                pageNumber--;
+                await ApplyFilters();
+            }
         }
 
         // ========== MODAL DE MACHINE TYPE ==========

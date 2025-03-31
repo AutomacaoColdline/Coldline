@@ -1093,10 +1093,10 @@
 /app/obj/Debug/net9.0/compressed/9wgpb6kazg-rubq0v1yiy.gz
 /app/obj/Debug/net9.0/compressed/x66qcifarx-tyz1a4w3vb.gz
 /app/obj/Debug/net9.0/compressed/gaazyjqxoj-jdja8ajmep.gz
-/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.jzifxa37us.pdb
-/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.jlrlizc0od.wasm
-/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.jlrlizc0od.wasm.gz
-/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.jzifxa37us.pdb.gz
-/app/obj/Debug/net9.0/compressed/hscczrya4x-jlrlizc0od.gz
-/app/obj/Debug/net9.0/compressed/q644bqhs6y-jzifxa37us.gz
-/app/obj/Debug/net9.0/compressed/cbhgt0xw5z-4ymcvu1slt.gz
+/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.nbtxz22bv9.pdb
+/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.c4m56e3nk0.wasm
+/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.c4m56e3nk0.wasm.gz
+/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.nbtxz22bv9.pdb.gz
+/app/obj/Debug/net9.0/compressed/hscczrya4x-c4m56e3nk0.gz
+/app/obj/Debug/net9.0/compressed/q644bqhs6y-nbtxz22bv9.gz
+/app/obj/Debug/net9.0/compressed/cbhgt0xw5z-gi8lujfhvp.gz

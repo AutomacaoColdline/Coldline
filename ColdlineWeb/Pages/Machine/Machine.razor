@@ -87,8 +87,26 @@ else
             </tbody>
         </table>
     </div>
+
+    <!-- PAGINAÇÃO -->
+    <div class="pagination-container mt-3">
+        <button class="btn btn-secondary"
+                @onclick="GoToPreviousPage"
+                disabled="@(!CanGoPrevious)">
+            <img src="img/seta-esquerda.png" alt="Anterior" style="width: 16px; height: 16px;" />
+        </button>
+
+        <span class="mx-2">@pageNumber de @totalPages</span>
+
+        <button class="btn btn-secondary"
+                @onclick="GoToNextPage"
+                disabled="@(!CanGoNext)">
+            <img src="img/seta-direita.png" alt="Próxima" style="width: 16px; height: 16px;" />
+        </button>
+    </div>
 }
 
+<!-- MODAL DE MÁQUINA -->
 <MachineModal ShowModal="@showModal"
               OnClose="@CloseModal"
               OnSave="@SaveMachine"
@@ -96,8 +114,7 @@ else
               IsEditing="@isEditing"
               MachineTypes="@machineTypes" />
 
-<!-- Novo modal de tipo de máquina -->
+<!-- MODAL DE TIPO DE MÁQUINA -->
 <MachineTypeModal ShowModal="@showMachineTypeModal"
                   CloseModal="CloseMachineTypeModal"
                   OnSaved="ReloadMachineTypes" />
-

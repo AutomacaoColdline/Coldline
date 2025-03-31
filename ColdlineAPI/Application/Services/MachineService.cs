@@ -80,35 +80,44 @@ namespace ColdlineAPI.Application.Services
             var builder = Builders<Machine>.Filter;
 
             if (!string.IsNullOrEmpty(filter.CustomerName))
-                filters.Add(builder.Regex(m => m.CustomerName, new MongoDB.Bson.BsonRegularExpression(filter.CustomerName, "i")));
-            
+                filters.Add(builder.Regex(m => m.CustomerName, new BsonRegularExpression(filter.CustomerName, "i")));
+
             if (!string.IsNullOrEmpty(filter.IdentificationNumber))
                 filters.Add(builder.Eq(m => m.IdentificationNumber, filter.IdentificationNumber));
-            
+
             if (!string.IsNullOrEmpty(filter.Phase))
                 filters.Add(builder.Eq(m => m.Phase, filter.Phase));
-            
+
             if (filter.Status != null)
                 filters.Add(builder.Eq(m => m.Status, filter.Status));
-            
+
             if (!string.IsNullOrEmpty(filter.Voltage))
                 filters.Add(builder.Eq(m => m.Voltage, filter.Voltage));
-            
+
             if (!string.IsNullOrEmpty(filter.ProcessId))
                 filters.Add(builder.Eq(m => m.Process.Id, filter.ProcessId));
-            
+
             if (!string.IsNullOrEmpty(filter.MachineTypeId))
                 filters.Add(builder.Eq(m => m.MachineType.Id, filter.MachineTypeId));
-            
+
             if (!string.IsNullOrEmpty(filter.QualityId))
                 filters.Add(builder.Eq(m => m.Quality.Id, filter.QualityId));
-            
+
             if (!string.IsNullOrEmpty(filter.MonitoringId))
                 filters.Add(builder.Eq(m => m.Monitoring.Id, filter.MonitoringId));
 
             var finalFilter = filters.Count > 0 ? builder.And(filters) : builder.Empty;
 
-            return await _machines.Find(finalFilter).ToListAsync();
+            // Paginação
+            int page = filter.Page <= 0 ? 1 : filter.Page;
+            int pageSize = filter.PageSize <= 0 ? 10 : filter.PageSize;
+            int skip = (page - 1) * pageSize;
+
+            return await _machines.Find(finalFilter)
+                                .Skip(skip)
+                                .Limit(pageSize)
+                                .ToListAsync();
         }
+
     }
 }

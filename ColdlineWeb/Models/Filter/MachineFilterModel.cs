@@ -13,5 +13,8 @@ namespace ColdlineWeb.Models.Filter
         public string? MonitoringId { get; set; }
         public string? MachineTypeId { get; set; }
         public MachineStatus? Status { get; set; }
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+
     }
 }

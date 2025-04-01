@@ -89,21 +89,22 @@ else
     </div>
 
     <!-- PAGINAÇÃO -->
-    <div class="pagination-container mt-3">
-        <button class="btn btn-secondary"
+    <div class="pagination-wrapper">
+        <button class="btn btn-pagination"
                 @onclick="GoToPreviousPage"
                 disabled="@(!CanGoPrevious)">
-            <img src="img/seta-esquerda.png" alt="Anterior" style="width: 16px; height: 16px;" />
+            <img src="img/seta-esquerda.png" alt="Anterior" class="pagination-icon" />
         </button>
 
-        <span class="mx-2">@pageNumber de @totalPages</span>
+        <span class="page-indicator">@pageNumber de @totalPages</span>
 
-        <button class="btn btn-secondary"
+        <button class="btn btn-pagination"
                 @onclick="GoToNextPage"
                 disabled="@(!CanGoNext)">
-            <img src="img/seta-direita.png" alt="Próxima" style="width: 16px; height: 16px;" />
+            <img src="img/seta-direita.png" alt="Próxima" class="pagination-icon" />
         </button>
     </div>
+
 }
 
 <!-- MODAL DE MÁQUINA -->

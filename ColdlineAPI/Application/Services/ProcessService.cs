@@ -167,18 +167,46 @@ namespace ColdlineAPI.Application.Services
             if (filter.EndDate.HasValue)
                 filters.Add(builder.Lte(p => p.EndDate, filter.EndDate.Value));
 
+            if (!string.IsNullOrEmpty(filter.UserId))
+                filters.Add(builder.Eq(p => p.User.Id, filter.UserId));
+
+            if (!string.IsNullOrEmpty(filter.DepartmentId))
+                filters.Add(builder.Eq(p => p.Department.Id, filter.DepartmentId));
+
+            if (!string.IsNullOrEmpty(filter.ProcessTypeId))
+                filters.Add(builder.Eq(p => p.ProcessType.Id, filter.ProcessTypeId));
+
+            if (!string.IsNullOrEmpty(filter.MachineId))
+                filters.Add(builder.Eq(p => p.Machine.Id, filter.MachineId));
+
+            if (filter.Finished.HasValue)
+                filters.Add(builder.Eq(p => p.Finished, filter.Finished));
+
+            if (filter.PreIndustrialization.HasValue)
+                filters.Add(builder.Eq(p => p.PreIndustrialization, filter.PreIndustrialization));
+
             var finalFilter = filters.Count > 0 ? builder.And(filters) : builder.Empty;
-            var processes = await _processes.Find(finalFilter).ToListAsync();
+
+            // Paginação
+            int page = filter.Page <= 0 ? 1 : filter.Page;
+            int pageSize = filter.PageSize <= 0 ? 10 : filter.PageSize;
+            int skip = (page - 1) * pageSize;
+
+            var processes = await _processes.Find(finalFilter)
+                                            .Skip(skip)
+                                            .Limit(pageSize)
+                                            .ToListAsync();
 
             foreach (var process in processes)
             {
                 string updatedTime = CalculateProcessTime(process.StartDate);
-                await UpdateProcessTimeInDatabase(process.Id, updatedTime);
+                await UpdateProcessTimeInDatabase(process.Id!, updatedTime);
                 process.ProcessTime = updatedTime;
             }
 
             return processes;
         }
+
 
         public async Task<Process> CreateProcessAsync(Process process)
         {

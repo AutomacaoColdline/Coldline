@@ -29,6 +29,10 @@
       "PackagePath": "staticwebassets/css/OccurrenceForm.css"
     },
     {
+      "Id": "/app/wwwroot/css/Process.css",
+      "PackagePath": "staticwebassets/css/Process.css"
+    },
+    {
       "Id": "/app/wwwroot/css/ProcessCard.css",
       "PackagePath": "staticwebassets/css/ProcessCard.css"
     },

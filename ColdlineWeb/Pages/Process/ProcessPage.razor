@@ -3,8 +3,6 @@
 
 <link rel="stylesheet" href="css/Process.css" />
 
-<h3>Gerenciamento de Processos</h3>
-
 @if (IsLoading)
 {
     <p>Carregando...</p>
@@ -15,58 +13,110 @@ else if (!string.IsNullOrEmpty(ErrorMessage))
 }
 else
 {
-    <button class="btn btn-primary mb-3" @onclick="OpenAddProcessModal">Adicionar Processo</button>
+    <!-- CARD DE FILTRO -->
+    <div class="filter-card">
+        <div class="search-filters">
+            <input class="form-control filter-small" placeholder="Número Identificação" @bind="Filter.IdentificationNumber" />
+            <input class="form-control filter-xs" type="date" @bind="Filter.StartDate" />
+            <input class="form-control filter-xs" type="date" @bind="Filter.EndDate" />
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Número de Identificação</th>
-                <th>Tempo do Processo</th>
-                <th>Data de Início</th>
-                <th>Data de Término</th>
-                <th>Usuário</th>
-                <th>Departamento</th>
-                <th>Tipo de Processo</th>
-                <th>Máquina</th>
-                <th>Ocorrências</th>
-                <th>Em Ocorrência</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var process in ProcessList)
-            {
+            <select class="form-control filter-medium" @bind="Filter.ProcessTypeId">
+                <option value="">Todos os Tipos</option>
+                @foreach (var type in ProcessTypes)
+                {
+                    <option value="@type.Id">@type.Name</option>
+                }
+            </select>
+
+            <select class="form-control filter-medium" @bind="Filter.UserId">
+                <option value="">Todos os Usuários</option>
+                @foreach (var user in UsersRef)
+                {
+                    <option value="@user.Id">@user.Name</option>
+                }
+            </select>
+
+            <button class="btn btn-filter" @onclick="ApplyFilters">
+                <img src="img/lupa.png" alt="Buscar" class="btn-icon" />
+            </button>
+
+            <button class="btn btn-filter" @onclick="ResetFilters">
+                <img src="img/limpar-limpo.png" alt="Limpar" class="btn-icon" />
+            </button>
+
+            <button class="btn btn-filter" @onclick="OpenAddProcessModal">
+                <img src="img/adicionar-maquina.png" alt="Adicionar" class="btn-icon" />
+            </button>
+        </div>
+    </div>
+
+    <!-- TABELA -->
+    <div class="table-card">
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@process.IdentificationNumber</td>
-                    <td>@process.ProcessTime</td>
-                    <td>@process.StartDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
-                    <td>@(process.EndDate.HasValue ? process.EndDate.Value.ToString("yyyy-MM-dd HH:mm:ss") : "Não finalizado")</td>
-                    <td>@(process.User?.Name ?? "Não informado")</td>
-                    <td>@(process.Department?.Name ?? "Não informado")</td>
-                    <td>@(process.ProcessType?.Name ?? "Não informado")</td>
-                    <td>@(process.Machine?.Name ?? "Não informado")</td>
-                    <td>
-                        @if (process.Occurrences != null && process.Occurrences.Any())
-                        {
-                            @string.Join(", ", process.Occurrences.Select(o => o.Name))
-                        }
-                        else
-                        {
-                            <span>Sem ocorrências</span>
-                        }
-                    </td>
-                    <td>@(process.InOccurrence ? "Sim" : "Não")</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm" @onclick="() => OpenEditProcessModal(process)">Editar</button>
-                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteProcess(process.Id)">Excluir</button>
-                    </td>
+                    <th>Nº Identificação</th>
+                    <th>Tempo</th>
+                    <th>Início</th>
+                    <th>Término</th>
+                    <th>Usuário</th>
+                    <th>Departamento</th>
+                    <th>Tipo</th>
+                    <th>Máquina</th>
+                    <th>Ocorrências</th>
+                    <th>Em Ocorrência</th>
+                    <th>Ações</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var process in ProcessList)
+                {
+                    <tr>
+                        <td>@process.IdentificationNumber</td>
+                        <td>@process.ProcessTime</td>
+                        <td>@process.StartDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@(process.EndDate?.ToString("dd/MM/yyyy HH:mm") ?? "Não finalizado")</td>
+                        <td>@process.User?.Name</td>
+                        <td>@process.Department?.Name</td>
+                        <td>@process.ProcessType?.Name</td>
+                        <td>@process.Machine?.Name</td>
+                        <td>
+                            @if (process.Occurrences?.Any() == true)
+                            {
+                                @string.Join(", ", process.Occurrences.Select(o => o.Name))
+                            }
+                            else { <span>–</span> }
+                        </td>
+                        <td>@(process.InOccurrence ? "Sim" : "Não")</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" @onclick="() => OpenEditProcessModal(process)">
+                                <img src="img/editar.png" style="width: 20px;" />
+                            </button>
+                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteProcess(process.Id)">
+                                <img src="img/lixeira.png" style="width: 20px;" />
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- PAGINAÇÃO -->
+    <div class="pagination-wrapper">
+        <button class="btn btn-pagination" @onclick="GoToPreviousPage" disabled="@(!CanGoPrevious)">
+            <img src="img/seta-esquerda.png" alt="Anterior" />
+        </button>
+
+        <span class="page-indicator">@PageNumber de @TotalPages</span>
+
+        <button class="btn btn-pagination" @onclick="GoToNextPage" disabled="@(!CanGoNext)">
+            <img src="img/seta-direita.png" alt="Próxima" />
+        </button>
+    </div>
 }
 
-<!-- Utilização do componente modal para adicionar/editar processo -->
+<!-- MODAL -->
 <ProcessModal ShowModal="ShowModal"
               IsEditing="IsEditing"
               CurrentProcess="CurrentProcess"

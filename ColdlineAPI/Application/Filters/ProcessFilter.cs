@@ -17,5 +17,8 @@ namespace ColdlineAPI.Application.Filters
         public string? MachineId { get; set; }
         public bool? Finished { get; set; }
         public bool? PreIndustrialization { get; set; }
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+
     }
 }

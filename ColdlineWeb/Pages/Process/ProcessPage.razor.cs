@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
-using System.Net.Http.Json;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Filter;
 using ColdlineWeb.Services;
@@ -13,12 +12,14 @@ namespace ColdlineWeb.Pages.Process
     public class ProcessPageBase : ComponentBase
     {
         [Inject] protected ProcessService ProcessService { get; set; } = default!;
-        [Inject] protected HttpClient Http { get; set; } = default!;
+        [Inject] protected UserService UserService { get; set; } = default!;
+        [Inject] protected DepartmentService DepartmentService { get; set; } = default!;
+        [Inject] protected ProcessTypeService ProcessTypeService { get; set; } = default!;
+        [Inject] protected MachineService MachineService { get; set; } = default!;
+        [Inject] protected OccurrenceService OccurrenceService { get; set; } = default!;
 
-        // Lista de processos
         protected List<ProcessModel> ProcessList = new();
 
-        // Dropdowns de referências
         protected List<ReferenceEntity> UsersRef = new();
         protected List<ReferenceEntity> Departments = new();
         protected List<ReferenceEntity> ProcessTypes = new();
@@ -26,51 +27,73 @@ namespace ColdlineWeb.Pages.Process
         protected List<ReferenceEntity> Occurrences = new();
         protected List<string> SelectedOccurrences = new();
 
-        // Processo atual para Add/Edit
         protected ProcessModel CurrentProcess = new();
 
-        // Controle do modal
         protected bool ShowModal = false;
         protected bool IsEditing = false;
         protected string? ErrorMessage;
         protected bool IsLoading = true;
 
+        // Filtro e paginação
+        protected ProcessFilterModel Filter = new();
+        protected int PageNumber = 1;
+        protected int TotalPages = 1;
+        protected const int PageSize = 4;
+
+        protected bool CanGoNext => PageNumber < TotalPages;
+        protected bool CanGoPrevious => PageNumber > 1;
+
         protected override async Task OnInitializedAsync()
         {
             await LoadDropdownData();
-            await LoadProcesses();
+            await ApplyFilters();
         }
 
         protected async Task LoadDropdownData()
         {
             try
             {
-                UsersRef = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/User") ?? new();
-                // Supondo que sua API de Departamento retorna DepartmentModel e você converte para ReferenceEntity:
-                var deptModels = await Http.GetFromJsonAsync<List<DepartmentModel>>("api/Department") ?? new List<DepartmentModel>();
-                Departments = deptModels.ConvertAll(d => new ReferenceEntity { Id = d.Id, Name = d.Name });
-                ProcessTypes = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/ProcessType") ?? new();
-                Machines = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Machine") ?? new();
-                Occurrences = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Occurrence") ?? new();
+                var users = await UserService.GetUsersAsync();
+                UsersRef = users.ConvertAll(u => new ReferenceEntity { Id = u.Id, Name = u.Name });
+
+                var departments = await DepartmentService.GetAllAsync();
+                Departments = departments.ConvertAll(d => new ReferenceEntity { Id = d.Id, Name = d.Name });
+
+                var types = await ProcessTypeService.GetAllAsync();
+                ProcessTypes = types.ConvertAll(t => new ReferenceEntity { Id = t.Id, Name = t.Name });
+
+                var machines = await MachineService.GetAllMachinesAsync();
+                Machines = machines.ConvertAll(m => new ReferenceEntity { Id = m.Id, Name = m.CustomerName });
+
+                var occurrenceModels = await OccurrenceService.GetAllAsync();
+                Occurrences = occurrenceModels.ConvertAll(o => new ReferenceEntity { Id = o.Id, Name = o.CodeOccurrence }); // ✅ Correção
             }
             catch (Exception ex)
             {
                 ErrorMessage = "Erro ao carregar dados para dropdowns.";
-                Console.WriteLine(ex.Message);
             }
         }
 
-        protected async Task LoadProcesses()
+
+        protected async Task ApplyFilters()
         {
             try
             {
                 IsLoading = true;
                 ErrorMessage = null;
-                ProcessList = await ProcessService.GetAllProcessesAsync();
+
+                Filter.Page = PageNumber;
+                Filter.PageSize = PageSize;
+
+                ProcessList = await ProcessService.SearchProcessesAsync(Filter);
+
+                TotalPages = ProcessList.Count < PageSize && PageNumber > 1
+                    ? PageNumber
+                    : PageNumber + (ProcessList.Count == PageSize ? 1 : 0);
             }
             catch (Exception ex)
             {
-                ErrorMessage = "Erro ao carregar processos.";
+                ErrorMessage = "Erro ao buscar processos.";
                 Console.WriteLine(ex.Message);
             }
             finally
@@ -79,10 +102,35 @@ namespace ColdlineWeb.Pages.Process
             }
         }
 
-        // Métodos CRUD de processo
+        protected async Task ResetFilters()
+        {
+            Filter = new();
+            PageNumber = 1;
+            await ApplyFilters();
+        }
+
+        protected async Task GoToNextPage()
+        {
+            if (CanGoNext)
+            {
+                PageNumber++;
+                await ApplyFilters();
+            }
+        }
+
+        protected async Task GoToPreviousPage()
+        {
+            if (CanGoPrevious)
+            {
+                PageNumber--;
+                await ApplyFilters();
+            }
+        }
+
         protected void OpenAddProcessModal()
         {
             CurrentProcess = new ProcessModel();
+            SelectedOccurrences = new();
             ShowModal = true;
             IsEditing = false;
         }
@@ -90,6 +138,7 @@ namespace ColdlineWeb.Pages.Process
         protected void OpenEditProcessModal(ProcessModel process)
         {
             CurrentProcess = process;
+            SelectedOccurrences = process.Occurrences?.Select(o => o.Id).ToList() ?? new();
             ShowModal = true;
             IsEditing = true;
         }
@@ -101,49 +150,38 @@ namespace ColdlineWeb.Pages.Process
 
         protected async Task SaveProcess()
         {
-            // Preenche os nomes das referências com base nos IDs selecionados
             CurrentProcess.User.Name = UsersRef.FirstOrDefault(u => u.Id == CurrentProcess.User.Id)?.Name ?? "Desconhecido";
             CurrentProcess.Department.Name = Departments.FirstOrDefault(d => d.Id == CurrentProcess.Department.Id)?.Name ?? "Desconhecido";
             CurrentProcess.ProcessType.Name = ProcessTypes.FirstOrDefault(pt => pt.Id == CurrentProcess.ProcessType.Id)?.Name ?? "Desconhecido";
-            var selectedMachine = Machines.FirstOrDefault(m => m.Id == CurrentProcess.Machine.Id);
-            if (selectedMachine != null)
-            {
-                CurrentProcess.Machine.Name = selectedMachine.Name;
-            }
-            else
-            {
-                ErrorMessage = "Máquina não encontrada!";
-                return;
-            }
-            // Preenche as ocorrências
+            CurrentProcess.Machine.Name = Machines.FirstOrDefault(m => m.Id == CurrentProcess.Machine.Id)?.Name ?? "Desconhecido";
+
             CurrentProcess.Occurrences = Occurrences
                 .Where(o => SelectedOccurrences.Contains(o.Id))
                 .Select(o => new ReferenceEntity { Id = o.Id, Name = o.Name })
                 .ToList();
 
-            HttpResponseMessage response;
+            bool success;
             if (IsEditing)
-                response = await Http.PutAsJsonAsync($"api/Process/{CurrentProcess.Id}", CurrentProcess);
+                success = await ProcessService.UpdateProcessAsync(CurrentProcess.Id, CurrentProcess);
             else
-                response = await Http.PostAsJsonAsync("api/Process", CurrentProcess);
+                success = (await ProcessService.CreateProcessAsync(CurrentProcess)) != null;
 
-            if (!response.IsSuccessStatusCode)
+            if (!success)
             {
-                ErrorMessage = $"Erro ao salvar processo. Status: {response.StatusCode}";
-                Console.WriteLine(await response.Content.ReadAsStringAsync());
+                ErrorMessage = "Erro ao salvar processo.";
                 return;
             }
 
             CloseProcessModal();
-            await LoadProcesses();
+            await ApplyFilters();
         }
 
         protected async Task DeleteProcess(string id)
         {
             try
             {
-                await Http.DeleteAsync($"api/Process/{id}");
-                await LoadProcesses();
+                await ProcessService.DeleteProcessAsync(id);
+                await ApplyFilters();
             }
             catch (Exception ex)
             {

@@ -4,43 +4,46 @@
 {
     <div class="top-row ps-3 navbar navbar-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="">ColdlineWeb</a>
-            <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <img src="img/logo.png" class="logo-navbar" alt="Logo" />
         </div>
     </div>
 
-    <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <div class="@NavMenuCssClass nav-scrollable">
         <nav class="nav flex-column">
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="/home" Match="NavLinkMatch.All">
-                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                    <img src="img/painel.png" class="nav-icon" alt="Home" />
+                    <div class="nav-label">   Dashboard</div>
                 </NavLink>
             </div>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="/users">
-                    <span class="bi bi-list-ul" aria-hidden="true"></span> Usuario
+                    <img src="img/usuario.png" class="nav-icon" alt="Usuário" />
+                    <div class="nav-label">   Usuário</div>
                 </NavLink>
             </div>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="/machines">
-                    <span class="bi bi-list-ul" aria-hidden="true"></span> Maquinas
+                    <img src="img/maquina.png" class="nav-icon" alt="Máquinas" />
+                    <div class="nav-label">   Máquinas</div>
                 </NavLink>
             </div>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="/processes">
-                    <span class="bi bi-list-ul" aria-hidden="true"></span> Processos
+                    <img src="img/processo.png" class="nav-icon" alt="Processos" />
+                    <div class="nav-label">   Processos</div>
                 </NavLink>
             </div>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="/quality">
-                    <span class="bi bi-list-ul" aria-hidden="true"></span> Qualidade
+                    <img src="img/qualidade.png" class="nav-icon" alt="Qualidade" />
+                    <div class="nav-label">   Qualidade</div>
                 </NavLink>
-            </div>         
+            </div>
         </nav>
     </div>
 }
+
 
 @code {
     private bool collapseNavMenu = true;

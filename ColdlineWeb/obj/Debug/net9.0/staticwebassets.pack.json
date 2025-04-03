@@ -81,6 +81,10 @@
       "PackagePath": "staticwebassets/img/editar.png"
     },
     {
+      "Id": "/app/wwwroot/img/icon.png",
+      "PackagePath": "staticwebassets/img/icon.png"
+    },
+    {
       "Id": "/app/wwwroot/img/limpar-limpo.png",
       "PackagePath": "staticwebassets/img/limpar-limpo.png"
     },
@@ -101,8 +105,24 @@
       "PackagePath": "staticwebassets/img/lupa.png"
     },
     {
+      "Id": "/app/wwwroot/img/maquina.png",
+      "PackagePath": "staticwebassets/img/maquina.png"
+    },
+    {
       "Id": "/app/wwwroot/img/novo-usuario.png",
       "PackagePath": "staticwebassets/img/novo-usuario.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/painel.png",
+      "PackagePath": "staticwebassets/img/painel.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/processo.png",
+      "PackagePath": "staticwebassets/img/processo.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/qualidade.png",
+      "PackagePath": "staticwebassets/img/qualidade.png"
     },
     {
       "Id": "/app/wwwroot/img/seta-direita.png",
@@ -111,6 +131,10 @@
     {
       "Id": "/app/wwwroot/img/seta-esquerda.png",
       "PackagePath": "staticwebassets/img/seta-esquerda.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/usuario.png",
+      "PackagePath": "staticwebassets/img/usuario.png"
     },
     {
       "Id": "/app/wwwroot/index.html",

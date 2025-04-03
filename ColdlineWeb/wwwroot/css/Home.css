@@ -1,3 +1,4 @@
+
 /* Removendo quaisquer margens/paddings padrão do body se desejar */
 html, body {
     margin: 0;
@@ -10,24 +11,25 @@ html, body {
 .machine-stats {
     width: 100%;
     margin: 0;
-    padding: 20px 0;
-    background-color: #1e3a5f; /* Azul escuro */
-    color: #fff;
+    padding: 0 10px;
+    height: 3.5rem; /* Igual à .top-row */
+    background-color: #6aa5f2; /* Azul escuro */
+    color: #000000;
     display: flex;
     justify-content: space-around;
     align-items: center;
-    border-radius: 0; /* sem arredondamento */
+    font-size: 0.95rem;
 }
 
 .stat-card {
+    margin: 0;
+    padding: 0;
     background: none;
-    color: #fff;
-    font-size: 16px;
-    font-weight: bold;
+    color: #000000;
+    font-size: 0.95rem;
+    font-weight: 500;
     text-align: center;
-    padding: 10px;
-    border: none;
-    box-shadow: none;
+    line-height: 1.2;
 }
 
 /* ================================================
@@ -35,18 +37,21 @@ html, body {
    ================================================ */
 .user-table-wrapper {
     max-width: 1200px;
-    margin: 40px auto; /* Margens maiores, layout mais espaçoso */
+    margin: 40px auto;
     display: flex;
     align-items: stretch;
     justify-content: center;
     gap: 10px;
+    padding: 0 10px;
+    touch-action: pan-y; /* permite swipe horizontal */
 }
 
+/* Botões laterais ocultos para swipe */
 .nav-area {
-    background-color: #5076a7; /* Azul personalizado */
+    background-color: #5076a7;
     width: 60px;
     border-radius: 8px;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
 }
@@ -73,14 +78,18 @@ html, body {
     opacity: 0.6;
 }
 
+/* ================================================
+   📌 CARTÃO DA TABELA CENTRAL
+   ================================================ */
 .user-table-card {
     flex: 1;
     background: #fff;
     border-radius: 8px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 15px; /* Volta ao padding maior */
+    padding: 15px;
     text-align: center;
     overflow-x: auto;
+    touch-action: none; /* necessário para capturar swipe */
 }
 
 /* ================================================
@@ -93,14 +102,14 @@ html, body {
 }
 
 .user-table thead tr {
-    background-color: #1e3a5f;
-    color: #fff;
+    background-color: #99c9ed;
+    color: #000000;
 }
 
 .user-table th,
 .user-table td {
     border: 1px solid #ddd;
-    padding: 10px;  /* Volta aos 10px */
+    padding: 10px;
     text-align: center;
     font-size: 14px;
 }
@@ -119,13 +128,32 @@ html, body {
 }
 
 /* ================================================
-   📌 CARTÕES DE USUÁRIO (OPCIONAIS)
+   📌 INDICADORES (círculo colorido)
+   ================================================ */
+.indicator {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin: 0 auto;
+}
+
+.indicator-red {
+    background-color: #dc3545;
+}
+
+.indicator-green {
+    background-color: #28a745;
+}
+
+/* ================================================
+   📌 CARTÕES DE USUÁRIO (opcional)
    ================================================ */
 .user-card {
     background: #fff;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 15px; /* Padrão anterior */
+    padding: 15px;
     text-align: center;
     transition: transform 0.3s ease;
 }
@@ -163,7 +191,7 @@ html, body {
 }
 
 /* ================================================
-   📌 CARDS DE MÁQUINA (AZUL ESCURO)
+   📌 LISTA DE MÁQUINAS
    ================================================ */
 .machine-list {
     display: flex;
@@ -174,8 +202,8 @@ html, body {
 }
 
 .machine-card {
-    background: #1e3a5f;
-    color: #fff;
+    background: #fff59d;
+    color: #000000;
     border-radius: 8px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     width: 320px;
@@ -204,26 +232,7 @@ html, body {
 .machine-card-body p {
     margin: 8px 0;
     font-size: 14px;
-    color: #fff;
-}
-
-/* ================================================
-   📌 INDICADOR (CÍRCULO)
-   ================================================ */
-.indicator {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    margin: 0 auto;
-}
-
-.indicator-red {
-    background-color: #dc3545; /* vermelho */
-}
-
-.indicator-green {
-    background-color: #28a745; /* verde */
+    color: #000000;
 }
 
 /* ================================================

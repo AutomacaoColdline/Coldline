@@ -84,7 +84,15 @@ namespace ColdlineAPI.Application.Services
 
             var finalFilter = filters.Count > 0 ? builder.And(filters) : builder.Empty;
 
-            return await _qualities.Find(finalFilter).ToListAsync();
+            // Paginação
+            int skip = (filter.Page - 1) * filter.PageSize;
+
+            return await _qualities
+                .Find(finalFilter)
+                .Skip(skip)
+                .Limit(filter.PageSize)
+                .ToListAsync();
         }
+
     }
 }

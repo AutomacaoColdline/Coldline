@@ -1,239 +1,111 @@
 @page "/quality"
-@inject HttpClient Http
+@inherits QualityPage
 
-<h3>Gerenciamento de Qualidade</h3>
+<link rel="stylesheet" href="css/Quality.css" />
 
-@if (isLoading)
+
+@if (IsLoading)
 {
     <p>Carregando...</p>
 }
-else if (!string.IsNullOrEmpty(errorMessage))
+else if (!string.IsNullOrEmpty(ErrorMessage))
 {
-    <div class="alert alert-danger">@errorMessage</div>
+    <div class="alert alert-danger">@ErrorMessage</div>
 }
 else
 {
-    <button class="btn btn-primary mb-3" @onclick="OpenAddQualityModal">Adicionar Qualidade</button>
+    <!-- CARD DE FILTRO -->
+    <div class="filter-card">
+        <div class="search-filters">
+            <input class="form-control filter-small" placeholder="Valor Total" @bind="Filter.TotalPartValue" />
+            <input class="form-control filter-small" placeholder="Custo Hora" @bind="Filter.WorkHourCost" />
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Valor Total da Peça</th>
-                <th>Custo da Hora de Trabalho</th>
-                <th>Departamento</th>
-                <th>Máquina</th>
-                <th>Ocorrências</th> <!-- Exibe Name da ocorrência -->
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var quality in qualities)
-            {
-                <tr>
-                    <td>@quality.TotalPartValue</td>
-                    <td>@quality.WorkHourCost</td>
-                    <td>@(GetEntityName(departments, quality.Departament?.Id))</td>
-                    <td>@(GetEntityName(machines, quality.Machine?.Id))</td>
-                    <td>
-                        @if (quality.Occurrences.Any())
-                        {
-                            <ul>
-                                @foreach (var occurrence in quality.Occurrences)
-                                {
-                                    <li>@occurrence.Name</li> <!-- Agora exibe corretamente o Name -->
-                                }
-                            </ul>
-                        }
-                        else
-                        {
-                            <span>Sem Ocorrências</span>
-                        }
-                    </td>
-                    <td>
-                        <button class="btn btn-warning btn-sm" @onclick="() => OpenEditQualityModal(quality)">Editar</button>
-                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteQuality(quality.Id)">Excluir</button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+            <select class="form-control filter-medium" @bind="Filter.DepartamentId">
+                <option value="">Todos os Departamentos</option>
+                @foreach (var dept in Departments)
+                {
+                    <option value="@dept.Id">@dept.Name</option>
+                }
+            </select>
 
-@if (showModal)
-{
-    <div class="modal d-block">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">@(isEditing ? "Editar Qualidade" : "Adicionar Qualidade")</h5>
-                    <button class="close" @onclick="CloseModal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <label>Valor Total da Peça:</label>
-                    <input class="form-control" @bind="currentQuality.TotalPartValue" />
+            <select class="form-control filter-medium" @bind="Filter.MachineId">
+                <option value="">Todas as Máquinas</option>
+                @foreach (var machine in Machines)
+                {
+                    <option value="@machine.Id">@machine.MachineType.Name</option>
+                }
+            </select>
 
-                    <label>Custo da Hora de Trabalho:</label>
-                    <input class="form-control" @bind="currentQuality.WorkHourCost" />
+            <button class="btn btn-filter" @onclick="ApplyFilters">
+                <img src="img/lupa.png" alt="Buscar" class="btn-icon" />
+            </button>
 
-                    <label>Departamento:</label>
-                    <select class="form-control" @bind="currentQuality.Departament.Id">
-                        @foreach (var department in departments)
-                        {
-                            <option value="@department.Id">@department.Name</option>
-                        }
-                    </select>
+            <button class="btn btn-filter" @onclick="ResetFilters">
+                <img src="img/limpar-limpo.png" alt="Limpar" class="btn-icon" />
+            </button>
 
-                    <label>Máquina:</label>
-                    <select class="form-control" @bind="currentQuality.Machine.Id">
-                        @foreach (var machine in machines)
-                        {
-                            <option value="@machine.Id">@machine.Name</option>
-                        }
-                    </select>
-
-                    <label>Ocorrências:</label>
-                    <select multiple class="form-control" @onchange="HandleOccurrenceSelection">
-                        @foreach (var occurrence in occurrences)
-                        {
-                            <option value="@occurrence.Id" selected="@selectedOccurrences.Contains(occurrence.Id)">
-                                @occurrence.CodeOccurrence <!-- Agora exibe CodeOccurrence no dropdown -->
-                            </option>
-                        }
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
-                    <button class="btn btn-success" @onclick="SaveQuality">Salvar</button>
-                </div>
-            </div>
+            <button class="btn btn-filter" @onclick="OpenAddQualityModal">
+                <img src="img/adicionar-maquina.png" alt="Adicionar" class="btn-icon" />
+            </button>
         </div>
+    </div>
+
+    <!-- TABELA -->
+    <div class="table-card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Valor Total da Peça</th>
+                    <th>Custo da Hora</th>
+                    <th>Departamento</th>
+                    <th>Máquina</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var quality in Qualities)
+                {
+                    <tr>
+                        <td>@quality.TotalPartValue</td>
+                        <td>@quality.WorkHourCost</td>
+                        <td>@GetNameById(Departments, quality.Departament?.Id)</td>
+                        <td>@GetNameById(Machines, quality.Machine?.Id, true)</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" @onclick="() => OpenEditQualityModal(quality)">
+                                <img src="img/editar.png" style="width: 20px;" />
+                            </button>
+                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteQuality(quality.Id)">
+                                <img src="img/lixeira.png" style="width: 20px;" />
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- PAGINAÇÃO -->
+    <div class="pagination-wrapper">
+        <button class="btn btn-pagination" @onclick="GoToPreviousPage" disabled="@(!CanGoPrevious)">
+            <img src="img/seta-esquerda.png" alt="Anterior" />
+        </button>
+
+        <span class="page-indicator">@PageNumber de @TotalPages</span>
+
+        <button class="btn btn-pagination" @onclick="GoToNextPage" disabled="@(!CanGoNext)">
+            <img src="img/seta-direita.png" alt="Próxima" />
+        </button>
     </div>
 }
 
-@code {
-    private List<QualityModel> qualities = new();
-    private List<ReferenceEntity> departments = new();
-    private List<ReferenceEntity> machines = new();
-    private List<OccurrenceModel> occurrences = new();
-    private QualityModel currentQuality = new();
-    private HashSet<string> selectedOccurrences = new();
-    private bool isLoading = true;
-    private bool showModal = false;
-    private bool isEditing = false;
-    private string? errorMessage;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadData();
-    }
-
-    private async Task LoadData()
-    {
-        try
-        {
-            qualities = await Http.GetFromJsonAsync<List<QualityModel>>("api/Quality") ?? new();
-            departments = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Department") ?? new();
-            machines = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/Machine") ?? new();
-            occurrences = await Http.GetFromJsonAsync<List<OccurrenceModel>>("api/Occurrence") ?? new();
-        }
-        catch (Exception ex)
-        {
-            errorMessage = "Erro ao carregar dados.";
-            Console.WriteLine(ex);
-        }
-        finally
-        {
-            isLoading = false;
-        }
-    }
-
-    private void OpenAddQualityModal()
-    {
-        currentQuality = new QualityModel();
-        selectedOccurrences.Clear();
-        showModal = true;
-        isEditing = false;
-    }
-
-    private void OpenEditQualityModal(QualityModel quality)
-    {
-        currentQuality = new QualityModel
-        {
-            Id = quality.Id,
-            TotalPartValue = quality.TotalPartValue,
-            WorkHourCost = quality.WorkHourCost,
-            Departament = departments.FirstOrDefault(d => d.Id == quality.Departament.Id) ?? new ReferenceEntity(),
-            Machine = machines.FirstOrDefault(m => m.Id == quality.Machine.Id) ?? new ReferenceEntity(),
-            Occurrences = quality.Occurrences.Select(o => new ReferenceEntity { Id = o.Id, Name = o.Name }).ToList()
-        };
-        selectedOccurrences = new HashSet<string>(quality.Occurrences.Select(o => o.Id));
-        showModal = true;
-        isEditing = true;
-    }
-
-    private async Task SaveQuality()
-    {
-        currentQuality.Occurrences = occurrences
-            .Where(o => selectedOccurrences.Contains(o.Id))
-            .Select(o => new ReferenceEntity { Id = o.Id, Name = o.CodeOccurrence }) // Salva CodeOccurrence
-            .ToList();
-
-        if (isEditing)
-        {
-            await Http.PutAsJsonAsync($"api/Quality/{currentQuality.Id}", currentQuality);
-        }
-        else
-        {
-            await Http.PostAsJsonAsync("api/Quality", currentQuality);
-        }
-        showModal = false;
-        await LoadData();
-    }
-
-    private async Task DeleteQuality(string id)
-    {
-        await Http.DeleteAsync($"api/Quality/{id}");
-        await LoadData();
-    }
-
-    private void CloseModal()
-    {
-        showModal = false;
-    }
-
-    private void HandleOccurrenceSelection(ChangeEventArgs e)
-    {
-        var selectedValues = e.Value as IEnumerable<string>;
-        if (selectedValues != null)
-        {
-            selectedOccurrences = new HashSet<string>(selectedValues);
-        }
-    }
-
-    private string GetEntityName(List<ReferenceEntity> list, string? id)
-    {
-        return list.FirstOrDefault(e => e.Id == id)?.Name ?? "Não informado";
-    }
-
-    private class QualityModel
-    {
-        public string Id { get; set; } = string.Empty;
-        public string TotalPartValue { get; set; } = string.Empty;
-        public string WorkHourCost { get; set; } = string.Empty;
-        public ReferenceEntity Departament { get; set; } = new();
-        public ReferenceEntity Machine { get; set; } = new();
-        public List<ReferenceEntity> Occurrences { get; set; } = new();
-    }
-
-    private class OccurrenceModel
-    {
-        public string Id { get; set; } = string.Empty;
-        public string CodeOccurrence { get; set; } = string.Empty;
-    }
-
-    private class ReferenceEntity
-    {
-        public string Id { get; set; } = string.Empty;
-        public string Name { get; set; } = string.Empty;
-    }
-}
+<!-- MODAL -->
+<QualityModal ShowModal="ShowModal"
+              IsEditing="IsEditing"
+              CurrentQuality="CurrentQuality"
+              Departments="Departments"
+              Machines="Machines"
+              Occurrences="Occurrences"
+              SelectedOccurrences="SelectedOccurrences"
+              OnOccurrenceSelection="HandleOccurrenceSelection"
+              OnSave="SaveQuality"
+              OnClose="CloseModal" />

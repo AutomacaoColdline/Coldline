@@ -9,6 +9,8 @@ namespace ColdlineWeb.Models.Filter
         public string? DepartamentId { get; set; }
         public string? MachineId { get; set; }
         public List<string>? OccurrencesIds { get; set; }
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
         
     }
 }

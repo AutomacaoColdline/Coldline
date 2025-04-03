@@ -108,6 +108,18 @@
       <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"ml3h5p9btj"},{"Name":"integrity","Value":"sha256-eqXDMIveYVYfZuRf9tM8ytzMQvoSGtPvgxnbstoJ658="},{"Name":"label","Value":"css/ProcessCard.css"}]]]></EndpointProperties>
       <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"600"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022eqXDMIveYVYfZuRf9tM8ytzMQvoSGtPvgxnbstoJ658=\u0022"},{"Name":"Last-Modified","Value":"Mon, 31 Mar 2025 12:31:40 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="css/Quality.9qy913dxbg.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\Quality.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"9qy913dxbg"},{"Name":"integrity","Value":"sha256-70qamlehS/ury2TtRnUeobu9WN6IqXH4tjdZsTFXtK8="},{"Name":"label","Value":"css/Quality.css"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"3796"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u002270qamlehS/ury2TtRnUeobu9WN6IqXH4tjdZsTFXtK8=\u0022"},{"Name":"Last-Modified","Value":"Thu, 03 Apr 2025 17:37:17 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="css/Quality.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\Quality.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-70qamlehS/ury2TtRnUeobu9WN6IqXH4tjdZsTFXtK8="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"3796"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u002270qamlehS/ury2TtRnUeobu9WN6IqXH4tjdZsTFXtK8=\u0022"},{"Name":"Last-Modified","Value":"Thu, 03 Apr 2025 17:37:17 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="css/Sidebar.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\Sidebar.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>

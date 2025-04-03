@@ -37,6 +37,10 @@
       "PackagePath": "staticwebassets/css/ProcessCard.css"
     },
     {
+      "Id": "/app/wwwroot/css/Quality.css",
+      "PackagePath": "staticwebassets/css/Quality.css"
+    },
+    {
       "Id": "/app/wwwroot/css/Sidebar.css",
       "PackagePath": "staticwebassets/css/Sidebar.css"
     },

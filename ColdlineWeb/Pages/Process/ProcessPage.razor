@@ -64,7 +64,6 @@ else
                     <th>Tipo</th>
                     <th>Máquina</th>
                     <th>Ocorrências</th>
-                    <th>Em Ocorrência</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -87,7 +86,6 @@ else
                             }
                             else { <span>–</span> }
                         </td>
-                        <td>@(process.InOccurrence ? "Sim" : "Não")</td>
                         <td>
                             <button class="btn btn-warning btn-sm" @onclick="() => OpenEditProcessModal(process)">
                                 <img src="img/editar.png" style="width: 20px;" />

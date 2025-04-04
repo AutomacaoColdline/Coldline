@@ -8,7 +8,6 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">@((IsEditing) ? "Editar Departamento" : "Adicionar Departamento")</h5>
-                    <button class="close" @onclick="CloseModalInternal">&times;</button>
                 </div>
                 <EditForm Model="DepartmentModel" OnValidSubmit="OnValidSubmitInternal">
                     <DataAnnotationsValidator />

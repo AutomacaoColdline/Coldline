@@ -4,6 +4,17 @@ html, body {
     margin: 0;
     padding: 0;
 }
+.user-table-wrapper,
+.user-table,
+.user-table td,
+.user-table th,
+.machine-list,
+.machine-card {
+    user-select: none;          /* navegador moderno */
+    -webkit-user-select: none;  /* Safari */
+    -moz-user-select: none;     /* Firefox */
+    -ms-user-select: none;      /* IE/Edge */
+}
 
 /* ================================================
    📌 BARRA DE ESTATÍSTICAS DAS MÁQUINAS (TOPO)
@@ -13,8 +24,8 @@ html, body {
     margin: 0;
     padding: 0 10px;
     height: 3.5rem; /* Igual à .top-row */
-    background-color: #6aa5f2; /* Azul escuro */
-    color: #000000;
+    background-color: #0c5bd2; /* Azul escuro */
+    color: #ffffff;
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -25,7 +36,7 @@ html, body {
     margin: 0;
     padding: 0;
     background: none;
-    color: #000000;
+    color: #ffffff;
     font-size: 0.95rem;
     font-weight: 500;
     text-align: center;

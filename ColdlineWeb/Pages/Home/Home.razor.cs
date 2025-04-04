@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using ColdlineWeb.Services;
 using ColdlineWeb.Models;
+using ColdlineWeb.Models.Filter;
 using ColdlineWeb.Models.Enum;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,7 @@ namespace ColdlineWeb.Pages
         public Dictionary<string, ProcessStats> ProcessStatsByUserId = new();
         protected List<UserModel> users = new();
         protected List<MachineModel> machines = new();
+        protected List<MachineModel> machinesCount = new();
 
         protected int totalMachines, machinesWaitingProduction, machinesInProgress, machinesInOccurrence, machinesFinished;
         protected bool isLoading = true;
@@ -32,6 +34,10 @@ namespace ColdlineWeb.Pages
         private double startX;
         private double currentX;
         private bool isDragging;
+        private int currentMachinePage = 1;
+        private const int machinePageSize = 3;
+        private double machineStartX;
+        private bool isDraggingMachine;
 
         protected override async Task OnInitializedAsync()
         {
@@ -56,12 +62,19 @@ namespace ColdlineWeb.Pages
         {
             try
             {
-                machines = await MachineService.GetAllMachinesAsync();
-                totalMachines = machines.Count;
-                machinesWaitingProduction = machines.Count(m => m.Status == MachineStatus.WaitingProduction);
-                machinesInProgress = machines.Count(m => m.Status == MachineStatus.InProgress);
-                machinesInOccurrence = machines.Count(m => m.Status == MachineStatus.InOcurrence);
-                machinesFinished = machines.Count(m => m.Status == MachineStatus.Finished);
+                var filter = new MachineFilterModel
+                {
+                    Page = currentMachinePage,
+                    PageSize = machinePageSize
+                };
+
+                machines = await MachineService.SearchMachinesAsync(filter);
+                machinesCount = await MachineService.GetAllMachinesAsync();
+                totalMachines = machinesCount.Count;
+                machinesWaitingProduction = machinesCount.Count(m => m.Status == MachineStatus.WaitingProduction);
+                machinesInProgress = machinesCount.Count(m => m.Status == MachineStatus.InProgress);
+                machinesInOccurrence = machinesCount.Count(m => m.Status == MachineStatus.InOcurrence);
+                machinesFinished = machinesCount.Count(m => m.Status == MachineStatus.Finished);
             }
             catch
             {
@@ -150,5 +163,39 @@ namespace ColdlineWeb.Pages
 
             StateHasChanged();
         }
+        protected void HandleMachinePointerDown(PointerEventArgs e)
+        {
+            isDraggingMachine = true;
+            machineStartX = e.ClientX;
+        }
+
+        protected async void HandleMachinePointerUp(PointerEventArgs e)
+        {
+            if (!isDraggingMachine) return;
+
+            isDraggingMachine = false;
+            double diff = e.ClientX - machineStartX;
+            const double threshold = 50;
+
+            if (diff > threshold && currentMachinePage > 1)
+            {
+                currentMachinePage--;
+                await LoadMachines();
+            }
+            else if (diff < -threshold)
+            {
+                // Tentativa de próxima página
+                currentMachinePage++;
+                await LoadMachines();
+
+                // Verifica se a nova página retornou menos que o limite (fim da paginação)
+                if (machines.Count < machinePageSize || machines.Count == 0)
+                {
+                    currentMachinePage--; // volta
+                    await LoadMachines(); // carrega a página anterior novamente
+                }
+            }
+        }
+
     }
 }

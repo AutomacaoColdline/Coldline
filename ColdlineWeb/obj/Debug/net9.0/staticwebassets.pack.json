@@ -121,8 +121,20 @@
       "PackagePath": "staticwebassets/img/processo.png"
     },
     {
+      "Id": "/app/wwwroot/img/processopreto.png",
+      "PackagePath": "staticwebassets/img/processopreto.png"
+    },
+    {
       "Id": "/app/wwwroot/img/qualidade.png",
       "PackagePath": "staticwebassets/img/qualidade.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/qualidadepreto.png",
+      "PackagePath": "staticwebassets/img/qualidadepreto.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/relatorio.png",
+      "PackagePath": "staticwebassets/img/relatorio.png"
     },
     {
       "Id": "/app/wwwroot/img/seta-direita.png",

@@ -133,12 +133,51 @@
     color: #000 !important;
 }
 
-/* ====== MODAL ====== */
+/* ===== MODAL (Aparência geral) ===== */
 .modal {
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+    z-index: 1050;
+}
+
+/* ===== DIÁLOGO DO MODAL ===== */
+.modal-dialog {
+    max-width: 600px;
+    margin: 5% auto;
+}
+
+/* ===== CONTEÚDO DO MODAL ===== */
+.modal-content {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== CABEÇALHO DO MODAL COM COR DESTACADA ===== */
+.modal-header {
+    background-color: #1c63e7;
+    color: white;
+    padding: 1rem;
+    font-size: 1.25rem;
+    font-weight: bold;
+    border-bottom: 2px solid #1c63e7;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Remove botão "X" antigo */
+.modal-header .close {
+    display: none !important;
+}
+
+/* ===== RODAPÉ DO MODAL ===== */
+.modal-footer {
+    background-color: #f1f5f9;
+    border-top: 1px solid #ddd;
+    padding: 1rem;
 }

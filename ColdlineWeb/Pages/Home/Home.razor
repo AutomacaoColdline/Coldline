@@ -77,7 +77,9 @@ else
     </div>
 
     <!-- Lista de máquinas -->
-    <div class="machine-list">
+   <div class="machine-list"
+        @onpointerdown="HandleMachinePointerDown"
+        @onpointerup="HandleMachinePointerUp">
         @foreach (var machine in machines)
         {
             <div class="machine-card">

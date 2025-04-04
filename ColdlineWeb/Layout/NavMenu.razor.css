@@ -9,17 +9,25 @@
     align-items: center;
     justify-content: center;
 }
+
+/* TOPO DA PÁGINA */
+.top-row {
+    height: 3.5rem; /* fixo */
+    background-color: #0c5bd2;
+    display: flex;
+    align-items: center;        /* centraliza verticalmente */
+    justify-content: center;    /* centraliza horizontalmente */
+    padding: 0;
+}
+
+/* IMAGEM DA LOGO */
 .logo-navbar {
-    height: 2.5rem;
+    height: 3.4rem;           /* agora ocupa 90% da barra */
+    max-height: 90%;          /* segurança extra */
     object-fit: contain;
     display: block;
 }
 
-/* TOPO DA PÁGINA */
-.top-row {
-    min-height: 3.5rem;
-    background-color: #6aa5f2;;
-}
 
 /* NAVITEM */
 .nav-item {

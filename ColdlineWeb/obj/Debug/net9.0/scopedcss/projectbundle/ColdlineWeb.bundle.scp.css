@@ -7,6 +7,7 @@
 
 main[b-jz6kpy4u2q] {
     flex: 1;
+    background-color: rgb(238, 246, 252);
 }
 
 .sidebar[b-jz6kpy4u2q] {
@@ -88,17 +89,25 @@ main[b-jz6kpy4u2q] {
     align-items: center;
     justify-content: center;
 }
+
+/* TOPO DA PÁGINA */
+.top-row[b-lx6nr6d397] {
+    height: 3.5rem; /* fixo */
+    background-color: #0c5bd2;
+    display: flex;
+    align-items: center;        /* centraliza verticalmente */
+    justify-content: center;    /* centraliza horizontalmente */
+    padding: 0;
+}
+
+/* IMAGEM DA LOGO */
 .logo-navbar[b-lx6nr6d397] {
-    height: 2.5rem;
+    height: 3.4rem;           /* agora ocupa 90% da barra */
+    max-height: 90%;          /* segurança extra */
     object-fit: contain;
     display: block;
 }
 
-/* TOPO DA PÁGINA */
-.top-row[b-lx6nr6d397] {
-    min-height: 3.5rem;
-    background-color: #6aa5f2;;
-}
 
 /* NAVITEM */
 .nav-item[b-lx6nr6d397] {

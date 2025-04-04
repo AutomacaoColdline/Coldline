@@ -32,20 +32,56 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0L0VtcHR5TGF5b3V0LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/ TypeDefects.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvIFR5cGVEZWZlY3RzLnJhem9y
+[/app/Pages/Bases/ TypeDefects.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvIFR5cGVEZWZlY3RzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Counter.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ291bnRlci5yYXpvcg==
+[/app/Pages/Bases/Counter.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvQ291bnRlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Defect.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRGVmZWN0LnJhem9y
+[/app/Pages/Bases/Defect.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvRGVmZWN0LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Department.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRGVwYXJ0bWVudC5yYXpvcg==
+[/app/Pages/Bases/Department.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvRGVwYXJ0bWVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Bases/MachineType.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvTWFjaGluZVR5cGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Bases/Monitoring.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvTW9uaXRvcmluZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Bases/MonitoringType.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvTW9uaXRvcmluZ1R5cGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Bases/Occurrence.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvT2NjdXJyZW5jZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Bases/Parts.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvUGFydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Bases/PauseTypes.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvUGF1c2VUeXBlcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Bases/ProcessType.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvUHJvY2Vzc1R5cGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Bases/UserTypes.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvVXNlclR5cGVzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Bases/Weather.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvV2VhdGhlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/Home/Home.razor]
@@ -92,40 +128,12 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZS9NYWNoaW5lVHlwZU1vZGFsLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/MachineType.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZVR5cGUucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Monitoring.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTW9uaXRvcmluZy5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/MonitoringType.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTW9uaXRvcmluZ1R5cGUucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Occurrence.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT2NjdXJyZW5jZS5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Parts.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFydHMucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/PauseTypes.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGF1c2VUeXBlcy5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
 [/app/Pages/Process/ProcessModal.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvY2Vzcy9Qcm9jZXNzTW9kYWwucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/Process/ProcessPage.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvY2Vzcy9Qcm9jZXNzUGFnZS5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/ProcessType.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvY2Vzc1R5cGUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/Quality/Quality.razor]
@@ -150,14 +158,6 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/app/Pages/User/UserTypeModal.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9Vc2VyVHlwZU1vZGFsLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/UserTypes.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlclR5cGVzLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Weather.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvV2VhdGhlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/_Imports.razor]

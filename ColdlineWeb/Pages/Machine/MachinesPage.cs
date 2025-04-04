@@ -150,6 +150,7 @@ namespace ColdlineWeb.Pages
                 currentMachine.Process = null;
                 currentMachine.Monitoring = null;
                 currentMachine.Quality = null;
+                currentMachine.Status = MachineStatus.WaitingProduction;
 
                 if (isEditing)
                     await Http.PutAsJsonAsync($"api/Machine/{currentMachine.Id}", currentMachine);

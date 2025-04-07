@@ -296,5 +296,21 @@ namespace ColdlineAPI.Presentation.Controllers
             }
         }
 
+        [HttpGet("export-excel")]
+        public async Task<IActionResult> ExportExcel()
+        {
+            var bytes = await _userService.GenerateExcelWithSampleDataAsync();
+            return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "usuarios.xlsx");
+        }
+
+
+        [HttpGet("export-pdf")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ExportPdf()
+        {
+            var bytes = await _userService.GeneratePdfWithAgeChartAsync();
+            return File(bytes, "application/pdf", "grafico-usuarios.pdf");
+        }
+
     }
 }

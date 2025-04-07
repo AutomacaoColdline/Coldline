@@ -45,15 +45,6 @@
                             <option value="@machine.Id">@machine.Name</option>
                         }
                     </select>
-                    <label>Ocorrências:</label>
-                    <select multiple class="form-control" @onchange="OnOccurrenceSelection">
-                        @foreach (var occ in Occurrences)
-                        {
-                            <option value="@occ.Id" selected="@SelectedOccurrences.Contains(occ.Id)">
-                                @occ.Name
-                            </option>
-                        }
-                    </select>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" @onclick="OnClose">Cancelar</button>

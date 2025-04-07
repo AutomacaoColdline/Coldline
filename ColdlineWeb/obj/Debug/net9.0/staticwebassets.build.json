@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "d0aeQRy7/LFaJfeDzs7GRU5l4G9//zOnAxjAWb3GuZI=",
+  "Hash": "QLOGwfnqcmBC3f3sl5Y2KwHHZE35O7hoO7vBlCDQO9o=",
   "Source": "ColdlineWeb",
   "BasePath": "/",
   "Mode": "Root",
@@ -31,8 +31,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "WasmResource",
       "AssetTraitValue": "manifest",
-      "Fingerprint": "ob8dvovv3d",
-      "Integrity": "ZPrmz/H/baBoK8e000fXyUeoLX+z1vFff/E0dPwuMxM=",
+      "Fingerprint": "91lhkm4aip",
+      "Integrity": "vfCnUoRSWVk9iUNCcVVk6blG0VOSoLYD8dzVWGiVzVg=",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "obj/Debug/net9.0/blazor.boot.json"
@@ -73,8 +73,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "WasmResource",
       "AssetTraitValue": "symbol",
-      "Fingerprint": "v0g93qs0gs",
-      "Integrity": "ofux/k1L3DmZzx0PtxuSRfOLClsVqVoBvgLeqwbdAdg=",
+      "Fingerprint": "d6fmu0xf0y",
+      "Integrity": "VaRPs3LVzKIBuwt2z+oeZOzJNa4rz1ImE1t0Qyv7UYM=",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "obj/Debug/net9.0/ColdlineWeb.pdb"
@@ -94,8 +94,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "WasmResource",
       "AssetTraitValue": "runtime",
-      "Fingerprint": "x6soc1ctgu",
-      "Integrity": "udSJxPCuJs8nvTado9DjeFJhuQoSe6JqWuMxcoXWQw4=",
+      "Fingerprint": "g0r10h0ckn",
+      "Integrity": "ACOhps0b78gtoH9u7m2VfEsFQrXInNkaUuNlq8JQEMA=",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "/app/obj/Debug/net9.0/webcil/ColdlineWeb.wasm"
@@ -6254,7 +6254,7 @@
       "OriginalItemSpec": "/app/bin/Debug/net9.0/wwwroot/_framework/System.IO.UnmanagedMemoryStream.wasm"
     },
     {
-      "Identity": "/app/obj/Debug/net9.0/compressed/cbhgt0xw5z-ob8dvovv3d.gz",
+      "Identity": "/app/obj/Debug/net9.0/compressed/cbhgt0xw5z-91lhkm4aip.gz",
       "SourceId": "ColdlineWeb",
       "SourceType": "Computed",
       "ContentRoot": "/app/obj/Debug/net9.0/compressed/",
@@ -6268,8 +6268,8 @@
       "RelatedAsset": "/app/bin/Debug/net9.0/wwwroot/_framework/blazor.boot.json",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
-      "Fingerprint": "xcbutmcvx5",
-      "Integrity": "/5WlXFyoPc7NbsZ8a3l4r5Do3UjCPoY5GG74TTy7cns=",
+      "Fingerprint": "wa1yl6ukc7",
+      "Integrity": "6Nf0r2BGnv3Li1J0uvKvG+enVAVBLFm7MQoMeoqCBn4=",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "/app/bin/Debug/net9.0/wwwroot/_framework/blazor.boot.json"
@@ -7178,12 +7178,12 @@
       "OriginalItemSpec": "/app/wwwroot/lib/bootstrap/dist/js/bootstrap.esm.js"
     },
     {
-      "Identity": "/app/obj/Debug/net9.0/compressed/hscczrya4x-x6soc1ctgu.gz",
+      "Identity": "/app/obj/Debug/net9.0/compressed/hscczrya4x-g0r10h0ckn.gz",
       "SourceId": "ColdlineWeb",
       "SourceType": "Computed",
       "ContentRoot": "/app/obj/Debug/net9.0/compressed/",
       "BasePath": "/",
-      "RelativePath": "_framework/ColdlineWeb#[.{fingerprint=x6soc1ctgu}]!.wasm.gz",
+      "RelativePath": "_framework/ColdlineWeb#[.{fingerprint=g0r10h0ckn}]!.wasm.gz",
       "AssetKind": "Build",
       "AssetMode": "All",
       "AssetRole": "Alternative",
@@ -7192,8 +7192,8 @@
       "RelatedAsset": "/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.wasm",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
-      "Fingerprint": "lh3f7093er",
-      "Integrity": "l4k1gaJX/3OprmZkNx/PkcIvBSuBURV9HE0WZWONl1k=",
+      "Fingerprint": "xovxq2g5cr",
+      "Integrity": "T/+HlbWjcWjZLoEbqgB0BiTZoNRy+4yMkAe72TY5JL4=",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.wasm"
@@ -8585,12 +8585,12 @@
       "OriginalItemSpec": "/app/bin/Debug/net9.0/wwwroot/_framework/Microsoft.AspNetCore.Authorization.wasm"
     },
     {
-      "Identity": "/app/obj/Debug/net9.0/compressed/q644bqhs6y-v0g93qs0gs.gz",
+      "Identity": "/app/obj/Debug/net9.0/compressed/q644bqhs6y-d6fmu0xf0y.gz",
       "SourceId": "ColdlineWeb",
       "SourceType": "Computed",
       "ContentRoot": "/app/obj/Debug/net9.0/compressed/",
       "BasePath": "/",
-      "RelativePath": "_framework/ColdlineWeb#[.{fingerprint=v0g93qs0gs}]!.pdb.gz",
+      "RelativePath": "_framework/ColdlineWeb#[.{fingerprint=d6fmu0xf0y}]!.pdb.gz",
       "AssetKind": "Build",
       "AssetMode": "All",
       "AssetRole": "Alternative",
@@ -8599,8 +8599,8 @@
       "RelatedAsset": "/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.pdb",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
-      "Fingerprint": "v18om1pxas",
-      "Integrity": "w4gIZEXKlnch+Rf0AId7+M4xY7mxCnKwM/egZliMTf0=",
+      "Fingerprint": "gkngk6unvn",
+      "Integrity": "UOfSiTKzdUoD08wAFqT+BuFLTritA6igoZgogCmE+f4=",
       "CopyToOutputDirectory": "PreserveNewest",
       "CopyToPublishDirectory": "Never",
       "OriginalItemSpec": "/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.pdb"
@@ -11692,11 +11692,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"ZPrmz/H/baBoK8e000fXyUeoLX+z1vFff/E0dPwuMxM=\""
+          "Value": "\"vfCnUoRSWVk9iUNCcVVk6blG0VOSoLYD8dzVWGiVzVg=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 04 Apr 2025 18:29:40 GMT"
+          "Value": "Mon, 07 Apr 2025 18:46:06 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -11706,18 +11706,18 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-ZPrmz/H/baBoK8e000fXyUeoLX+z1vFff/E0dPwuMxM="
+          "Value": "sha256-vfCnUoRSWVk9iUNCcVVk6blG0VOSoLYD8dzVWGiVzVg="
         }
       ]
     },
     {
       "Route": "_framework/blazor.boot.json",
-      "AssetFile": "/app/obj/Debug/net9.0/compressed/cbhgt0xw5z-ob8dvovv3d.gz",
+      "AssetFile": "/app/obj/Debug/net9.0/compressed/cbhgt0xw5z-91lhkm4aip.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.000080580177"
+          "Quality": "0.000080606158"
         }
       ],
       "ResponseHeaders": [
@@ -11727,15 +11727,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "12409"
+          "Value": "12405"
         },
         {
           "Name": "ETag",
-          "Value": "\"/5WlXFyoPc7NbsZ8a3l4r5Do3UjCPoY5GG74TTy7cns=\""
+          "Value": "\"6Nf0r2BGnv3Li1J0uvKvG+enVAVBLFm7MQoMeoqCBn4=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 04 Apr 2025 18:26:13 GMT"
+          "Value": "Mon, 07 Apr 2025 18:10:03 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -11755,19 +11755,19 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"ZPrmz/H/baBoK8e000fXyUeoLX+z1vFff/E0dPwuMxM=\""
+          "Value": "W/\"vfCnUoRSWVk9iUNCcVVk6blG0VOSoLYD8dzVWGiVzVg=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-ZPrmz/H/baBoK8e000fXyUeoLX+z1vFff/E0dPwuMxM="
+          "Value": "sha256-vfCnUoRSWVk9iUNCcVVk6blG0VOSoLYD8dzVWGiVzVg="
         }
       ]
     },
     {
       "Route": "_framework/blazor.boot.json.gz",
-      "AssetFile": "/app/obj/Debug/net9.0/compressed/cbhgt0xw5z-ob8dvovv3d.gz",
+      "AssetFile": "/app/obj/Debug/net9.0/compressed/cbhgt0xw5z-91lhkm4aip.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -11776,7 +11776,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "12409"
+          "Value": "12405"
         },
         {
           "Name": "Content-Type",
@@ -11784,11 +11784,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"/5WlXFyoPc7NbsZ8a3l4r5Do3UjCPoY5GG74TTy7cns=\""
+          "Value": "\"6Nf0r2BGnv3Li1J0uvKvG+enVAVBLFm7MQoMeoqCBn4=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 04 Apr 2025 18:26:13 GMT"
+          "Value": "Mon, 07 Apr 2025 18:10:03 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -11806,7 +11806,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-/5WlXFyoPc7NbsZ8a3l4r5Do3UjCPoY5GG74TTy7cns="
+          "Value": "sha256-6Nf0r2BGnv3Li1J0uvKvG+enVAVBLFm7MQoMeoqCBn4="
         }
       ]
     },
@@ -11948,7 +11948,7 @@
       ]
     },
     {
-      "Route": "_framework/ColdlineWeb.pdb",
+      "Route": "_framework/ColdlineWeb.d6fmu0xf0y.pdb",
       "AssetFile": "/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.pdb",
       "Selectors": [],
       "ResponseHeaders": [
@@ -11958,7 +11958,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "200164"
+          "Value": "199652"
         },
         {
           "Name": "Content-Type",
@@ -11966,148 +11966,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"ofux/k1L3DmZzx0PtxuSRfOLClsVqVoBvgLeqwbdAdg=\""
+          "Value": "\"VaRPs3LVzKIBuwt2z+oeZOzJNa4rz1ImE1t0Qyv7UYM=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 04 Apr 2025 18:26:09 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-ofux/k1L3DmZzx0PtxuSRfOLClsVqVoBvgLeqwbdAdg="
-        }
-      ]
-    },
-    {
-      "Route": "_framework/ColdlineWeb.pdb",
-      "AssetFile": "/app/obj/Debug/net9.0/compressed/q644bqhs6y-v0g93qs0gs.gz",
-      "Selectors": [
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip",
-          "Quality": "0.000007670535"
-        }
-      ],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "130368"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"w4gIZEXKlnch+Rf0AId7+M4xY7mxCnKwM/egZliMTf0=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Fri, 04 Apr 2025 18:26:14 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
-        },
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip"
-        },
-        {
-          "Name": "Vary",
-          "Value": "Content-Encoding"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "application/octet-stream"
-        },
-        {
-          "Name": "ETag",
-          "Value": "W/\"ofux/k1L3DmZzx0PtxuSRfOLClsVqVoBvgLeqwbdAdg=\""
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-ofux/k1L3DmZzx0PtxuSRfOLClsVqVoBvgLeqwbdAdg="
-        }
-      ]
-    },
-    {
-      "Route": "_framework/ColdlineWeb.pdb.gz",
-      "AssetFile": "/app/obj/Debug/net9.0/compressed/q644bqhs6y-v0g93qs0gs.gz",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "130368"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "application/octet-stream"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"w4gIZEXKlnch+Rf0AId7+M4xY7mxCnKwM/egZliMTf0=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Fri, 04 Apr 2025 18:26:14 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
-        },
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip"
-        },
-        {
-          "Name": "Vary",
-          "Value": "Content-Encoding"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-w4gIZEXKlnch+Rf0AId7+M4xY7mxCnKwM/egZliMTf0="
-        }
-      ]
-    },
-    {
-      "Route": "_framework/ColdlineWeb.v0g93qs0gs.pdb",
-      "AssetFile": "/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.pdb",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "200164"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "application/octet-stream"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"ofux/k1L3DmZzx0PtxuSRfOLClsVqVoBvgLeqwbdAdg=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Fri, 04 Apr 2025 18:26:09 GMT"
+          "Value": "Mon, 07 Apr 2025 18:09:51 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -12117,7 +11980,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "v0g93qs0gs"
+          "Value": "d6fmu0xf0y"
         },
         {
           "Name": "label",
@@ -12125,18 +11988,18 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-ofux/k1L3DmZzx0PtxuSRfOLClsVqVoBvgLeqwbdAdg="
+          "Value": "sha256-VaRPs3LVzKIBuwt2z+oeZOzJNa4rz1ImE1t0Qyv7UYM="
         }
       ]
     },
     {
-      "Route": "_framework/ColdlineWeb.v0g93qs0gs.pdb",
-      "AssetFile": "/app/obj/Debug/net9.0/compressed/q644bqhs6y-v0g93qs0gs.gz",
+      "Route": "_framework/ColdlineWeb.d6fmu0xf0y.pdb",
+      "AssetFile": "/app/obj/Debug/net9.0/compressed/q644bqhs6y-d6fmu0xf0y.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.000007670535"
+          "Quality": "0.000007694379"
         }
       ],
       "ResponseHeaders": [
@@ -12146,15 +12009,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "130368"
+          "Value": "129964"
         },
         {
           "Name": "ETag",
-          "Value": "\"w4gIZEXKlnch+Rf0AId7+M4xY7mxCnKwM/egZliMTf0=\""
+          "Value": "\"UOfSiTKzdUoD08wAFqT+BuFLTritA6igoZgogCmE+f4=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 04 Apr 2025 18:26:14 GMT"
+          "Value": "Mon, 07 Apr 2025 18:10:05 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -12174,13 +12037,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"ofux/k1L3DmZzx0PtxuSRfOLClsVqVoBvgLeqwbdAdg=\""
+          "Value": "W/\"VaRPs3LVzKIBuwt2z+oeZOzJNa4rz1ImE1t0Qyv7UYM=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "v0g93qs0gs"
+          "Value": "d6fmu0xf0y"
         },
         {
           "Name": "label",
@@ -12188,13 +12051,13 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-ofux/k1L3DmZzx0PtxuSRfOLClsVqVoBvgLeqwbdAdg="
+          "Value": "sha256-VaRPs3LVzKIBuwt2z+oeZOzJNa4rz1ImE1t0Qyv7UYM="
         }
       ]
     },
     {
-      "Route": "_framework/ColdlineWeb.v0g93qs0gs.pdb.gz",
-      "AssetFile": "/app/obj/Debug/net9.0/compressed/q644bqhs6y-v0g93qs0gs.gz",
+      "Route": "_framework/ColdlineWeb.d6fmu0xf0y.pdb.gz",
+      "AssetFile": "/app/obj/Debug/net9.0/compressed/q644bqhs6y-d6fmu0xf0y.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -12203,7 +12066,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "130368"
+          "Value": "129964"
         },
         {
           "Name": "Content-Type",
@@ -12211,11 +12074,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"w4gIZEXKlnch+Rf0AId7+M4xY7mxCnKwM/egZliMTf0=\""
+          "Value": "\"UOfSiTKzdUoD08wAFqT+BuFLTritA6igoZgogCmE+f4=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 04 Apr 2025 18:26:14 GMT"
+          "Value": "Mon, 07 Apr 2025 18:10:05 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -12233,7 +12096,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "v0g93qs0gs"
+          "Value": "d6fmu0xf0y"
         },
         {
           "Name": "label",
@@ -12241,12 +12104,12 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-w4gIZEXKlnch+Rf0AId7+M4xY7mxCnKwM/egZliMTf0="
+          "Value": "sha256-UOfSiTKzdUoD08wAFqT+BuFLTritA6igoZgogCmE+f4="
         }
       ]
     },
     {
-      "Route": "_framework/ColdlineWeb.wasm",
+      "Route": "_framework/ColdlineWeb.g0r10h0ckn.wasm",
       "AssetFile": "/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.wasm",
       "Selectors": [],
       "ResponseHeaders": [
@@ -12256,7 +12119,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "388373"
+          "Value": "387349"
         },
         {
           "Name": "Content-Type",
@@ -12264,148 +12127,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"udSJxPCuJs8nvTado9DjeFJhuQoSe6JqWuMxcoXWQw4=\""
+          "Value": "\"ACOhps0b78gtoH9u7m2VfEsFQrXInNkaUuNlq8JQEMA=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 04 Apr 2025 18:26:10 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-udSJxPCuJs8nvTado9DjeFJhuQoSe6JqWuMxcoXWQw4="
-        }
-      ]
-    },
-    {
-      "Route": "_framework/ColdlineWeb.wasm",
-      "AssetFile": "/app/obj/Debug/net9.0/compressed/hscczrya4x-x6soc1ctgu.gz",
-      "Selectors": [
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip",
-          "Quality": "0.000007930969"
-        }
-      ],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "126087"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"l4k1gaJX/3OprmZkNx/PkcIvBSuBURV9HE0WZWONl1k=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Fri, 04 Apr 2025 18:26:14 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
-        },
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip"
-        },
-        {
-          "Name": "Vary",
-          "Value": "Content-Encoding"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "application/wasm"
-        },
-        {
-          "Name": "ETag",
-          "Value": "W/\"udSJxPCuJs8nvTado9DjeFJhuQoSe6JqWuMxcoXWQw4=\""
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-udSJxPCuJs8nvTado9DjeFJhuQoSe6JqWuMxcoXWQw4="
-        }
-      ]
-    },
-    {
-      "Route": "_framework/ColdlineWeb.wasm.gz",
-      "AssetFile": "/app/obj/Debug/net9.0/compressed/hscczrya4x-x6soc1ctgu.gz",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "126087"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "application/wasm"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"l4k1gaJX/3OprmZkNx/PkcIvBSuBURV9HE0WZWONl1k=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Fri, 04 Apr 2025 18:26:14 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "no-cache"
-        },
-        {
-          "Name": "Content-Encoding",
-          "Value": "gzip"
-        },
-        {
-          "Name": "Vary",
-          "Value": "Content-Encoding"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-l4k1gaJX/3OprmZkNx/PkcIvBSuBURV9HE0WZWONl1k="
-        }
-      ]
-    },
-    {
-      "Route": "_framework/ColdlineWeb.x6soc1ctgu.wasm",
-      "AssetFile": "/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.wasm",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "388373"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "application/wasm"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"udSJxPCuJs8nvTado9DjeFJhuQoSe6JqWuMxcoXWQw4=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Fri, 04 Apr 2025 18:26:10 GMT"
+          "Value": "Mon, 07 Apr 2025 18:09:56 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -12415,7 +12141,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "x6soc1ctgu"
+          "Value": "g0r10h0ckn"
         },
         {
           "Name": "label",
@@ -12423,18 +12149,18 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-udSJxPCuJs8nvTado9DjeFJhuQoSe6JqWuMxcoXWQw4="
+          "Value": "sha256-ACOhps0b78gtoH9u7m2VfEsFQrXInNkaUuNlq8JQEMA="
         }
       ]
     },
     {
-      "Route": "_framework/ColdlineWeb.x6soc1ctgu.wasm",
-      "AssetFile": "/app/obj/Debug/net9.0/compressed/hscczrya4x-x6soc1ctgu.gz",
+      "Route": "_framework/ColdlineWeb.g0r10h0ckn.wasm",
+      "AssetFile": "/app/obj/Debug/net9.0/compressed/hscczrya4x-g0r10h0ckn.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.000007930969"
+          "Quality": "0.000007950390"
         }
       ],
       "ResponseHeaders": [
@@ -12444,15 +12170,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "126087"
+          "Value": "125779"
         },
         {
           "Name": "ETag",
-          "Value": "\"l4k1gaJX/3OprmZkNx/PkcIvBSuBURV9HE0WZWONl1k=\""
+          "Value": "\"T/+HlbWjcWjZLoEbqgB0BiTZoNRy+4yMkAe72TY5JL4=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 04 Apr 2025 18:26:14 GMT"
+          "Value": "Mon, 07 Apr 2025 18:10:05 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -12472,13 +12198,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"udSJxPCuJs8nvTado9DjeFJhuQoSe6JqWuMxcoXWQw4=\""
+          "Value": "W/\"ACOhps0b78gtoH9u7m2VfEsFQrXInNkaUuNlq8JQEMA=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "x6soc1ctgu"
+          "Value": "g0r10h0ckn"
         },
         {
           "Name": "label",
@@ -12486,13 +12212,13 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-udSJxPCuJs8nvTado9DjeFJhuQoSe6JqWuMxcoXWQw4="
+          "Value": "sha256-ACOhps0b78gtoH9u7m2VfEsFQrXInNkaUuNlq8JQEMA="
         }
       ]
     },
     {
-      "Route": "_framework/ColdlineWeb.x6soc1ctgu.wasm.gz",
-      "AssetFile": "/app/obj/Debug/net9.0/compressed/hscczrya4x-x6soc1ctgu.gz",
+      "Route": "_framework/ColdlineWeb.g0r10h0ckn.wasm.gz",
+      "AssetFile": "/app/obj/Debug/net9.0/compressed/hscczrya4x-g0r10h0ckn.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -12501,7 +12227,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "126087"
+          "Value": "125779"
         },
         {
           "Name": "Content-Type",
@@ -12509,11 +12235,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"l4k1gaJX/3OprmZkNx/PkcIvBSuBURV9HE0WZWONl1k=\""
+          "Value": "\"T/+HlbWjcWjZLoEbqgB0BiTZoNRy+4yMkAe72TY5JL4=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 04 Apr 2025 18:26:14 GMT"
+          "Value": "Mon, 07 Apr 2025 18:10:05 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -12531,7 +12257,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "x6soc1ctgu"
+          "Value": "g0r10h0ckn"
         },
         {
           "Name": "label",
@@ -12539,7 +12265,281 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-l4k1gaJX/3OprmZkNx/PkcIvBSuBURV9HE0WZWONl1k="
+          "Value": "sha256-T/+HlbWjcWjZLoEbqgB0BiTZoNRy+4yMkAe72TY5JL4="
+        }
+      ]
+    },
+    {
+      "Route": "_framework/ColdlineWeb.pdb",
+      "AssetFile": "/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.pdb",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "199652"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/octet-stream"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"VaRPs3LVzKIBuwt2z+oeZOzJNa4rz1ImE1t0Qyv7UYM=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 07 Apr 2025 18:09:51 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-VaRPs3LVzKIBuwt2z+oeZOzJNa4rz1ImE1t0Qyv7UYM="
+        }
+      ]
+    },
+    {
+      "Route": "_framework/ColdlineWeb.pdb",
+      "AssetFile": "/app/obj/Debug/net9.0/compressed/q644bqhs6y-d6fmu0xf0y.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000007694379"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "129964"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"UOfSiTKzdUoD08wAFqT+BuFLTritA6igoZgogCmE+f4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 07 Apr 2025 18:10:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/octet-stream"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"VaRPs3LVzKIBuwt2z+oeZOzJNa4rz1ImE1t0Qyv7UYM=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-VaRPs3LVzKIBuwt2z+oeZOzJNa4rz1ImE1t0Qyv7UYM="
+        }
+      ]
+    },
+    {
+      "Route": "_framework/ColdlineWeb.pdb.gz",
+      "AssetFile": "/app/obj/Debug/net9.0/compressed/q644bqhs6y-d6fmu0xf0y.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "129964"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/octet-stream"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"UOfSiTKzdUoD08wAFqT+BuFLTritA6igoZgogCmE+f4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 07 Apr 2025 18:10:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-UOfSiTKzdUoD08wAFqT+BuFLTritA6igoZgogCmE+f4="
+        }
+      ]
+    },
+    {
+      "Route": "_framework/ColdlineWeb.wasm",
+      "AssetFile": "/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.wasm",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "387349"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/wasm"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"ACOhps0b78gtoH9u7m2VfEsFQrXInNkaUuNlq8JQEMA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 07 Apr 2025 18:09:56 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-ACOhps0b78gtoH9u7m2VfEsFQrXInNkaUuNlq8JQEMA="
+        }
+      ]
+    },
+    {
+      "Route": "_framework/ColdlineWeb.wasm",
+      "AssetFile": "/app/obj/Debug/net9.0/compressed/hscczrya4x-g0r10h0ckn.gz",
+      "Selectors": [
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip",
+          "Quality": "0.000007950390"
+        }
+      ],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "125779"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"T/+HlbWjcWjZLoEbqgB0BiTZoNRy+4yMkAe72TY5JL4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 07 Apr 2025 18:10:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/wasm"
+        },
+        {
+          "Name": "ETag",
+          "Value": "W/\"ACOhps0b78gtoH9u7m2VfEsFQrXInNkaUuNlq8JQEMA=\""
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-ACOhps0b78gtoH9u7m2VfEsFQrXInNkaUuNlq8JQEMA="
+        }
+      ]
+    },
+    {
+      "Route": "_framework/ColdlineWeb.wasm.gz",
+      "AssetFile": "/app/obj/Debug/net9.0/compressed/hscczrya4x-g0r10h0ckn.gz",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "125779"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/wasm"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"T/+HlbWjcWjZLoEbqgB0BiTZoNRy+4yMkAe72TY5JL4=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 07 Apr 2025 18:10:05 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Encoding",
+          "Value": "gzip"
+        },
+        {
+          "Name": "Vary",
+          "Value": "Content-Encoding"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-T/+HlbWjcWjZLoEbqgB0BiTZoNRy+4yMkAe72TY5JL4="
         }
       ]
     },

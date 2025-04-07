@@ -17,7 +17,8 @@ namespace ColdlineAPI.Application.Interfaces
         Task<bool> ForgotPasswordAsync(string email);
         Task<bool> ChangePasswordAsync(string userId, string oldPassword, string newPassword);
         Task<User?> GetUserByIdentificationNumberAsync(string identificationNumber);
-
+        Task<byte[]> GenerateExcelWithSampleDataAsync();
+        Task<byte[]> GeneratePdfWithAgeChartAsync();
 
     }
 }

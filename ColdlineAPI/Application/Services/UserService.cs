@@ -1,18 +1,32 @@
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Text;
-using System.Threading.Tasks;
-using System.IdentityModel.Tokens.Jwt;
+using System.Drawing;
 using System.Security.Claims;
-using ColdlineAPI.Application.Interfaces;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+
 using ColdlineAPI.Domain.Entities;
+using ColdlineAPI.Infrastructure.Utils;
+using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Infrastructure.Settings;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using MongoDB.Driver;
+
 using MongoDB.Bson;
-using ColdlineAPI.Infrastructure.Utils;
+using MongoDB.Driver;
+
+using ClosedXML.Excel;
+
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Elements;
+using QuestPDF.Infrastructure;
+
+using SkiaSharp;
 
 namespace ColdlineAPI.Application.Services
 {
@@ -242,5 +256,125 @@ namespace ColdlineAPI.Application.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+        public Task<byte[]> GenerateExcelWithSampleDataAsync()
+        {
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Pessoas");
+
+            worksheet.Cell(1, 1).Value = "Nome";
+            worksheet.Cell(1, 2).Value = "Idade";
+            worksheet.Cell(1, 3).Value = "Altura (m)";
+
+            var data = new[]
+            {
+                new { Nome = "Ana", Idade = 28, Altura = 1.65 },
+                new { Nome = "Bruno", Idade = 34, Altura = 1.80 },
+                new { Nome = "Carlos", Idade = 22, Altura = 1.75 },
+                new { Nome = "Daniela", Idade = 30, Altura = 1.70 }
+            };
+
+            int row = 2;
+            foreach (var pessoa in data)
+            {
+                worksheet.Cell(row, 1).Value = pessoa.Nome;
+                worksheet.Cell(row, 2).Value = pessoa.Idade;
+                worksheet.Cell(row, 3).Value = pessoa.Altura;
+                row++;
+            }
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+
+            return Task.FromResult(stream.ToArray()); // ✅ CORRETO
+        }
+
+        public Task<byte[]> GeneratePdfWithAgeChartAsync()
+        {
+            var data = new[]
+            {
+                new { Nome = "eduardo", Idade = 18.0 },
+                new { Nome = "amanda", Idade = 19.0 },
+                new { Nome = "caio", Idade = 20.0 }
+            };
+
+            double max = 20.5;
+            double min = 17.0;
+            double step = 0.5;
+            int steps = (int)((max - min) / step);
+
+            QuestPDF.Settings.License = LicenseType.Community;
+
+            using var stream = new MemoryStream();
+
+            Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(40);
+                    page.DefaultTextStyle(x => x.FontSize(12));
+
+                    page.Header().AlignCenter().Text("idade").Bold().FontSize(18);
+
+                    page.Content().PaddingTop(30).Row(mainRow =>
+                    {
+                        // 🔹 Números da lateral (eixo Y)
+                        mainRow.ConstantColumn(50).Column(yCol =>
+                        {
+                            for (double i = max; i >= min; i -= step)
+                            {
+                                yCol.Item().Height(20).AlignRight().AlignMiddle().Text(i.ToString("0.0")).FontSize(10);
+                            }
+                        });
+
+                        // 🔹 Área do gráfico com borda
+                        mainRow.RelativeColumn().Border(1).BorderColor(Colors.Red.Medium).PaddingLeft(10).Column(area =>
+                        {
+                            // 🔸 Linhas horizontais
+                            area.Item().Column(lineCol =>
+                            {
+                                for (int i = 0; i <= steps; i++)
+                                {
+                                    lineCol.Item().Height(20).LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten2);
+                                }
+                            });
+
+                            // 🔸 Barras verticais (com espaçamento entre elas)
+                            area.Item().PaddingTop(-20 * steps).Row(barRow =>
+                            {
+                                foreach (var pessoa in data)
+                                {
+                                    int barSteps = (int)((pessoa.Idade - min) / step);
+                                    int barHeight = barSteps * 20;
+
+                                    barRow.RelativeColumn().Column(col =>
+                                    {
+                                        col.Item().Height(20 * (steps - barSteps));
+                                        col.Item().Height(barHeight).Background(Colors.Blue.Medium);
+                                    });
+
+                                    // Adiciona uma coluna vazia entre barras (espaço)
+                                    barRow.RelativeColumn().Column(_ => { });
+                                }
+                            });
+
+                            // 🔸 Nomes abaixo do gráfico
+                            area.Item().Row(labelRow =>
+                            {
+                                foreach (var pessoa in data)
+                                {
+                                    labelRow.RelativeColumn().AlignCenter().Text(pessoa.Nome).FontSize(10);
+                                    labelRow.RelativeColumn(); // Espaço entre nomes
+                                }
+                            });
+                        });
+                    });
+                });
+            }).GeneratePdf(stream);
+
+            return Task.FromResult(stream.ToArray());
+        }
     }
+
 }

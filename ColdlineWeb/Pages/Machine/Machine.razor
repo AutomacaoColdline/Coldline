@@ -17,9 +17,6 @@ else
         <div class="search-filters">
             <input class="form-control filter-large" placeholder="Nome do Cliente" @bind="filter.CustomerName" />
             <input class="form-control filter-small" placeholder="Número de Identificação" @bind="filter.IdentificationNumber" />
-            <input class="form-control filter-xs" placeholder="Fase" @bind="filter.Phase" />
-            <input class="form-control filter-xs" placeholder="Voltagem" @bind="filter.Voltage" />
-
             <select class="form-control filter-medium" @bind="filter.MachineTypeId">
                 <option value="">Todos os Tipos</option>
                 @foreach (var type in machineTypes)

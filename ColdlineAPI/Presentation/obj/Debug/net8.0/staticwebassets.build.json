@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "ZABpFlzze5hvStCtLXln6Few8/nqhvSYlv5nsWkCjOw=",
+  "Hash": "hf/HSVXf+izbWe8LFnaDgLAX2oix4ebV5qwl4iKKEPA=",
   "Source": "Presentation",
   "BasePath": "_content/Presentation",
   "Mode": "Default",
@@ -129,6 +129,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/uploads/Fabio.png"
+    },
+    {
+      "Identity": "/app/Presentation/wwwroot/uploads/Franke Allan Costa Freitas.png",
+      "SourceId": "Presentation",
+      "SourceType": "Discovered",
+      "ContentRoot": "/app/Presentation/wwwroot/",
+      "BasePath": "_content/Presentation",
+      "RelativePath": "uploads/Franke Allan Costa Freitas.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/uploads/Franke Allan Costa Freitas.png"
     },
     {
       "Identity": "/app/Presentation/wwwroot/uploads/Gabriel.png",

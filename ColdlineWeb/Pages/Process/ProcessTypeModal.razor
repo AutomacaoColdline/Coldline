@@ -1,0 +1,31 @@
+@using ColdlineWeb.Models
+
+@if (ShowModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Adicionar Tipo de Processo</h5>
+                </div>
+                <div class="modal-body">
+                    <label>Nome:</label>
+                    <input class="form-control" @bind="NewProcessType.Name" />
+                    <label>Descrição:</label>
+                    <input class="form-control" @bind="NewProcessType.Description" />
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="OnClose">Cancelar</button>
+                    <button class="btn btn-success" @onclick="OnSave">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool ShowModal { get; set; }
+    [Parameter] public ProcessTypeModel NewProcessType { get; set; } = new();
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+}

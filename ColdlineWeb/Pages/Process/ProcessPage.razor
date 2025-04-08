@@ -47,7 +47,7 @@ else
             <button class="btn btn-filter" @onclick="OpenAddProcessModal">
                 <img src="img/processopreto.png" alt="Adicionar" class="btn-icon" />
             </button>
-            <button class="btn btn-filter" @onclick="OpenAddProcessModal">
+            <button class="btn btn-filter" @onclick="OpenAddProcessTypeModal">
                 <img src="img/processopreto.png" alt="Adicionar" class="btn-icon" />
             </button>
         </div>
@@ -130,3 +130,9 @@ else
               OnOccurrenceSelection="HandleOccurrenceSelection"
               OnSave="SaveProcess"
               OnClose="CloseProcessModal" />
+
+<ProcessTypeModal ShowModal="ShowProcessTypeModal"
+                  NewProcessType="NewProcessType"
+                  OnSave="SaveProcessType"
+                  OnClose="CloseProcessTypeModal" />
+

@@ -6,6 +6,8 @@ using System;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Filter;
 using ColdlineWeb.Services;
+using System.Net.Http;
+using System.Net.Http.Json;
 
 namespace ColdlineWeb.Pages.Process
 {
@@ -17,6 +19,7 @@ namespace ColdlineWeb.Pages.Process
         [Inject] protected ProcessTypeService ProcessTypeService { get; set; } = default!;
         [Inject] protected MachineService MachineService { get; set; } = default!;
         [Inject] protected OccurrenceService OccurrenceService { get; set; } = default!;
+        [Inject] protected HttpClient Http { get; set; } = default!;
 
         protected List<ProcessModel> ProcessList = new();
 
@@ -43,6 +46,9 @@ namespace ColdlineWeb.Pages.Process
         protected bool CanGoNext => PageNumber < TotalPages;
         protected bool CanGoPrevious => PageNumber > 1;
 
+        protected bool ShowProcessTypeModal = false;
+        protected ProcessTypeModel NewProcessType = new();
+
         protected override async Task OnInitializedAsync()
         {
             await LoadDropdownData();
@@ -66,14 +72,13 @@ namespace ColdlineWeb.Pages.Process
                 Machines = machines.ConvertAll(m => new ReferenceEntity { Id = m.Id, Name = m.CustomerName });
 
                 var occurrenceModels = await OccurrenceService.GetAllAsync();
-                Occurrences = occurrenceModels.ConvertAll(o => new ReferenceEntity { Id = o.Id, Name = o.CodeOccurrence }); // ✅ Correção
+                Occurrences = occurrenceModels.ConvertAll(o => new ReferenceEntity { Id = o.Id, Name = o.CodeOccurrence });
             }
             catch (Exception ex)
             {
                 ErrorMessage = "Erro ao carregar dados para dropdowns.";
             }
         }
-
 
         protected async Task ApplyFilters()
         {
@@ -196,6 +201,36 @@ namespace ColdlineWeb.Pages.Process
                 SelectedOccurrences = values.ToList();
             else if (e.Value is string singleValue)
                 SelectedOccurrences = new List<string> { singleValue };
+        }
+
+        protected void OpenAddProcessTypeModal()
+        {
+            NewProcessType = new();
+            ShowProcessTypeModal = true;
+        }
+
+        protected void CloseProcessTypeModal()
+        {
+            ShowProcessTypeModal = false;
+        }
+
+        protected async Task SaveProcessType()
+        {
+            try
+            {
+                await Http.PostAsJsonAsync("api/ProcessType", NewProcessType);
+
+                // Recarrega os tipos para dropdown
+                var types = await ProcessTypeService.GetAllAsync();
+                ProcessTypes = types.ConvertAll(t => new ReferenceEntity { Id = t.Id, Name = t.Name });
+
+                ShowProcessTypeModal = false;
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = "Erro ao salvar o tipo de processo.";
+                Console.WriteLine(ex.Message);
+            }
         }
     }
 }

@@ -6,13 +6,10 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">@((IsEditing ? "Editar Processo" : "Adicionar Processo"))</h5>
-                    <button class="close" @onclick="OnClose">&times;</button>
                 </div>
                 <div class="modal-body">
                     <label>Número de Identificação:</label>
                     <input class="form-control" @bind="CurrentProcess.IdentificationNumber" />
-                    <label>Tempo do Processo:</label>
-                    <input class="form-control" @bind="CurrentProcess.ProcessTime" />
                     <label>Data de Início:</label>
                     <input type="datetime-local" class="form-control" @bind="CurrentProcess.StartDate" />
                     <label>Data de Término:</label>
@@ -44,6 +41,12 @@
                         {
                             <option value="@machine.Id">@machine.Name</option>
                         }
+                    </select>
+                    <label>Pré-Industrialização:</label>
+                    <select class="form-control" @bind="CurrentProcess.PreIndustrialization">
+                        <option value="">Selecione</option>
+                        <option value="true">Sim</option>
+                        <option value="false">Não</option>
                     </select>
                 </div>
                 <div class="modal-footer">

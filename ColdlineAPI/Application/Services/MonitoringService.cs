@@ -1,57 +1,71 @@
 using ColdlineAPI.Application.Interfaces;
+using ColdlineAPI.Application.Factories;
+using ColdlineAPI.Application.Repositories;
 using ColdlineAPI.Domain.Entities;
-using ColdlineAPI.Infrastructure.Settings;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
 using MongoDB.Bson;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using MongoDB.Driver;
 
 namespace ColdlineAPI.Application.Services
 {
     public class MonitoringService : IMonitoringService
     {
-        private readonly IMongoCollection<Monitoring> _monitorings;
+        private readonly MongoRepository<Monitoring> _monitorings;
 
-        public MonitoringService(IOptions<MongoDBSettings> mongoDBSettings)
+        public MonitoringService(RepositoryFactory factory)
         {
-            var client = new MongoClient(mongoDBSettings.Value.ConnectionString);
-            var database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
-            _monitorings = database.GetCollection<Monitoring>("Monitorings");
+            _monitorings = factory.CreateRepository<Monitoring>("Monitorings");
         }
 
-        public async Task<List<Monitoring>> GetAllMonitoringsAsync() =>
-            await _monitorings.Find(_ => true).ToListAsync();
+        public async Task<List<Monitoring>> GetAllMonitoringsAsync()
+        {
+            var projection = Builders<Monitoring>.Projection
+                .Include(x => x.Id)
+                .Include(x => x.Gateway)
+                .Include(x => x.IHM)
+                .Include(x => x.CLP)
+                .Include(x => x.IdRustdesk)
+                .Include(x => x.IdAnydesk)
+                .Include(x => x.IdTeamViewer)
+                .Include(x => x.MonitoringType);
 
-        public async Task<Monitoring?> GetMonitoringByIdAsync(string id) =>
-            await _monitorings.Find(m => m.Id == id).FirstOrDefaultAsync();
+            var collection = _monitorings.GetCollection();
+            var result = await collection.Find(_ => true).Project<Monitoring>(projection).ToListAsync();
+            return result;
+        }
+
+        public async Task<Monitoring?> GetMonitoringByIdAsync(string id)
+        {
+            return await _monitorings.GetByIdAsync(m => m.Id == id);
+        }
 
         public async Task<Monitoring> CreateMonitoringAsync(Monitoring monitoring)
         {
-            if (string.IsNullOrEmpty(monitoring.Id) || !ObjectId.TryParse(monitoring.Id, out _))
-            {
+            if (string.IsNullOrEmpty(monitoring.Id))
                 monitoring.Id = ObjectId.GenerateNewId().ToString();
-            }
 
-            await _monitorings.InsertOneAsync(monitoring);
-            return monitoring;
+            return await _monitorings.CreateAsync(monitoring);
         }
 
         public async Task<bool> UpdateMonitoringAsync(string id, Monitoring monitoring)
         {
-            if (monitoring == null) return false;  // Evita salvar dados vazios
+            var update = Builders<Monitoring>.Update
+                .Set(x => x.Gateway, monitoring.Gateway)
+                .Set(x => x.IHM, monitoring.IHM)
+                .Set(x => x.CLP, monitoring.CLP)
+                .Set(x => x.IdRustdesk, monitoring.IdRustdesk)
+                .Set(x => x.IdAnydesk, monitoring.IdAnydesk)
+                .Set(x => x.IdTeamViewer, monitoring.IdTeamViewer)
+                .Set(x => x.MonitoringType, monitoring.MonitoringType);
 
-            var existingMonitoring = await _monitorings.Find(m => m.Id == id).FirstOrDefaultAsync();
-            if (existingMonitoring == null) return false; // Garante que o ID existe antes de atualizar
+            var result = await _monitorings.GetCollection()
+                .UpdateOneAsync(m => m.Id == id, update);
 
-            var result = await _monitorings.ReplaceOneAsync(m => m.Id == id, monitoring);
             return result.IsAcknowledged && result.ModifiedCount > 0;
         }
 
         public async Task<bool> DeleteMonitoringAsync(string id)
         {
-            var result = await _monitorings.DeleteOneAsync(m => m.Id == id);
-            return result.IsAcknowledged && result.DeletedCount > 0;
+            return await _monitorings.DeleteAsync(m => m.Id == id);
         }
     }
 }

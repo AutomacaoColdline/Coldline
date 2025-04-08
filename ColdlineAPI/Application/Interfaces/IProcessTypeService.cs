@@ -8,8 +8,8 @@ namespace ColdlineAPI.Application.Interfaces
     {
         Task<List<ProcessType>> GetAllProcessTypesAsync();
         Task<ProcessType?> GetProcessTypeByIdAsync(string id);
-        Task<ProcessType> CreateProcessTypeAsync(ProcessType ProcessType);
-        Task<bool> UpdateProcessTypeAsync(string id, ProcessType ProcessType);
+        Task<ProcessType> CreateProcessTypeAsync(ProcessType processType);
+        Task<bool> UpdateProcessTypeAsync(string id, ProcessType processType);
         Task<bool> DeleteProcessTypeAsync(string id);
     }
 }

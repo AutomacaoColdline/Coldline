@@ -28,28 +28,28 @@ namespace ColdlineAPI.Presentation.Controllers
         public async Task<IActionResult> GetDepartmentById(string id)
         {
             var department = await _departmentService.GetDepartmentByIdAsync(id);
-            return department != null ? Ok(department) : NotFound();
+            return department != null ? Ok(department) : NotFound(new { Message = "Departamento não encontrado." });
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateDepartment([FromBody] Department department)
         {
-            var createdDepartment = await _departmentService.CreateDepartmentAsync(department);
-            return CreatedAtAction(nameof(GetDepartmentById), new { id = createdDepartment.Id }, createdDepartment);
+            var created = await _departmentService.CreateDepartmentAsync(department);
+            return CreatedAtAction(nameof(GetDepartmentById), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateDepartment(string id, [FromBody] Department department)
         {
-            var updated = await _departmentService.UpdateDepartmentAsync(id, department);
-            return updated ? NoContent() : NotFound();
+            var (success, message) = await _departmentService.UpdateDepartmentAsync(id, department);
+            return success ? Ok(new { Message = message }) : BadRequest(new { Message = message });
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDepartment(string id)
         {
-            var deleted = await _departmentService.DeleteDepartmentAsync(id);
-            return deleted ? NoContent() : NotFound();
+            var (success, message) = await _departmentService.DeleteDepartmentAsync(id);
+            return success ? Ok(new { Message = message }) : BadRequest(new { Message = message });
         }
     }
 }

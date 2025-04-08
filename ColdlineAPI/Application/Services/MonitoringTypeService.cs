@@ -1,53 +1,60 @@
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Domain.Entities;
-using ColdlineAPI.Infrastructure.Settings;
-using Microsoft.Extensions.Options;
+using ColdlineAPI.Application.Repositories;
+using ColdlineAPI.Application.Factories;
 using MongoDB.Driver;
 using MongoDB.Bson;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace ColdlineAPI.Application.Services
 {
     public class MonitoringTypeService : IMonitoringTypeService
     {
-        private readonly IMongoCollection<MonitoringType> _monitoringTypes;
+        private readonly MongoRepository<MonitoringType> _monitoringTypes;
 
-        public MonitoringTypeService(IOptions<MongoDBSettings> mongoDBSettings)
+        public MonitoringTypeService(RepositoryFactory factory)
         {
-            var client = new MongoClient(mongoDBSettings.Value.ConnectionString);
-            var database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
-
-            _monitoringTypes = database.GetCollection<MonitoringType>("MonitoringTypes");
+            _monitoringTypes = factory.CreateRepository<MonitoringType>("MonitoringTypes");
         }
 
-        public async Task<List<MonitoringType>> GetAllMonitoringTypesAsync() =>
-            await _monitoringTypes.Find(MonitoringType => true).ToListAsync();
-
-        public async Task<MonitoringType?> GetMonitoringTypeByIdAsync(string id) =>
-            await _monitoringTypes.Find(MonitoringType => MonitoringType.Id == id).FirstOrDefaultAsync();
-
-        public async Task<MonitoringType> CreateMonitoringTypeAsync(MonitoringType MonitoringType)
+        public async Task<List<MonitoringType>> GetAllMonitoringTypesAsync()
         {
-            if (string.IsNullOrEmpty(MonitoringType.Id) || !ObjectId.TryParse(MonitoringType.Id, out _))
-            {
-                MonitoringType.Id = ObjectId.GenerateNewId().ToString();
-            }
+            var projection = Builders<MonitoringType>.Projection
+                .Include(m => m.Id)
+                .Include(m => m.Name);
 
-            await _monitoringTypes.InsertOneAsync(MonitoringType);
-            return MonitoringType;
+            return await _monitoringTypes
+                .GetCollection()
+                .Find(_ => true)
+                .Project<MonitoringType>(projection)
+                .ToListAsync();
         }
 
-        public async Task<bool> UpdateMonitoringTypeAsync(string id, MonitoringType MonitoringType)
+        public async Task<MonitoringType?> GetMonitoringTypeByIdAsync(string id)
         {
-            var result = await _monitoringTypes.ReplaceOneAsync(u => u.Id == id, MonitoringType);
+            return await _monitoringTypes.GetByIdAsync(m => m.Id == id);
+        }
+
+        public async Task<MonitoringType> CreateMonitoringTypeAsync(MonitoringType monitoringType)
+        {
+            monitoringType.Id ??= ObjectId.GenerateNewId().ToString();
+            return await _monitoringTypes.CreateAsync(monitoringType);
+        }
+
+        public async Task<bool> UpdateMonitoringTypeAsync(string id, MonitoringType monitoringType)
+        {
+            var update = Builders<MonitoringType>.Update
+                .Set(m => m.Name, monitoringType.Name);
+
+            var result = await _monitoringTypes
+                .GetCollection()
+                .UpdateOneAsync(m => m.Id == id, update);
+
             return result.IsAcknowledged && result.ModifiedCount > 0;
         }
 
         public async Task<bool> DeleteMonitoringTypeAsync(string id)
         {
-            var result = await _monitoringTypes.DeleteOneAsync(MonitoringType => MonitoringType.Id == id);
-            return result.IsAcknowledged && result.DeletedCount > 0;
+            return await _monitoringTypes.DeleteAsync(m => m.Id == id);
         }
     }
 }

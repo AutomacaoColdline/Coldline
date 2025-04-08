@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Application.Services;
+using ColdlineAPI.Application.Factories;
 
 namespace ColdlineAPI.Application.Configurations
 {
@@ -26,6 +27,7 @@ namespace ColdlineAPI.Application.Configurations
             services.AddScoped<IProcessTypeService, ProcessTypeService>();
             services.AddScoped<IMachineService, MachineService>();
             services.AddScoped<IMachineTypeService, MachineTypeService>();
+            services.AddScoped<RepositoryFactory>();
 
 
         }

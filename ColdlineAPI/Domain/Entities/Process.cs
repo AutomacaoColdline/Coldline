@@ -44,7 +44,7 @@ namespace ColdlineAPI.Domain.Entities
         [BsonElement("InOccurrence")]
         public bool? InOccurrence { get; set; }
         [BsonElement("finished")]
-        public bool? Finished { get; set; }
+        public bool Finished { get; set; }
         [BsonElement("preIndustrialization")]
         public bool? PreIndustrialization { get; set; }
         [BsonElement("ReWork")]

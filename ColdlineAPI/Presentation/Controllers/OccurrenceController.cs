@@ -1,5 +1,4 @@
 using ColdlineAPI.Application.Interfaces;
-using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Domain.Entities;
 using ColdlineAPI.Domain.Common;
 using ColdlineAPI.Application.DTOs;
@@ -15,35 +14,36 @@ namespace ColdlineAPI.Presentation.Controllers
     {
         private readonly IOccurrenceService _occurrenceService;
 
-        public OccurrenceController(IOccurrenceService OccurrenceService)
+        public OccurrenceController(IOccurrenceService occurrenceService)
         {
-            _occurrenceService = OccurrenceService;
+            _occurrenceService = occurrenceService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Occurrence>>> GetAllOccurrences()
         {
-            return Ok(await _occurrenceService.GetAllOccurrencesAsync());
+            var occurrences = await _occurrenceService.GetAllOccurrencesAsync();
+            return Ok(occurrences);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Occurrence>> GetOccurrenceById(string id)
         {
-            var Occurrence = await _occurrenceService.GetOccurrenceByIdAsync(id);
-            return Occurrence != null ? Ok(Occurrence) : NotFound();
+            var occurrence = await _occurrenceService.GetOccurrenceByIdAsync(id);
+            return occurrence != null ? Ok(occurrence) : NotFound();
         }
 
         [HttpPost]
-        public async Task<ActionResult<Occurrence>> CreateOccurrence([FromBody] Occurrence Occurrence)
+        public async Task<ActionResult<Occurrence>> CreateOccurrence([FromBody] Occurrence occurrence)
         {
-            var createdOccurrence = await _occurrenceService.CreateOccurrenceAsync(Occurrence);
+            var createdOccurrence = await _occurrenceService.CreateOccurrenceAsync(occurrence);
             return CreatedAtAction(nameof(GetOccurrenceById), new { id = createdOccurrence.Id }, createdOccurrence);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOccurrence(string id, [FromBody] Occurrence Occurrence)
+        public async Task<IActionResult> UpdateOccurrence(string id, [FromBody] Occurrence occurrence)
         {
-            var updated = await _occurrenceService.UpdateOccurrenceAsync(id, Occurrence);
+            var updated = await _occurrenceService.UpdateOccurrenceAsync(id, occurrence);
             return updated ? NoContent() : NotFound();
         }
 
@@ -67,19 +67,21 @@ namespace ColdlineAPI.Presentation.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
         [HttpPost("end-occurrence/{id}")]
         public async Task<IActionResult> EndOccurrence(string id)
         {
             try
             {
                 var result = await _occurrenceService.EndOccurrenceAsync(id);
-                return result ? Ok(new { message = "Ocorrência finalizada com sucesso." }) : BadRequest(new { message = "Falha ao finalizar a ocorrência." });
+                return result
+                    ? Ok(new { message = "Ocorrência finalizada com sucesso." })
+                    : BadRequest(new { message = "Falha ao finalizar a ocorrência." });
             }
             catch (ArgumentException ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
         }
-
     }
 }

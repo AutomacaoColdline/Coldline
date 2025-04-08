@@ -1,7 +1,7 @@
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Domain.Entities;
-using ColdlineAPI.Infrastructure.Settings;
-using Microsoft.Extensions.Options;
+using ColdlineAPI.Application.Repositories;
+using ColdlineAPI.Application.Factories;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Collections.Generic;
@@ -11,43 +11,47 @@ namespace ColdlineAPI.Application.Services
 {
     public class PauseTypeService : IPauseTypeService
     {
-        private readonly IMongoCollection<PauseType> _pauseTypes;
+        private readonly MongoRepository<PauseType> _pauseTypes;
 
-        public PauseTypeService(IOptions<MongoDBSettings> mongoDBSettings)
+        public PauseTypeService(RepositoryFactory factory)
         {
-            var client = new MongoClient(mongoDBSettings.Value.ConnectionString);
-            var database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
-
-            _pauseTypes = database.GetCollection<PauseType>("PauseTypes");
+            _pauseTypes = factory.CreateRepository<PauseType>("PauseTypes");
         }
 
-        public async Task<List<PauseType>> GetAllPauseTypesAsync() =>
-            await _pauseTypes.Find(PauseType => true).ToListAsync();
-
-        public async Task<PauseType?> GetPauseTypeByIdAsync(string id) =>
-            await _pauseTypes.Find(PauseType => PauseType.Id == id).FirstOrDefaultAsync();
-
-        public async Task<PauseType> CreatePauseTypeAsync(PauseType PauseType)
+        public async Task<List<PauseType>> GetAllPauseTypesAsync()
         {
-            if (string.IsNullOrEmpty(PauseType.Id) || !ObjectId.TryParse(PauseType.Id, out _))
+            return await _pauseTypes.GetAllAsync();
+        }
+
+        public async Task<PauseType?> GetPauseTypeByIdAsync(string id)
+        {
+            return await _pauseTypes.GetByIdAsync(p => p.Id == id);
+        }
+
+        public async Task<PauseType> CreatePauseTypeAsync(PauseType pauseType)
+        {
+            if (string.IsNullOrEmpty(pauseType.Id) || !ObjectId.TryParse(pauseType.Id, out _))
             {
-                PauseType.Id = ObjectId.GenerateNewId().ToString();
+                pauseType.Id = ObjectId.GenerateNewId().ToString();
             }
 
-            await _pauseTypes.InsertOneAsync(PauseType);
-            return PauseType;
+            await _pauseTypes.CreateAsync(pauseType);
+            return pauseType;
         }
 
-        public async Task<bool> UpdatePauseTypeAsync(string id, PauseType PauseType)
+        public async Task<bool> UpdatePauseTypeAsync(string id, PauseType pauseType)
         {
-            var result = await _pauseTypes.ReplaceOneAsync(u => u.Id == id, PauseType);
+            var filter = Builders<PauseType>.Filter.Eq(p => p.Id, id);
+            var update = Builders<PauseType>.Update
+                .Set(p => p.Name, pauseType.Name);
+
+            var result = await _pauseTypes.GetCollection().UpdateOneAsync(filter, update);
             return result.IsAcknowledged && result.ModifiedCount > 0;
         }
 
         public async Task<bool> DeletePauseTypeAsync(string id)
         {
-            var result = await _pauseTypes.DeleteOneAsync(PauseType => PauseType.Id == id);
-            return result.IsAcknowledged && result.DeletedCount > 0;
+            return await _pauseTypes.DeleteAsync(p => p.Id == id);
         }
     }
 }

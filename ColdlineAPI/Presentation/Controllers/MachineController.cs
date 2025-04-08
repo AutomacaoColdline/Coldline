@@ -1,6 +1,7 @@
 using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Domain.Entities;
+using ColdlineAPI.Domain.Enum;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -52,12 +53,47 @@ namespace ColdlineAPI.Presentation.Controllers
             return deleted ? NoContent() : NotFound();
         }
 
-
-        [HttpPost("search")]
-        public async Task<ActionResult<IEnumerable<Machine>>> SearchMachines([FromBody] MachineFilter filter)
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchMachines(
+            [FromQuery] string? customerName,
+            [FromQuery] string? identificationNumber,
+            [FromQuery] string? phase,
+            [FromQuery] string? voltage,
+            [FromQuery] string? processId,
+            [FromQuery] string? qualityId,
+            [FromQuery] string? monitoringId,
+            [FromQuery] string? machineTypeId,
+            [FromQuery] int? status,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10)
         {
-            var machines = await _machineService.SearchMachinesAsync(filter);
-            return Ok(machines);
+            var filter = new MachineFilter
+            {
+                CustomerName = customerName,
+                IdentificationNumber = identificationNumber,
+                Phase = phase,
+                Voltage = voltage,
+                ProcessId = processId,
+                QualityId = qualityId,
+                MonitoringId = monitoringId,
+                MachineTypeId = machineTypeId,
+                Status = status.HasValue ? (MachineStatus?)status.Value : null,
+                Page = page,
+                PageSize = pageSize
+            };
+
+            var items = await _machineService.SearchMachinesAsync(filter);
+
+            var response = new
+            {
+                pageNumber = page,
+                pageSize = pageSize,
+                totalCount = items.Count, // ou estimativa se implementar
+                totalPages = (int)System.Math.Ceiling((double)items.Count / pageSize),
+                items
+            };
+
+            return Ok(response);
         }
     }
 }

@@ -12,9 +12,9 @@ namespace ColdlineAPI.Presentation.Controllers
     {
         private readonly ITypeDefectService _typeDefectService;
 
-        public TypeDefectController(ITypeDefectService TypeDefectService)
+        public TypeDefectController(ITypeDefectService typeDefectService)
         {
-            _typeDefectService = TypeDefectService;
+            _typeDefectService = typeDefectService;
         }
 
         [HttpGet]
@@ -26,21 +26,21 @@ namespace ColdlineAPI.Presentation.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TypeDefect>> GetTypeDefectById(string id)
         {
-            var TypeDefect = await _typeDefectService.GetTypeDefectByIdAsync(id);
-            return TypeDefect != null ? Ok(TypeDefect) : NotFound();
+            var typeDefect = await _typeDefectService.GetTypeDefectByIdAsync(id);
+            return typeDefect != null ? Ok(typeDefect) : NotFound();
         }
 
         [HttpPost]
-        public async Task<ActionResult<TypeDefect>> CreateTypeDefect([FromBody] TypeDefect TypeDefect)
+        public async Task<ActionResult<TypeDefect>> CreateTypeDefect([FromBody] TypeDefect typeDefect)
         {
-            var createdTypeDefect = await _typeDefectService.CreateTypeDefectAsync(TypeDefect);
-            return CreatedAtAction(nameof(GetTypeDefectById), new { id = createdTypeDefect.Id }, createdTypeDefect);
+            var created = await _typeDefectService.CreateTypeDefectAsync(typeDefect);
+            return CreatedAtAction(nameof(GetTypeDefectById), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTypeDefect(string id, [FromBody] TypeDefect TypeDefect)
+        public async Task<IActionResult> UpdateTypeDefect(string id, [FromBody] TypeDefect typeDefect)
         {
-            var updated = await _typeDefectService.UpdateTypeDefectAsync(id, TypeDefect);
+            var updated = await _typeDefectService.UpdateTypeDefectAsync(id, typeDefect);
             return updated ? NoContent() : NotFound();
         }
 

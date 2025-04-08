@@ -10,45 +10,46 @@ namespace ColdlineAPI.Presentation.Controllers
     [Route("api/[controller]")]
     public class MachineTypeController : ControllerBase
     {
-        private readonly IMachineTypeService _defectService;
+        private readonly IMachineTypeService _machineTypeService;
 
-        public MachineTypeController(IMachineTypeService MachineTypeService)
+        public MachineTypeController(IMachineTypeService machineTypeService)
         {
-            _defectService = MachineTypeService;
+            _machineTypeService = machineTypeService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MachineType>>> GetAllMachineTypes()
+        public async Task<IActionResult> GetAllMachineTypes()
         {
-            return Ok(await _defectService.GetAllMachineTypesAsync());
+            var result = await _machineTypeService.GetAllMachineTypesAsync();
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<MachineType>> GetMachineTypeById(string id)
+        public async Task<IActionResult> GetMachineTypeById(string id)
         {
-            var MachineType = await _defectService.GetMachineTypeByIdAsync(id);
-            return MachineType != null ? Ok(MachineType) : NotFound();
+            var result = await _machineTypeService.GetMachineTypeByIdAsync(id);
+            return result != null ? Ok(result) : NotFound();
         }
 
         [HttpPost]
-        public async Task<ActionResult<MachineType>> CreateMachineType([FromBody] MachineType MachineType)
+        public async Task<IActionResult> CreateMachineType([FromBody] MachineType machineType)
         {
-            var createdMachineType = await _defectService.CreateMachineTypeAsync(MachineType);
-            return CreatedAtAction(nameof(GetMachineTypeById), new { id = createdMachineType.Id }, createdMachineType);
+            var created = await _machineTypeService.CreateMachineTypeAsync(machineType);
+            return CreatedAtAction(nameof(GetMachineTypeById), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateMachineType(string id, [FromBody] MachineType MachineType)
+        public async Task<IActionResult> UpdateMachineType(string id, [FromBody] MachineType machineType)
         {
-            var updated = await _defectService.UpdateMachineTypeAsync(id, MachineType);
-            return updated ? NoContent() : NotFound();
+            var success = await _machineTypeService.UpdateMachineTypeAsync(id, machineType);
+            return success ? NoContent() : NotFound();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMachineType(string id)
         {
-            var deleted = await _defectService.DeleteMachineTypeAsync(id);
-            return deleted ? NoContent() : NotFound();
+            var success = await _machineTypeService.DeleteMachineTypeAsync(id);
+            return success ? NoContent() : NotFound();
         }
     }
 }

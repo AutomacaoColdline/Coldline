@@ -78,18 +78,6 @@
               "target": "Package",
               "version": "[2024.12.3, )"
             },
-            "SkiaSharp": {
-              "target": "Package",
-              "version": "[2.88.3, )"
-            },
-            "SkiaSharp.NativeAssets.Linux": {
-              "target": "Package",
-              "version": "[2.88.3, )"
-            },
-            "SkiaSharp.Views": {
-              "target": "Package",
-              "version": "[2.88.3, )"
-            },
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
               "version": "[8.0.0, )"

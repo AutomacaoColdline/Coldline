@@ -18,23 +18,24 @@ namespace ColdlineAPI.Presentation.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserType>>> GetAllUserTypes()
+        public async Task<IActionResult> GetAllUserTypes()
         {
-            return Ok(await _userTypeService.GetAllUserTypesAsync());
+            var items = await _userTypeService.GetAllUserTypesAsync();
+            return Ok(items);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserType>> GetUserTypeById(string id)
+        public async Task<IActionResult> GetUserTypeById(string id)
         {
             var userType = await _userTypeService.GetUserTypeByIdAsync(id);
             return userType != null ? Ok(userType) : NotFound();
         }
 
         [HttpPost]
-        public async Task<ActionResult<UserType>> CreateUserType([FromBody] UserType userType)
+        public async Task<IActionResult> CreateUserType([FromBody] UserType userType)
         {
-            var createdUserType = await _userTypeService.CreateUserTypeAsync(userType);
-            return CreatedAtAction(nameof(GetUserTypeById), new { id = createdUserType.Id }, createdUserType);
+            var created = await _userTypeService.CreateUserTypeAsync(userType);
+            return CreatedAtAction(nameof(GetUserTypeById), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
@@ -47,8 +48,15 @@ namespace ColdlineAPI.Presentation.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUserType(string id)
         {
-            var deleted = await _userTypeService.DeleteUserTypeAsync(id);
-            return deleted ? NoContent() : NotFound();
+            try
+            {
+                var deleted = await _userTypeService.DeleteUserTypeAsync(id);
+                return deleted ? NoContent() : NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
         }
     }
 }

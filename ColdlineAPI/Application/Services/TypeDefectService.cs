@@ -1,9 +1,10 @@
 using ColdlineAPI.Application.Interfaces;
+using ColdlineAPI.Application.Repositories;
+using ColdlineAPI.Application.Factories;
 using ColdlineAPI.Domain.Entities;
-using ColdlineAPI.Infrastructure.Settings;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,52 +12,56 @@ namespace ColdlineAPI.Application.Services
 {
     public class TypeDefectService : ITypeDefectService
     {
-        private readonly IMongoCollection<TypeDefect> _typeDefects;
-        private readonly IMongoCollection<Defect> _defects; // Referência à coleção de usuários
+        private readonly MongoRepository<TypeDefect> _typeDefects;
+        private readonly MongoRepository<Defect> _defects;
 
-        public TypeDefectService(IOptions<MongoDBSettings> mongoDBSettings)
+        public TypeDefectService(RepositoryFactory factory)
         {
-            var client = new MongoClient(mongoDBSettings.Value.ConnectionString);
-            var database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
-
-            _typeDefects = database.GetCollection<TypeDefect>("TypeDefects");
-            _defects = database.GetCollection<Defect>("Defects");
+            _typeDefects = factory.CreateRepository<TypeDefect>("TypeDefects");
+            _defects = factory.CreateRepository<Defect>("Defects");
         }
 
-        public async Task<List<TypeDefect>> GetAllTypeDefectsAsync() =>
-            await _typeDefects.Find(TypeDefect => true).ToListAsync();
-
-        public async Task<TypeDefect?> GetTypeDefectByIdAsync(string id) =>
-            await _typeDefects.Find(TypeDefect => TypeDefect.Id == id).FirstOrDefaultAsync();
-
-        public async Task<TypeDefect> CreateTypeDefectAsync(TypeDefect TypeDefect)
+        public async Task<List<TypeDefect>> GetAllTypeDefectsAsync()
         {
-            if (string.IsNullOrEmpty(TypeDefect.Id) || !ObjectId.TryParse(TypeDefect.Id, out _))
-            {
-                TypeDefect.Id = ObjectId.GenerateNewId().ToString();
-            }
-
-            await _typeDefects.InsertOneAsync(TypeDefect);
-            return TypeDefect;
+            return await _typeDefects.GetCollection().Find(_ => true).ToListAsync();
         }
 
-        public async Task<bool> UpdateTypeDefectAsync(string id, TypeDefect TypeDefect)
+        public async Task<TypeDefect?> GetTypeDefectByIdAsync(string id)
         {
-            var result = await _typeDefects.ReplaceOneAsync(u => u.Id == id, TypeDefect);
+            return await _typeDefects.GetCollection().Find(x => x.Id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<TypeDefect> CreateTypeDefectAsync(TypeDefect typeDefect)
+        {
+            if (string.IsNullOrEmpty(typeDefect.Id))
+                typeDefect.Id = ObjectId.GenerateNewId().ToString();
+
+            await _typeDefects.CreateAsync(typeDefect);
+            return typeDefect;
+        }
+
+        public async Task<bool> UpdateTypeDefectAsync(string id, TypeDefect typeDefect)
+        {
+            var update = Builders<TypeDefect>.Update
+                .Set(x => x.Name, typeDefect.Name);
+
+            var result = await _typeDefects.GetCollection()
+                .UpdateOneAsync(x => x.Id == id, update);
+
             return result.IsAcknowledged && result.ModifiedCount > 0;
         }
 
         public async Task<bool> DeleteTypeDefectAsync(string id)
         {
-            // Verifica se existe algum usuário associado a este tipo de usuário
-            var isTypeDefectInUse = await _defects.Find(Defect => Defect.TypeDefect.Id == id).AnyAsync();
-            if (isTypeDefectInUse)
-            {
-                throw new InvalidOperationException("O tipo de Defeito não pode ser excluído pois está vinculado a um ou mais Defeito.");
-            }
+            var inUse = await _defects.GetCollection()
+                .Find(d => d.TypeDefect.Id == id)
+                .AnyAsync();
 
-            var result = await _typeDefects.DeleteOneAsync(TypeDefect => TypeDefect.Id == id);
-            return result.IsAcknowledged && result.DeletedCount > 0;
+            if (inUse)
+                throw new InvalidOperationException("O tipo de Defeito não pode ser excluído pois está vinculado a um ou mais Defeitos.");
+
+            var result = await _typeDefects.DeleteAsync(x => x.Id == id);
+            return result;
         }
     }
 }

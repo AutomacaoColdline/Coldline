@@ -1,33 +1,31 @@
 using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
+using ColdlineWeb.Util;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Enum;
 using ColdlineWeb.Models.Filter;
+using ColdlineWeb.Services;
 
 namespace ColdlineWeb.Pages
 {
     public class MachinesPage : ComponentBase
     {
         [Inject] protected HttpClient Http { get; set; } = default!;
+        [Inject] protected MachineService machineService { get; set; } = default!;
 
-        // Lista principal
         protected List<MachineModel> machines = new();
         protected MachineModel currentMachine = new();
 
-        // Relacionamentos
         protected List<ReferenceEntity> machineTypes = new();
         protected List<ProcessModel> processes = new();
 
-        // Estado da UI
         protected bool isLoading = true;
         protected bool showModal = false;
         protected bool isEditing = false;
         protected string? errorMessage;
 
-        // Filtros
         protected MachineFilterModel filter = new();
 
-        // Paginação
         protected int pageNumber = 1;
         protected int totalPages = 1;
         protected const int defaultPageSize = 10;
@@ -35,7 +33,6 @@ namespace ColdlineWeb.Pages
         protected bool CanGoNext => pageNumber < totalPages;
         protected bool CanGoPrevious => pageNumber > 1;
 
-        // Modal de MachineType
         protected bool showMachineTypeModal = false;
         protected bool isEditingMachineType = false;
         protected MachineTypeModel newMachineType = new();
@@ -50,12 +47,8 @@ namespace ColdlineWeb.Pages
             try
             {
                 isLoading = true;
-
-                // Buscar tipos e processos
                 processes = await Http.GetFromJsonAsync<List<ProcessModel>>("api/Process") ?? new();
                 machineTypes = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/MachineType") ?? new();
-
-                // Aplicar filtros com paginação
                 await ApplyFilters();
             }
             catch (Exception ex)
@@ -76,24 +69,13 @@ namespace ColdlineWeb.Pages
                 filter.Page = pageNumber;
                 filter.PageSize = defaultPageSize;
 
-                var response = await Http.PostAsJsonAsync("api/Machine/search", filter);
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadFromJsonAsync<List<MachineModel>>() ?? new();
-                    machines = result;
-
-                    // Atualiza total de páginas com base em suposição de total fixo (simples)
-                    // Ideal: trazer TotalCount na resposta da API
-                    totalPages = result.Count < defaultPageSize && pageNumber > 1 ? pageNumber : pageNumber + (result.Count == defaultPageSize ? 1 : 0);
-                }
-                else
-                {
-                    errorMessage = "Erro ao aplicar os filtros.";
-                }
+                var result = await machineService.SearchMachinesAsync(filter);
+                machines = result;
+                totalPages = result.Count == defaultPageSize ? pageNumber + 1 : pageNumber;
             }
             catch (Exception ex)
             {
-                errorMessage = "Erro inesperado ao aplicar filtros.";
+                errorMessage = "Erro ao aplicar filtros.";
                 Console.WriteLine($"[ERRO] {ex.Message}");
             }
         }
@@ -105,10 +87,7 @@ namespace ColdlineWeb.Pages
             await ApplyFilters();
         }
 
-        protected void CloseModal()
-        {
-            showModal = false;
-        }
+        protected void CloseModal() => showModal = false;
 
         protected void OpenAddMachineModal()
         {
@@ -181,7 +160,6 @@ namespace ColdlineWeb.Pages
             }
         }
 
-        // Paginação
         protected async Task GoToNextPage()
         {
             if (CanGoNext)
@@ -200,8 +178,6 @@ namespace ColdlineWeb.Pages
             }
         }
 
-        // ========== MODAL DE MACHINE TYPE ==========
-
         protected void OpenMachineTypeModal()
         {
             newMachineType = new MachineTypeModel();
@@ -209,10 +185,7 @@ namespace ColdlineWeb.Pages
             isEditingMachineType = false;
         }
 
-        protected void CloseMachineTypeModal()
-        {
-            showMachineTypeModal = false;
-        }
+        protected void CloseMachineTypeModal() => showMachineTypeModal = false;
 
         protected async Task SaveMachineType()
         {

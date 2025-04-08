@@ -12,35 +12,36 @@ namespace ColdlineAPI.Presentation.Controllers
     {
         private readonly IProcessTypeService _processTypeService;
 
-        public ProcessTypeController(IProcessTypeService ProcessTypeService)
+        public ProcessTypeController(IProcessTypeService processTypeService)
         {
-            _processTypeService = ProcessTypeService;
+            _processTypeService = processTypeService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProcessType>>> GetAllProcessTypes()
         {
-            return Ok(await _processTypeService.GetAllProcessTypesAsync());
+            var items = await _processTypeService.GetAllProcessTypesAsync();
+            return Ok(items);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ProcessType>> GetProcessTypeById(string id)
         {
-            var ProcessType = await _processTypeService.GetProcessTypeByIdAsync(id);
-            return ProcessType != null ? Ok(ProcessType) : NotFound();
+            var item = await _processTypeService.GetProcessTypeByIdAsync(id);
+            return item != null ? Ok(item) : NotFound();
         }
 
         [HttpPost]
-        public async Task<ActionResult<ProcessType>> CreateProcessType([FromBody] ProcessType ProcessType)
+        public async Task<ActionResult<ProcessType>> CreateProcessType([FromBody] ProcessType processType)
         {
-            var createdProcessType = await _processTypeService.CreateProcessTypeAsync(ProcessType);
-            return CreatedAtAction(nameof(GetProcessTypeById), new { id = createdProcessType.Id }, createdProcessType);
+            var created = await _processTypeService.CreateProcessTypeAsync(processType);
+            return CreatedAtAction(nameof(GetProcessTypeById), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProcessType(string id, [FromBody] ProcessType ProcessType)
+        public async Task<IActionResult> UpdateProcessType(string id, [FromBody] ProcessType processType)
         {
-            var updated = await _processTypeService.UpdateProcessTypeAsync(id, ProcessType);
+            var updated = await _processTypeService.UpdateProcessTypeAsync(id, processType);
             return updated ? NoContent() : NotFound();
         }
 

@@ -1,6 +1,6 @@
+using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Domain.Entities;
-using ColdlineAPI.Application.Filters;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,35 +13,36 @@ namespace ColdlineAPI.Presentation.Controllers
     {
         private readonly IQualityService _qualityService;
 
-        public QualityController(IQualityService QualityService)
+        public QualityController(IQualityService qualityService)
         {
-            _qualityService = QualityService;
+            _qualityService = qualityService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Quality>>> GetAllQualitys()
         {
-            return Ok(await _qualityService.GetAllQualitysAsync());
+            var result = await _qualityService.GetAllQualitysAsync();
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Quality>> GetQualityById(string id)
         {
-            var Quality = await _qualityService.GetQualityByIdAsync(id);
-            return Quality != null ? Ok(Quality) : NotFound();
+            var quality = await _qualityService.GetQualityByIdAsync(id);
+            return quality != null ? Ok(quality) : NotFound();
         }
 
         [HttpPost]
-        public async Task<ActionResult<Quality>> CreateQuality([FromBody] Quality Quality)
+        public async Task<ActionResult<Quality>> CreateQuality([FromBody] Quality quality)
         {
-            var createdQuality = await _qualityService.CreateQualityAsync(Quality);
-            return CreatedAtAction(nameof(GetQualityById), new { id = createdQuality.Id }, createdQuality);
+            var created = await _qualityService.CreateQualityAsync(quality);
+            return CreatedAtAction(nameof(GetQualityById), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateQuality(string id, [FromBody] Quality Quality)
+        public async Task<IActionResult> UpdateQuality(string id, [FromBody] Quality quality)
         {
-            var updated = await _qualityService.UpdateQualityAsync(id, Quality);
+            var updated = await _qualityService.UpdateQualityAsync(id, quality);
             return updated ? NoContent() : NotFound();
         }
 
@@ -51,11 +52,13 @@ namespace ColdlineAPI.Presentation.Controllers
             var deleted = await _qualityService.DeleteQualityAsync(id);
             return deleted ? NoContent() : NotFound();
         }
+
         [HttpPost("search")]
-        public async Task<ActionResult<IEnumerable<Quality>>> SearchQuality([FromBody] QualityFilter filter)
+        public async Task<IActionResult> SearchQuality([FromBody] QualityFilter filter)
         {
-            var results = await _qualityService.SearchQualityAsync(filter);
-            return Ok(results);
+            var (items, totalCount) = await _qualityService.SearchQualityAsync(filter);
+            return Ok(new { Items = items, TotalCount = totalCount });
         }
+
     }
 }

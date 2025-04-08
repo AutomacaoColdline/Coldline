@@ -8,8 +8,8 @@ namespace ColdlineAPI.Application.Interfaces
     {
         Task<List<Defect>> GetAllDefectsAsync();
         Task<Defect?> GetDefectByIdAsync(string id);
-        Task<Defect> CreateDefectAsync(Defect Defect);
-        Task<bool> UpdateDefectAsync(string id, Defect Defect);
+        Task<Defect> CreateDefectAsync(Defect defect);
+        Task<bool> UpdateDefectAsync(string id, Defect defect);
         Task<bool> DeleteDefectAsync(string id);
     }
 }

@@ -1,9 +1,9 @@
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Domain.Entities;
-using ColdlineAPI.Infrastructure.Settings;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
+using ColdlineAPI.Application.Factories;
+using ColdlineAPI.Application.Repositories;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,52 +11,67 @@ namespace ColdlineAPI.Application.Services
 {
     public class PartService : IPartService
     {
-        private readonly IMongoCollection<Part> _parts;
-        private readonly IMongoCollection<Defect> _defects; // Referência à coleção de usuários
+        private readonly MongoRepository<Part> _parts;
+        private readonly MongoRepository<Defect> _defects;
 
-        public PartService(IOptions<MongoDBSettings> mongoDBSettings)
+        public PartService(RepositoryFactory factory)
         {
-            var client = new MongoClient(mongoDBSettings.Value.ConnectionString);
-            var database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
-
-            _parts = database.GetCollection<Part>("Parts");
-            _defects = database.GetCollection<Defect>("Defects");
+            _parts = factory.CreateRepository<Part>("Parts");
+            _defects = factory.CreateRepository<Defect>("Defects");
         }
 
-        public async Task<List<Part>> GetAllPartsAsync() =>
-            await _parts.Find(Part => true).ToListAsync();
-
-        public async Task<Part?> GetPartByIdAsync(string id) =>
-            await _parts.Find(Part => Part.Id == id).FirstOrDefaultAsync();
-
-        public async Task<Part> CreatePartAsync(Part Part)
+        public async Task<(List<Part> Items, long TotalCount)> GetAllPartsAsync(int page, int pageSize)
         {
-            if (string.IsNullOrEmpty(Part.Id) || !ObjectId.TryParse(Part.Id, out _))
-            {
-                Part.Id = ObjectId.GenerateNewId().ToString();
-            }
+            var skip = (page - 1) * pageSize;
 
-            await _parts.InsertOneAsync(Part);
-            return Part;
+            var projection = Builders<Part>.Projection
+                .Include(p => p.Id)
+                .Include(p => p.Name);
+
+            var items = await _parts.GetCollection()
+                .Find(_ => true)
+                .Project<Part>(projection)
+                .Skip(skip)
+                .Limit(pageSize)
+                .ToListAsync();
+
+            long totalCount = items.Count < pageSize
+                ? skip + items.Count
+                : await _parts.GetCollection().CountDocumentsAsync(_ => true);
+
+            return (items, totalCount);
         }
 
-        public async Task<bool> UpdatePartAsync(string id, Part Part)
+        public async Task<Part?> GetPartByIdAsync(string id)
         {
-            var result = await _parts.ReplaceOneAsync(u => u.Id == id, Part);
+            return await _parts.GetByIdAsync(p => p.Id == id);
+        }
+
+        public async Task<Part> CreatePartAsync(Part part)
+        {
+            part.Id ??= ObjectId.GenerateNewId().ToString();
+            return await _parts.CreateAsync(part);
+        }
+
+        public async Task<bool> UpdatePartAsync(string id, Part part)
+        {
+            var existing = await _parts.GetByIdAsync(p => p.Id == id);
+            if (existing == null) return false;
+
+            var update = Builders<Part>.Update
+                .Set(p => p.Name, part.Name ?? existing.Name);
+
+            var result = await _parts.GetCollection().UpdateOneAsync(p => p.Id == id, update);
             return result.IsAcknowledged && result.ModifiedCount > 0;
         }
 
         public async Task<bool> DeletePartAsync(string id)
         {
-            // Verifica se existe algum usuário associado a este tipo de usuário
-            var isPartInUse = await _defects.Find(Defect => Defect.Part.Id == id).AnyAsync();
-            if (isPartInUse)
-            {
-                throw new InvalidOperationException("O Peça não pode ser excluído pois está vinculado a um ou mais Defeito.");
-            }
+            var isInUse = await _defects.GetCollection().Find(d => d.Part.Id == id).AnyAsync();
+            if (isInUse)
+                throw new InvalidOperationException("A peça está vinculada a um ou mais defeitos.");
 
-            var result = await _parts.DeleteOneAsync(Part => Part.Id == id);
-            return result.IsAcknowledged && result.DeletedCount > 0;
+            return await _parts.DeleteAsync(p => p.Id == id);
         }
     }
 }

@@ -12,43 +12,51 @@ namespace ColdlineAPI.Presentation.Controllers
     {
         private readonly IDefectService _defectService;
 
-        public DefectController(IDefectService DefectService)
+        public DefectController(IDefectService defectService)
         {
-            _defectService = DefectService;
+            _defectService = defectService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Defect>>> GetAllDefects()
         {
-            return Ok(await _defectService.GetAllDefectsAsync());
+            var defects = await _defectService.GetAllDefectsAsync();
+            return Ok(defects);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Defect>> GetDefectById(string id)
         {
-            var Defect = await _defectService.GetDefectByIdAsync(id);
-            return Defect != null ? Ok(Defect) : NotFound();
+            var defect = await _defectService.GetDefectByIdAsync(id);
+            return defect != null ? Ok(defect) : NotFound();
         }
 
         [HttpPost]
-        public async Task<ActionResult<Defect>> CreateDefect([FromBody] Defect Defect)
+        public async Task<ActionResult<Defect>> CreateDefect([FromBody] Defect defect)
         {
-            var createdDefect = await _defectService.CreateDefectAsync(Defect);
-            return CreatedAtAction(nameof(GetDefectById), new { id = createdDefect.Id }, createdDefect);
+            var created = await _defectService.CreateDefectAsync(defect);
+            return CreatedAtAction(nameof(GetDefectById), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateDefect(string id, [FromBody] Defect Defect)
+        public async Task<IActionResult> UpdateDefect(string id, [FromBody] Defect defect)
         {
-            var updated = await _defectService.UpdateDefectAsync(id, Defect);
+            var updated = await _defectService.UpdateDefectAsync(id, defect);
             return updated ? NoContent() : NotFound();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDefect(string id)
         {
-            var deleted = await _defectService.DeleteDefectAsync(id);
-            return deleted ? NoContent() : NotFound();
+            try
+            {
+                var deleted = await _defectService.DeleteDefectAsync(id);
+                return deleted ? NoContent() : NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

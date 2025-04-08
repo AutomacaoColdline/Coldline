@@ -12,9 +12,9 @@ namespace ColdlineAPI.Presentation.Controllers
     {
         private readonly IMonitoringTypeService _monitoringTypeService;
 
-        public MonitoringTypeController(IMonitoringTypeService MonitoringTypeService)
+        public MonitoringTypeController(IMonitoringTypeService monitoringTypeService)
         {
-            _monitoringTypeService = MonitoringTypeService;
+            _monitoringTypeService = monitoringTypeService;
         }
 
         [HttpGet]
@@ -26,21 +26,21 @@ namespace ColdlineAPI.Presentation.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<MonitoringType>> GetMonitoringTypeById(string id)
         {
-            var MonitoringType = await _monitoringTypeService.GetMonitoringTypeByIdAsync(id);
-            return MonitoringType != null ? Ok(MonitoringType) : NotFound();
+            var result = await _monitoringTypeService.GetMonitoringTypeByIdAsync(id);
+            return result != null ? Ok(result) : NotFound();
         }
 
         [HttpPost]
-        public async Task<ActionResult<MonitoringType>> CreateMonitoringType([FromBody] MonitoringType MonitoringType)
+        public async Task<ActionResult<MonitoringType>> CreateMonitoringType([FromBody] MonitoringType monitoringType)
         {
-            var createdMonitoringType = await _monitoringTypeService.CreateMonitoringTypeAsync(MonitoringType);
-            return CreatedAtAction(nameof(GetMonitoringTypeById), new { id = createdMonitoringType.Id }, createdMonitoringType);
+            var created = await _monitoringTypeService.CreateMonitoringTypeAsync(monitoringType);
+            return CreatedAtAction(nameof(GetMonitoringTypeById), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateMonitoringType(string id, [FromBody] MonitoringType MonitoringType)
+        public async Task<IActionResult> UpdateMonitoringType(string id, [FromBody] MonitoringType monitoringType)
         {
-            var updated = await _monitoringTypeService.UpdateMonitoringTypeAsync(id, MonitoringType);
+            var updated = await _monitoringTypeService.UpdateMonitoringTypeAsync(id, monitoringType);
             return updated ? NoContent() : NotFound();
         }
 

@@ -9,7 +9,7 @@ namespace ColdlineAPI.Application.Interfaces
         Task<List<Department>> GetAllDepartmentsAsync();
         Task<Department?> GetDepartmentByIdAsync(string id);
         Task<Department> CreateDepartmentAsync(Department department);
-        Task<bool> UpdateDepartmentAsync(string id, Department department);
-        Task<bool> DeleteDepartmentAsync(string id);
+        Task<(bool Success, string Message)> UpdateDepartmentAsync(string id, Department department);
+        Task<(bool Success, string Message)> DeleteDepartmentAsync(string id);
     }
 }

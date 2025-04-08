@@ -1,7 +1,6 @@
+using ColdlineAPI.Application.Factories;
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Domain.Entities;
-using ColdlineAPI.Infrastructure.Settings;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Collections.Generic;
@@ -12,29 +11,37 @@ namespace ColdlineAPI.Application.Services
     public class UserTypeService : IUserTypeService
     {
         private readonly IMongoCollection<UserType> _userTypes;
-        private readonly IMongoCollection<User> _users; // Referência à coleção de usuários
+        private readonly IMongoCollection<User> _users;
 
-        public UserTypeService(IOptions<MongoDBSettings> mongoDBSettings)
+        public UserTypeService(RepositoryFactory factory)
         {
-            var client = new MongoClient(mongoDBSettings.Value.ConnectionString);
-            var database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
-
-            _userTypes = database.GetCollection<UserType>("UserTypes");
-            _users = database.GetCollection<User>("Users");
+            _userTypes = factory.CreateRepository<UserType>("UserTypes").GetCollection();
+            _users = factory.CreateRepository<User>("Users").GetCollection();
         }
 
-        public async Task<List<UserType>> GetAllUserTypesAsync() =>
-            await _userTypes.Find(userType => true).ToListAsync();
+        public async Task<List<UserType>> GetAllUserTypesAsync()
+        {
+            var projection = Builders<UserType>.Projection
+                .Include(x => x.Id)
+                .Include(x => x.Name);
 
-        public async Task<UserType?> GetUserTypeByIdAsync(string id) =>
-            await _userTypes.Find(userType => userType.Id == id).FirstOrDefaultAsync();
+            var result = await _userTypes.Find(Builders<UserType>.Filter.Empty)
+                .Project<UserType>(projection)
+                .SortBy(x => x.Name)
+                .ToListAsync();
+
+            return result;
+        }
+
+        public async Task<UserType?> GetUserTypeByIdAsync(string id)
+        {
+            return await _userTypes.Find(x => x.Id == id).FirstOrDefaultAsync();
+        }
 
         public async Task<UserType> CreateUserTypeAsync(UserType userType)
         {
-            if (string.IsNullOrEmpty(userType.Id) || !ObjectId.TryParse(userType.Id, out _))
-            {
+            if (string.IsNullOrWhiteSpace(userType.Id) || !ObjectId.TryParse(userType.Id, out _))
                 userType.Id = ObjectId.GenerateNewId().ToString();
-            }
 
             await _userTypes.InsertOneAsync(userType);
             return userType;
@@ -48,14 +55,11 @@ namespace ColdlineAPI.Application.Services
 
         public async Task<bool> DeleteUserTypeAsync(string id)
         {
-            // Verifica se existe algum usuário associado a este tipo de usuário
-            var isUserTypeInUse = await _users.Find(user => user.UserType.Id == id).AnyAsync();
-            if (isUserTypeInUse)
-            {
-                throw new InvalidOperationException("O tipo de usuário não pode ser excluído pois está vinculado a um ou mais usuários.");
-            }
+            var hasDependency = await _users.Find(u => u.UserType.Id == id).AnyAsync();
+            if (hasDependency)
+                throw new InvalidOperationException("Tipo de usuário vinculado a um ou mais usuários.");
 
-            var result = await _userTypes.DeleteOneAsync(userType => userType.Id == id);
+            var result = await _userTypes.DeleteOneAsync(x => x.Id == id);
             return result.IsAcknowledged && result.DeletedCount > 0;
         }
     }

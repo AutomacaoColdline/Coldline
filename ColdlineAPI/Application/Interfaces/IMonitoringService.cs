@@ -8,8 +8,8 @@ namespace ColdlineAPI.Application.Interfaces
     {
         Task<List<Monitoring>> GetAllMonitoringsAsync();
         Task<Monitoring?> GetMonitoringByIdAsync(string id);
-        Task<Monitoring> CreateMonitoringAsync(Monitoring Monitoring);
-        Task<bool> UpdateMonitoringAsync(string id, Monitoring Monitoring);
+        Task<Monitoring> CreateMonitoringAsync(Monitoring monitoring);
+        Task<bool> UpdateMonitoringAsync(string id, Monitoring monitoring);
         Task<bool> DeleteMonitoringAsync(string id);
     }
 }

@@ -12,35 +12,46 @@ namespace ColdlineAPI.Presentation.Controllers
     {
         private readonly IPartService _partService;
 
-        public PartController(IPartService PartService)
+        public PartController(IPartService partService)
         {
-            _partService = PartService;
+            _partService = partService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Part>>> GetAllParts()
+        public async Task<IActionResult> GetAllParts([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
         {
-            return Ok(await _partService.GetAllPartsAsync());
+            var (items, totalCount) = await _partService.GetAllPartsAsync(page, pageSize);
+
+            var response = new
+            {
+                pageNumber = page,
+                pageSize,
+                totalCount,
+                totalPages = (int)System.Math.Ceiling((double)totalCount / pageSize),
+                items
+            };
+
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Part>> GetPartById(string id)
+        public async Task<IActionResult> GetPartById(string id)
         {
-            var Part = await _partService.GetPartByIdAsync(id);
-            return Part != null ? Ok(Part) : NotFound();
+            var part = await _partService.GetPartByIdAsync(id);
+            return part != null ? Ok(part) : NotFound();
         }
 
         [HttpPost]
-        public async Task<ActionResult<Part>> CreatePart([FromBody] Part Part)
+        public async Task<IActionResult> CreatePart([FromBody] Part part)
         {
-            var createdPart = await _partService.CreatePartAsync(Part);
-            return CreatedAtAction(nameof(GetPartById), new { id = createdPart.Id }, createdPart);
+            var created = await _partService.CreatePartAsync(part);
+            return CreatedAtAction(nameof(GetPartById), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePart(string id, [FromBody] Part Part)
+        public async Task<IActionResult> UpdatePart(string id, [FromBody] Part part)
         {
-            var updated = await _partService.UpdatePartAsync(id, Part);
+            var updated = await _partService.UpdatePartAsync(id, part);
             return updated ? NoContent() : NotFound();
         }
 

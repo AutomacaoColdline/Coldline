@@ -2,8 +2,11 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using ColdlineWeb.Util;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Filter;
+using System.Text.Json;
+
 
 namespace ColdlineWeb.Services
 {
@@ -64,8 +67,24 @@ namespace ColdlineWeb.Services
         /// </summary>
         public async Task<List<MachineModel>> SearchMachinesAsync(MachineFilterModel filter)
         {
-            var response = await _http.PostAsJsonAsync("api/Machine/search", filter);
-            return response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<List<MachineModel>>() ?? new List<MachineModel>() : new List<MachineModel>();
+            var query = filter.ToQueryString();
+            var response = await _http.GetAsync($"api/Machine/search?{query}");
+
+            if (!response.IsSuccessStatusCode)
+                return new List<MachineModel>();
+
+            var json = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(json);
+
+            var itemsElement = doc.RootElement.GetProperty("items");
+
+            var items = JsonSerializer.Deserialize<List<MachineModel>>(itemsElement.GetRawText(), new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            return items ?? new List<MachineModel>();
         }
+
     }
 }

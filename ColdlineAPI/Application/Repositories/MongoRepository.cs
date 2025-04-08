@@ -9,11 +9,9 @@ namespace ColdlineAPI.Application.Repositories
     {
         private readonly IMongoCollection<T> _collection;
 
-        public MongoRepository(IOptions<MongoDBSettings> mongoDBSettings, string collectionName)
+        public MongoRepository(IMongoClient client, IOptions<MongoDBSettings> mongoDBSettings, string collectionName)
         {
-            var client = new MongoClient(mongoDBSettings.Value.ConnectionString);
             var database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
-
             _collection = database.GetCollection<T>(collectionName);
         }
 
@@ -39,6 +37,11 @@ namespace ColdlineAPI.Application.Repositories
         {
             var result = await _collection.DeleteOneAsync(filter);
             return result.IsAcknowledged && result.DeletedCount > 0;
+        }
+        
+        public IMongoCollection<T> GetCollection()
+        {
+            return _collection;
         }
     }
 }

@@ -1,7 +1,7 @@
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Domain.Entities;
-using ColdlineAPI.Infrastructure.Settings;
-using Microsoft.Extensions.Options;
+using ColdlineAPI.Application.Factories;
+using ColdlineAPI.Application.Repositories;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Collections.Generic;
@@ -11,43 +11,36 @@ namespace ColdlineAPI.Application.Services
 {
     public class ProcessTypeService : IProcessTypeService
     {
-        private readonly IMongoCollection<ProcessType> _processTypes;
+        private readonly MongoRepository<ProcessType> _processTypes;
 
-        public ProcessTypeService(IOptions<MongoDBSettings> mongoDBSettings)
+        public ProcessTypeService(RepositoryFactory factory)
         {
-            var client = new MongoClient(mongoDBSettings.Value.ConnectionString);
-            var database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
-
-            _processTypes = database.GetCollection<ProcessType>("ProcessTypes");
+            _processTypes = factory.CreateRepository<ProcessType>("ProcessTypes");
         }
 
         public async Task<List<ProcessType>> GetAllProcessTypesAsync() =>
-            await _processTypes.Find(ProcessType => true).ToListAsync();
+            await _processTypes.GetAllAsync();
 
         public async Task<ProcessType?> GetProcessTypeByIdAsync(string id) =>
-            await _processTypes.Find(ProcessType => ProcessType.Id == id).FirstOrDefaultAsync();
+            await _processTypes.GetByIdAsync(p => p.Id == id);
 
-        public async Task<ProcessType> CreateProcessTypeAsync(ProcessType ProcessType)
+        public async Task<ProcessType> CreateProcessTypeAsync(ProcessType processType)
         {
-            if (string.IsNullOrEmpty(ProcessType.Id) || !ObjectId.TryParse(ProcessType.Id, out _))
-            {
-                ProcessType.Id = ObjectId.GenerateNewId().ToString();
-            }
+            if (string.IsNullOrEmpty(processType.Id) || !ObjectId.TryParse(processType.Id, out _))
+                processType.Id = ObjectId.GenerateNewId().ToString();
 
-            await _processTypes.InsertOneAsync(ProcessType);
-            return ProcessType;
+            await _processTypes.CreateAsync(processType);
+            return processType;
         }
 
-        public async Task<bool> UpdateProcessTypeAsync(string id, ProcessType ProcessType)
+        public async Task<bool> UpdateProcessTypeAsync(string id, ProcessType processType)
         {
-            var result = await _processTypes.ReplaceOneAsync(u => u.Id == id, ProcessType);
-            return result.IsAcknowledged && result.ModifiedCount > 0;
+            return await _processTypes.UpdateAsync(p => p.Id == id, processType);
         }
 
         public async Task<bool> DeleteProcessTypeAsync(string id)
         {
-            var result = await _processTypes.DeleteOneAsync(ProcessType => ProcessType.Id == id);
-            return result.IsAcknowledged && result.DeletedCount > 0;
+            return await _processTypes.DeleteAsync(p => p.Id == id);
         }
     }
 }

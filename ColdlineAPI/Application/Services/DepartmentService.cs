@@ -1,7 +1,7 @@
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Domain.Entities;
-using ColdlineAPI.Infrastructure.Settings;
-using Microsoft.Extensions.Options;
+using ColdlineAPI.Application.Repositories;
+using ColdlineAPI.Application.Factories;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Collections.Generic;
@@ -11,52 +11,64 @@ namespace ColdlineAPI.Application.Services
 {
     public class DepartmentService : IDepartmentService
     {
-        private readonly IMongoCollection<Department> _departments;
-        private readonly IMongoCollection<User> _users; // Referência à coleção de usuários
+        private readonly MongoRepository<Department> _departments;
+        private readonly MongoRepository<User> _users;
 
-        public DepartmentService(IOptions<MongoDBSettings> mongoDBSettings)
+        public DepartmentService(RepositoryFactory factory)
         {
-            var client = new MongoClient(mongoDBSettings.Value.ConnectionString);
-            var database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
-
-            _departments = database.GetCollection<Department>("Departments");
-            _users = database.GetCollection<User>("Users");
+            _departments = factory.CreateRepository<Department>("Departments");
+            _users = factory.CreateRepository<User>("Users");
         }
 
-        public async Task<List<Department>> GetAllDepartmentsAsync() =>
-            await _departments.Find(department => true).ToListAsync();
+        public async Task<List<Department>> GetAllDepartmentsAsync()
+        {
+            var projection = Builders<Department>.Projection
+                .Include(d => d.Id)
+                .Include(d => d.Name);
 
-        public async Task<Department?> GetDepartmentByIdAsync(string id) =>
-            await _departments.Find(department => department.Id == id).FirstOrDefaultAsync();
+            return await _departments.GetCollection()
+                .Find(Builders<Department>.Filter.Empty)
+                .Project<Department>(projection)
+                .ToListAsync();
+        }
+
+        public async Task<Department?> GetDepartmentByIdAsync(string id)
+        {
+            return await _departments.GetByIdAsync(d => d.Id == id);
+        }
 
         public async Task<Department> CreateDepartmentAsync(Department department)
         {
-            if (string.IsNullOrEmpty(department.Id) || !ObjectId.TryParse(department.Id, out _))
-            {
-                department.Id = ObjectId.GenerateNewId().ToString();
-            }
-
-            await _departments.InsertOneAsync(department);
-            return department;
+            department.Id ??= ObjectId.GenerateNewId().ToString();
+            return await _departments.CreateAsync(department);
         }
 
-        public async Task<bool> UpdateDepartmentAsync(string id, Department department)
+        public async Task<(bool Success, string Message)> UpdateDepartmentAsync(string id, Department department)
         {
-            var result = await _departments.ReplaceOneAsync(d => d.Id == id, department);
-            return result.IsAcknowledged && result.ModifiedCount > 0;
+            var existing = await _departments.GetByIdAsync(d => d.Id == id);
+            if (existing == null)
+                return (false, "Departamento não encontrado.");
+
+            var update = Builders<Department>.Update
+                .Set(d => d.Name, department.Name ?? existing.Name);
+
+            var result = await _departments.GetCollection().UpdateOneAsync(d => d.Id == id, update);
+
+            return result.IsAcknowledged && result.ModifiedCount > 0
+                ? (true, "Departamento atualizado com sucesso.")
+                : (false, "Nenhuma modificação realizada.");
         }
 
-        public async Task<bool> DeleteDepartmentAsync(string id)
+        public async Task<(bool Success, string Message)> DeleteDepartmentAsync(string id)
         {
-            // Verifica se existe algum usuário associado a este departamento
-            var isDepartmentInUse = await _users.Find(user => user.Department.Id == id).AnyAsync();
-            if (isDepartmentInUse)
-            {
-                throw new InvalidOperationException("O departamento não pode ser excluído pois está vinculado a um ou mais usuários.");
-            }
+            var inUse = await _users.GetCollection().Find(u => u.Department.Id == id).AnyAsync();
+            if (inUse)
+                return (false, "O departamento está vinculado a usuários e não pode ser excluído.");
 
-            var result = await _departments.DeleteOneAsync(department => department.Id == id);
-            return result.IsAcknowledged && result.DeletedCount > 0;
+            var result = await _departments.DeleteAsync(d => d.Id == id);
+            return result
+                ? (true, "Departamento excluído com sucesso.")
+                : (false, "Departamento não encontrado para exclusão.");
         }
     }
 }

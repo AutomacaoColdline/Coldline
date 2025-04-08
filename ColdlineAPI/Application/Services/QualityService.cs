@@ -1,71 +1,75 @@
 using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Application.Interfaces;
+using ColdlineAPI.Application.Factories;
+using ColdlineAPI.Application.Repositories;
 using ColdlineAPI.Domain.Entities;
-using ColdlineAPI.Domain.Common;
-using ColdlineAPI.Infrastructure.Settings;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
 using MongoDB.Bson;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using MongoDB.Driver;
 
 namespace ColdlineAPI.Application.Services
 {
     public class QualityService : IQualityService
     {
-        private readonly IMongoCollection<Quality> _qualities;
+        private readonly MongoRepository<Quality> _qualities;
 
-        public QualityService(IOptions<MongoDBSettings> mongoDBSettings)
+        public QualityService(RepositoryFactory factory)
         {
-            var client = new MongoClient(mongoDBSettings.Value.ConnectionString);
-            var database = client.GetDatabase(mongoDBSettings.Value.DatabaseName);
-            _qualities = database.GetCollection<Quality>("Qualitys");
+            _qualities = factory.CreateRepository<Quality>("Qualitys");
         }
 
-        public async Task<List<Quality>> GetAllQualitysAsync() =>
-            await _qualities.Find(q => true).ToListAsync();
+        public async Task<List<Quality>> GetAllQualitysAsync()
+        {
+            var projection = Builders<Quality>.Projection
+                .Include(q => q.Id)
+                .Include(q => q.TotalPartValue)
+                .Include(q => q.WorkHourCost)
+                .Include(q => q.Machine)
+                .Include(q => q.Departament);
 
-        public async Task<Quality?> GetQualityByIdAsync(string id) =>
-            await _qualities.Find(q => q.Id == id).FirstOrDefaultAsync();
+            return await _qualities.GetCollection()
+                .Find(_ => true)
+                .Project<Quality>(projection)
+                .ToListAsync();
+        }
+
+        public async Task<Quality?> GetQualityByIdAsync(string id)
+        {
+            return await _qualities.GetByIdAsync(q => q.Id == id);
+        }
 
         public async Task<Quality> CreateQualityAsync(Quality quality)
         {
-            if (string.IsNullOrEmpty(quality.Id))
-            {
-                quality.Id = ObjectId.GenerateNewId().ToString();
-            }
-            await _qualities.InsertOneAsync(quality);
-            return quality;
+            quality.Id ??= ObjectId.GenerateNewId().ToString();
+            return await _qualities.CreateAsync(quality);
         }
 
         public async Task<bool> UpdateQualityAsync(string id, Quality quality)
         {
-            var objectId = ObjectId.Parse(id);
-            var existingQuality = await _qualities.Find(q => q.Id == objectId.ToString()).FirstOrDefaultAsync();
+            var existing = await _qualities.GetByIdAsync(q => q.Id == id);
+            if (existing == null) return false;
 
-            if (existingQuality == null) return false;
+            var update = Builders<Quality>.Update
+                .Set(q => q.TotalPartValue, quality.TotalPartValue ?? existing.TotalPartValue)
+                .Set(q => q.WorkHourCost, quality.WorkHourCost ?? existing.WorkHourCost)
+                .Set(q => q.Machine, quality.Machine ?? existing.Machine)
+                .Set(q => q.Departament, quality.Departament ?? existing.Departament)
+                .Set(q => q.Occurrences, quality.Occurrences ?? existing.Occurrences);
 
-            var updateDefinition = Builders<Quality>.Update
-                .Set(q => q.TotalPartValue, quality.TotalPartValue ?? existingQuality.TotalPartValue)
-                .Set(q => q.WorkHourCost, quality.WorkHourCost ?? existingQuality.WorkHourCost)
-                .Set(q => q.Machine, quality.Machine ?? existingQuality.Machine)
-                .Set(q => q.Departament, quality.Departament ?? existingQuality.Departament)
-                .Set(q => q.Occurrences, quality.Occurrences ?? existingQuality.Occurrences);
+            var result = await _qualities.GetCollection()
+                .UpdateOneAsync(q => q.Id == id, update);
 
-            var result = await _qualities.UpdateOneAsync(q => q.Id == id, updateDefinition);
             return result.IsAcknowledged && result.ModifiedCount > 0;
         }
+
         public async Task<bool> DeleteQualityAsync(string id)
         {
-            var result = await _qualities.DeleteOneAsync(q => q.Id == id);
-            return result.IsAcknowledged && result.DeletedCount > 0;
+            return await _qualities.DeleteAsync(q => q.Id == id);
         }
 
-        public async Task<List<Quality>> SearchQualityAsync(QualityFilter filter)
+        public async Task<(List<Quality> Items, int TotalCount)> SearchQualityAsync(QualityFilter filter)
         {
-            var filters = new List<FilterDefinition<Quality>>();
             var builder = Builders<Quality>.Filter;
+            var filters = new List<FilterDefinition<Quality>>();
 
             if (!string.IsNullOrEmpty(filter.TotalPartValue))
                 filters.Add(builder.Eq(q => q.TotalPartValue, filter.TotalPartValue));
@@ -74,24 +78,39 @@ namespace ColdlineAPI.Application.Services
                 filters.Add(builder.Eq(q => q.WorkHourCost, filter.WorkHourCost));
 
             if (!string.IsNullOrEmpty(filter.MachineId))
-                filters.Add(builder.Eq(q => q.Machine.Id, filter.MachineId));
+                filters.Add(builder.Eq("machine.id", filter.MachineId));
 
             if (!string.IsNullOrEmpty(filter.DepartamentId))
-                filters.Add(builder.Eq(q => q.Departament.Id, filter.DepartamentId));
+                filters.Add(builder.Eq("departament.id", filter.DepartamentId));
 
-            if (filter.OccurrencesIds != null && filter.OccurrencesIds.Count > 0)
-                filters.Add(builder.In("Occurrences.Id", filter.OccurrencesIds));
+            if (filter.OccurrencesIds?.Count > 0)
+                filters.Add(builder.In("occurrences.id", filter.OccurrencesIds));
 
             var finalFilter = filters.Count > 0 ? builder.And(filters) : builder.Empty;
 
-            // Paginação
-            int skip = (filter.Page - 1) * filter.PageSize;
+            int page = filter.Page <= 0 ? 1 : filter.Page;
+            int pageSize = filter.PageSize <= 0 ? 10 : filter.PageSize;
+            int skip = (page - 1) * pageSize;
 
-            return await _qualities
+            var collection = _qualities.GetCollection();
+            var totalCount = await collection.CountDocumentsAsync(finalFilter);
+
+            var projection = Builders<Quality>.Projection
+                .Include(q => q.Id)
+                .Include(q => q.TotalPartValue)
+                .Include(q => q.WorkHourCost)
+                .Include(q => q.Machine)
+                .Include(q => q.Departament);
+
+            var items = await collection
                 .Find(finalFilter)
+                .Project<Quality>(projection)
+                .SortBy(q => q.TotalPartValue)
                 .Skip(skip)
-                .Limit(filter.PageSize)
+                .Limit(pageSize)
                 .ToListAsync();
+
+            return (items, (int)totalCount);
         }
 
     }

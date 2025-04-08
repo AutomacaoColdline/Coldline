@@ -12,40 +12,41 @@ namespace ColdlineAPI.Presentation.Controllers
     {
         private readonly IMonitoringService _monitoringService;
 
-        public MonitoringController(IMonitoringService MonitoringService)
+        public MonitoringController(IMonitoringService monitoringService)
         {
-            _monitoringService = MonitoringService;
+            _monitoringService = monitoringService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Monitoring>>> GetAllMonitorings()
+        public async Task<ActionResult<IEnumerable<Monitoring>>> GetAll()
         {
-            return Ok(await _monitoringService.GetAllMonitoringsAsync());
+            var monitorings = await _monitoringService.GetAllMonitoringsAsync();
+            return Ok(monitorings);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Monitoring>> GetMonitoringById(string id)
+        public async Task<ActionResult<Monitoring>> GetById(string id)
         {
-            var Monitoring = await _monitoringService.GetMonitoringByIdAsync(id);
-            return Monitoring != null ? Ok(Monitoring) : NotFound();
+            var monitoring = await _monitoringService.GetMonitoringByIdAsync(id);
+            return monitoring != null ? Ok(monitoring) : NotFound();
         }
 
         [HttpPost]
-        public async Task<ActionResult<Monitoring>> CreateMonitoring([FromBody] Monitoring Monitoring)
+        public async Task<ActionResult<Monitoring>> Create([FromBody] Monitoring monitoring)
         {
-            var createdMonitoring = await _monitoringService.CreateMonitoringAsync(Monitoring);
-            return CreatedAtAction(nameof(GetMonitoringById), new { id = createdMonitoring.Id }, createdMonitoring);
+            var created = await _monitoringService.CreateMonitoringAsync(monitoring);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateMonitoring(string id, [FromBody] Monitoring Monitoring)
+        public async Task<IActionResult> Update(string id, [FromBody] Monitoring monitoring)
         {
-            var updated = await _monitoringService.UpdateMonitoringAsync(id, Monitoring);
+            var updated = await _monitoringService.UpdateMonitoringAsync(id, monitoring);
             return updated ? NoContent() : NotFound();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMonitoring(string id)
+        public async Task<IActionResult> Delete(string id)
         {
             var deleted = await _monitoringService.DeleteMonitoringAsync(id);
             return deleted ? NoContent() : NotFound();

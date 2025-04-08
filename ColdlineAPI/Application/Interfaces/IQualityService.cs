@@ -12,6 +12,6 @@ namespace ColdlineAPI.Application.Interfaces
         Task<Quality> CreateQualityAsync(Quality quality);
         Task<bool> UpdateQualityAsync(string id, Quality quality);
         Task<bool> DeleteQualityAsync(string id);
-        Task<List<Quality>> SearchQualityAsync(QualityFilter filter);
+        Task<(List<Quality> Items, int TotalCount)> SearchQualityAsync(QualityFilter filter);
     }
 }

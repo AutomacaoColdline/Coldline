@@ -18,21 +18,12 @@ namespace ColdlineAPI.Presentation.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllParts([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+        public async Task<IActionResult> GetAllParts()
         {
-            var (items, totalCount) = await _partService.GetAllPartsAsync(page, pageSize);
-
-            var response = new
-            {
-                pageNumber = page,
-                pageSize,
-                totalCount,
-                totalPages = (int)System.Math.Ceiling((double)totalCount / pageSize),
-                items
-            };
-
-            return Ok(response);
+            var items = await _partService.GetAllPartsAsync();
+            return Ok(items);
         }
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPartById(string id)

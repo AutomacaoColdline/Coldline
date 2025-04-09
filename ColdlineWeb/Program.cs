@@ -20,6 +20,8 @@ builder.Services.AddScoped<DefectService>();
 builder.Services.AddScoped<DepartmentService>();
 builder.Services.AddScoped<UserTypeService>();
 builder.Services.AddScoped<PauseTypeService>();
+builder.Services.AddScoped<PartService>();
+builder.Services.AddScoped<MachineTypeService>();
 builder.Services.AddScoped<ProcessTypeService>();
 builder.Services.AddScoped<QualityService>();
 builder.Services.AddScoped<TypeDefectService>();

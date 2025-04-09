@@ -43,7 +43,7 @@ else
                         <th>Processo Atual</th>
                         <th>Tempo de Processo</th>
                         <th>Tempo Médio</th>
-                        <th>Desvio Padrão</th>
+                        <th>Tempo limite</th>
                         <th>Ocorrência Atual</th>
                         <th>Indicador</th>
                     </tr>
@@ -54,12 +54,23 @@ else
                         <tr>
                             <td><img class="user-photo" src="@($"http://10.0.0.44:5000/uploads/{user.UrlPhoto}")" alt="Foto de @user.Name" /></td>
                             <td>@user.Name</td>
-                            <td>@(user.CurrentProcess?.Name ?? "Nenhum")</td>
+                            <td>
+                                @if (user.CurrentProcess != null)
+                                {
+                                    <a href="@($"/processViewer/{user.CurrentProcess.Id}")" class="text-link">
+                                        @user.CurrentProcess.Name
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span>Nenhum</span>
+                                }
+                            </td>
                             @if (ProcessStatsByUserId.TryGetValue(user.Id, out var stat))
                             {
                                 <td>@stat.ProcessTime</td>
                                 <td>@stat.Avg</td>
-                                <td>@stat.Std</td>
+                                <td>@stat.Upper</td>
                             }
                             else
                             {
@@ -67,7 +78,18 @@ else
                                 <td>Nenhum</td>
                                 <td>Nenhum</td>
                             }
-                            <td>@(user.CurrentOccurrence?.Name ?? "Nenhuma")</td>
+                            <td>
+                                @if (user.CurrentOccurrence != null && !string.IsNullOrEmpty(user.CurrentOccurrence.Id))
+                                {
+                                    <a href="@($"/occurrenceViewer/{user.CurrentOccurrence.Id}")" class="text-link">
+                                        @user.CurrentOccurrence.Name
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span>Nenhuma</span>
+                                }
+                            </td>
                             <td>@(RenderIndicator(user, stat))</td>
                         </tr>
                     }

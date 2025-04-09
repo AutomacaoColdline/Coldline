@@ -1,0 +1,52 @@
+@using ColdlineWeb.Models
+@using ColdlineWeb.Services
+@inject MachineTypeService MachineTypeService
+
+@if (Visible)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(IsEdit ? "Editar Tipo de Máquina" : "Adicionar Tipo de Máquina")</h5>
+                    <button class="close" @onclick="Close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <label>Nome:</label>
+                    <input class="form-control" @bind="MachineType.Name" />
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="Close">Cancelar</button>
+                    <button class="btn btn-success" @onclick="Save">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public MachineTypeModel MachineType { get; set; } = new();
+    [Parameter] public EventCallback OnSaved { get; set; }
+    [Parameter] public bool IsEdit { get; set; }
+
+    private async Task Save()
+    {
+        if (string.IsNullOrWhiteSpace(MachineType.Name))
+            return;
+
+        if (IsEdit)
+            await MachineTypeService.UpdateAsync(MachineType.Id, MachineType);
+        else
+            await MachineTypeService.CreateAsync(MachineType);
+
+        await OnSaved.InvokeAsync();
+        await VisibleChanged.InvokeAsync(false);
+    }
+
+    private async Task Close()
+    {
+        await VisibleChanged.InvokeAsync(false);
+    }
+}

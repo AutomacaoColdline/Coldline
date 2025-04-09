@@ -1,0 +1,195 @@
+@page "/configuration"
+@inherits ConfigurationPage
+
+<link rel="stylesheet" href="css/Configuration.css" />
+
+<div class="tab-bar">
+    <button class="tab-button @(SelectedTab == "Defects" ? "active" : "")" @onclick='() => SelectTab("Defects")'>Defeitos</button>
+    <button class="tab-button @(SelectedTab == "Parts" ? "active" : "")" @onclick='() => SelectTab("Parts")'>Peças</button>
+    <button class="tab-button @(SelectedTab == "PauseTypes" ? "active" : "")" @onclick='() => SelectTab("PauseTypes")'>Tipos de Pausa</button>
+    <button class="tab-button @(SelectedTab == "ProcessTypes" ? "active" : "")" @onclick='() => SelectTab("ProcessTypes")'>Tipos de Processo</button>
+    <button class="tab-button @(SelectedTab == "UserTypes" ? "active" : "")" @onclick='() => SelectTab("UserTypes")'>Tipos de Usuário</button>
+    <button class="tab-button @(SelectedTab == "MachineTypes" ? "active" : "")" @onclick='() => SelectTab("MachineTypes")'>Tipos de Máquina</button>
+    <button class="tab-button @(SelectedTab == "Departments" ? "active" : "")" @onclick='() => SelectTab("Departments")'>Departamentos</button>
+    <button class="tab-button @(SelectedTab == "TypeDefects" ? "active" : "")" @onclick='() => SelectTab("TypeDefects")'>Tipos de Defeito</button>
+</div>
+
+<div class="config-content">
+    @if (SelectedTab == "Defects")
+    {
+        <button class="btn btn-primary mb-3" @onclick="OpenAddDefectModal">Adicionar Defeito</button>
+
+        @foreach (var item in Defects)
+        {
+            <div class="config-item">
+                <span><strong>@item.Name</strong> - @item.Description</span>
+                <div class="action-buttons">
+                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditDefectModal(item)"><img src="img/editar.png" alt="Editar" style="width: 20px;" /></button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteDefect(item.Id)"><img src="img/lixeira.png" alt="Excluir" style="width: 20px;" /></button>
+                </div>
+            </div>
+        }
+    }
+    else if (SelectedTab == "Parts")
+    {
+        <button class="btn btn-primary mb-3" @onclick="OpenAddPartModal">Adicionar Peça</button>
+
+        @foreach (var item in Parts)
+        {
+            <div class="config-item">
+                <span><strong>@item.Name</strong> - R$ @item.Value.ToString("F2")</span>
+                <div class="action-buttons">
+                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditPartModal(item)"><img src="img/editar.png" alt="Editar" style="width: 20px;" /></button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeletePart(item.Id)"><img src="img/lixeira.png" alt="Excluir" style="width: 20px;" /></button>
+                </div>
+            </div>
+        }
+    }
+    else if (SelectedTab == "PauseTypes")
+    {
+        <button class="btn btn-primary mb-3" @onclick="OpenAddPauseTypeModal">Adicionar Tipo de Pausa</button>
+
+        @foreach (var item in PauseTypes)
+        {
+            <div class="config-item">
+                <span><strong>@item.Name</strong> - @item.Description</span>
+                <div class="action-buttons">
+                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditPauseTypeModal(item)"><img src="img/editar.png" alt="Editar" style="width: 20px;" /></button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeletePauseType(item.Id)"><img src="img/lixeira.png" alt="Excluir" style="width: 20px;" /></button>
+                </div>
+            </div>
+        }
+    }
+    else if (SelectedTab == "ProcessTypes")
+    {
+        <button class="btn btn-primary mb-3" @onclick="OpenAddProcessTypeModal">Adicionar Tipo de Processo</button>
+
+        @foreach (var item in ProcessTypes)
+        {
+            <div class="config-item">
+                <span><strong>@item.Name</strong> - @item.Description</span>
+                <div class="action-buttons">
+                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditProcessTypeModal(item)"><img src="img/editar.png" alt="Editar" style="width: 20px;" /></button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteProcessType(item.Id)"><img src="img/lixeira.png" alt="Excluir" style="width: 20px;" /></button>
+                </div>
+            </div>
+        }
+    }
+    else if (SelectedTab == "UserTypes")
+    {
+        <button class="btn btn-primary mb-3" @onclick="OpenAddUserTypeModal">Adicionar Tipo de Usuário</button>
+
+        @foreach (var item in UserTypes)
+        {
+            <div class="config-item">
+                <span><strong>@item.Name</strong> - @item.Description</span>
+                <div class="action-buttons">
+                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditUserTypeModal(item)"><img src="img/editar.png" alt="Editar" style="width: 20px;" /></button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteUserType(item.Id)"><img src="img/lixeira.png" alt="Excluir" style="width: 20px;" /></button>
+                </div>
+            </div>
+        }
+    }
+    else if (SelectedTab == "MachineTypes")
+    {
+        <button class="btn btn-primary mb-3" @onclick="OpenAddMachineTypeModal">Adicionar Tipo de Máquina</button>
+
+        @foreach (var item in MachineTypes)
+        {
+            <div class="config-item">
+                <span><strong>@item.Name</strong></span>
+                <div class="action-buttons">
+                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditMachineTypeModal(item)"><img src="img/editar.png" alt="Editar" style="width: 20px;" /></button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteMachineType(item.Id)"><img src="img/lixeira.png" alt="Excluir" style="width: 20px;" /></button>
+                </div>
+            </div>
+        }
+    }
+    else if (SelectedTab == "Departments")
+    {
+        <button class="btn btn-primary mb-3" @onclick="OpenAddDepartmentModal">Adicionar Departamento</button>
+
+        @foreach (var item in Departments)
+        {
+            <div class="config-item">
+                <span><strong>@item.Name</strong> - @item.Description</span>
+                <div class="action-buttons">
+                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditDepartmentModal(item)"><img src="img/editar.png" alt="Editar" style="width: 20px;" /></button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteDepartment(item.Id)"><img src="img/lixeira.png" alt="Excluir" style="width: 20px;" /></button>
+                </div>
+            </div>
+        }
+    }
+    else if (SelectedTab == "TypeDefects")
+    {
+        <button class="btn btn-primary mb-3" @onclick="OpenAddTypeDefectModal">Adicionar Tipo de Defeito</button>
+
+        @foreach (var item in TypeDefects)
+        {
+            <div class="config-item">
+                <span><strong>@item.Name</strong> - @item.Description</span>
+                <div class="action-buttons">
+                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditTypeDefectModal(item)"><img src="img/editar.png" alt="Editar" style="width: 20px;" /></button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteTypeDefect(item.Id)"><img src="img/lixeira.png" alt="Excluir" style="width: 20px;" /></button>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<DefectModalComponent 
+    Visible="@showDefectModal"
+    VisibleChanged="v => showDefectModal = v"
+    Defect="currentDefect"
+    IsEdit="isEditingDefect"
+    OnSaved="LoadAll" />
+
+<PartModalComponent 
+    Visible="@showPartModal"
+    VisibleChanged="v => showPartModal = v"
+    Part="currentPart"
+    IsEdit="isEditingPart"
+    OnSaved="LoadAll" />
+
+<PauseTypeModalComponent 
+    Visible="@showPauseTypeModal"
+    VisibleChanged="v => showPauseTypeModal = v"
+    PauseType="currentPauseType"
+    IsEdit="isEditingPauseType"
+    OnSaved="LoadAll" />
+
+<ProcessTypeModalComponent 
+    Visible="@showProcessTypeModal"
+    VisibleChanged="v => showProcessTypeModal = v"
+    ProcessType="currentProcessType"
+    IsEdit="isEditingProcessType"
+    OnSaved="LoadAll" />
+
+<UserTypeModalComponent 
+    Visible="@showUserTypeModal"
+    VisibleChanged="v => showUserTypeModal = v"
+    UserType="currentUserType"
+    IsEdit="isEditingUserType"
+    OnSaved="LoadAll" />
+
+<MachineTypeModalComponent 
+    Visible="@showMachineTypeModal"
+    VisibleChanged="v => showMachineTypeModal = v"
+    MachineType="currentMachineType"
+    IsEdit="isEditingMachineType"
+    OnSaved="LoadAll" />
+
+<DepartmentModalComponent 
+    Visible="@showDepartmentModal"
+    VisibleChanged="v => showDepartmentModal = v"
+    Department="currentDepartment"
+    IsEdit="isEditingDepartment"
+    OnSaved="LoadAll" />
+
+<TypeDefectModalComponent 
+    Visible="@showTypeDefectModal"
+    VisibleChanged="v => showTypeDefectModal = v"
+    TypeDefect="currentTypeDefect"
+    IsEdit="isEditingTypeDefect"
+    OnSaved="LoadAll" />
+

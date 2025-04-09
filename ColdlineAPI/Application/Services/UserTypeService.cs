@@ -23,7 +23,8 @@ namespace ColdlineAPI.Application.Services
         {
             var projection = Builders<UserType>.Projection
                 .Include(x => x.Id)
-                .Include(x => x.Name);
+                .Include(x => x.Name)
+                .Include(x => x.Description);
 
             var result = await _userTypes.Find(Builders<UserType>.Filter.Empty)
                 .Project<UserType>(projection)

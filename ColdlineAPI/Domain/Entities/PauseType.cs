@@ -16,7 +16,7 @@ namespace ColdlineAPI.Domain.Entities
         [BsonElement("description")]
         public string Description { get; set; } = string.Empty;
         [BsonElement("defect")]
-        public ReferenceEntity Defect { get; set; } = new ReferenceEntity();
+        public ReferenceEntity? Defect { get; set; } = new ReferenceEntity();
         [BsonElement("rework")]
         public bool? Rework { get; set; }
     }

@@ -20,27 +20,22 @@ namespace ColdlineAPI.Application.Services
             _defects = factory.CreateRepository<Defect>("Defects");
         }
 
-        public async Task<(List<Part> Items, long TotalCount)> GetAllPartsAsync(int page, int pageSize)
+        public async Task<List<Part>> GetAllPartsAsync()
         {
-            var skip = (page - 1) * pageSize;
-
             var projection = Builders<Part>.Projection
                 .Include(p => p.Id)
-                .Include(p => p.Name);
+                .Include(p => p.Name)
+                .Include(p => p.Description)
+                .Include(p => p.Value);
 
-            var items = await _parts.GetCollection()
+            var parts = await _parts.GetCollection()
                 .Find(_ => true)
                 .Project<Part>(projection)
-                .Skip(skip)
-                .Limit(pageSize)
                 .ToListAsync();
 
-            long totalCount = items.Count < pageSize
-                ? skip + items.Count
-                : await _parts.GetCollection().CountDocumentsAsync(_ => true);
-
-            return (items, totalCount);
+            return parts;
         }
+
 
         public async Task<Part?> GetPartByIdAsync(string id)
         {
@@ -59,7 +54,9 @@ namespace ColdlineAPI.Application.Services
             if (existing == null) return false;
 
             var update = Builders<Part>.Update
-                .Set(p => p.Name, part.Name ?? existing.Name);
+                .Set(p => p.Name, part.Name ?? existing.Name)
+                .Set(p => p.Description, part.Description)
+                .Set(p => p.Value, part.Value);
 
             var result = await _parts.GetCollection().UpdateOneAsync(p => p.Id == id, update);
             return result.IsAcknowledged && result.ModifiedCount > 0;

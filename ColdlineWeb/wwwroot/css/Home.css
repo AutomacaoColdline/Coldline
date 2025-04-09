@@ -290,3 +290,12 @@ html, body {
         max-width: 350px;
     }
 }
+.text-link {
+    color: #0c5bd2;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.text-link:hover {
+    text-decoration: underline;
+}

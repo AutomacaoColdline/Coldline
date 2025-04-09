@@ -1,0 +1,29 @@
+.occurrence-details {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+}
+
+.occurrence-details h4 {
+    margin-bottom: 20px;
+}
+
+.occurrence-details div {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.btn {
+    padding: 8px 14px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}

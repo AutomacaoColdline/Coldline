@@ -9,6 +9,10 @@
       "PackagePath": "staticwebassets/ColdlineWeb.styles.css"
     },
     {
+      "Id": "/app/wwwroot/css/Configuration.css",
+      "PackagePath": "staticwebassets/css/Configuration.css"
+    },
+    {
       "Id": "/app/wwwroot/css/Home.css",
       "PackagePath": "staticwebassets/css/Home.css"
     },
@@ -29,12 +33,20 @@
       "PackagePath": "staticwebassets/css/OccurrenceForm.css"
     },
     {
+      "Id": "/app/wwwroot/css/OccurrenceViewer.css",
+      "PackagePath": "staticwebassets/css/OccurrenceViewer.css"
+    },
+    {
       "Id": "/app/wwwroot/css/Process.css",
       "PackagePath": "staticwebassets/css/Process.css"
     },
     {
       "Id": "/app/wwwroot/css/ProcessCard.css",
       "PackagePath": "staticwebassets/css/ProcessCard.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/ProcessViewer.css",
+      "PackagePath": "staticwebassets/css/ProcessViewer.css"
     },
     {
       "Id": "/app/wwwroot/css/Quality.css",
@@ -75,6 +87,10 @@
     {
       "Id": "/app/wwwroot/img/adicionar-maquina.png",
       "PackagePath": "staticwebassets/img/adicionar-maquina.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/configuration.png",
+      "PackagePath": "staticwebassets/img/configuration.png"
     },
     {
       "Id": "/app/wwwroot/img/editar.png",

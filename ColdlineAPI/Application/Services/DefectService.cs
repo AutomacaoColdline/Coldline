@@ -22,7 +22,11 @@ namespace ColdlineAPI.Application.Services
         {
             var projection = Builders<Defect>.Projection
                 .Include(d => d.Id)
-                .Include(d => d.Name);
+                .Include(d => d.Name)
+                .Include(d => d.Description)
+                .Include(d => d.Internal)
+                .Include(d => d.TypeDefect)
+                .Include(d => d.Part);
 
             return await _defects
                 .GetCollection()
@@ -45,7 +49,11 @@ namespace ColdlineAPI.Application.Services
         public async Task<bool> UpdateDefectAsync(string id, Defect defect)
         {
             var update = Builders<Defect>.Update
-                .Set(d => d.Name, defect.Name);
+                .Set(d => d.Name, defect.Name)
+                .Set(d => d.Description, defect.Description)
+                .Set(d => d.Internal, defect.Internal)
+                .Set(d => d.TypeDefect, defect.TypeDefect)
+                .Set(d => d.Part, defect.Part);
 
             var result = await _defects.GetCollection()
                 .UpdateOneAsync(d => d.Id == id, update);

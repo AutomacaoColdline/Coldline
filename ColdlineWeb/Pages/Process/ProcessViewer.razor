@@ -1,0 +1,63 @@
+@page "/processViewer/{Id}"
+@using ColdlineWeb.Models
+@using ColdlineWeb.Services
+@inject ProcessService ProcessService
+@inject NavigationManager Navigation
+
+<link rel="stylesheet" href="css/ProcessViewer.css" />
+
+<h3>Detalhes do Processo</h3>
+
+@if (isLoading)
+{
+    <p>Carregando dados do processo...</p>
+}
+else if (process == null)
+{
+    <div class="alert alert-danger">Processo não encontrado.</div>
+}
+else
+{
+    <div class="process-details">
+        <div><strong>Nº Identificação:</strong> @process.IdentificationNumber</div>
+        <div><strong>Início:</strong> @process.StartDate.ToString("dd/MM/yyyy HH:mm")</div>
+        <div><strong>Término:</strong> @(process.EndDate?.ToString("dd/MM/yyyy HH:mm") ?? "Não finalizado")</div>
+        <div><strong>Tempo Total:</strong> @process.ProcessTime</div>
+        <div><strong>Usuário:</strong> @process.User?.Name</div>
+        <div><strong>Departamento:</strong> @process.Department?.Name</div>
+        <div><strong>Tipo de Processo:</strong> @process.ProcessType?.Name</div>
+        <div><strong>Máquina:</strong> @process.Machine?.Name</div>
+        <div><strong>Ocorrências:</strong> @(process.Occurrences?.Count ?? 0)</div>
+        <div><strong>Re-trabalho:</strong> @(process.ReWork ? "Sim" : "Não")</div>
+        <div><strong>Pré-Industrialização:</strong> @(process.PreIndustrialization == true ? "Sim" : process.PreIndustrialization == false ? "Não" : "Não informado")</div>
+    </div>
+
+    <button class="btn btn-secondary mt-3" @onclick="@GoBack">Voltar</button>
+}
+
+@code {
+    [Parameter] public string Id { get; set; } = string.Empty;
+    private ProcessModel? process;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            process = await ProcessService.GetProcessByIdAsync(Id);
+        }
+        catch
+        {
+            process = null;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    void GoBack()
+    {
+        Navigation.NavigateTo("/home");
+    }
+}

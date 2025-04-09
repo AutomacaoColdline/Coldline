@@ -28,14 +28,6 @@ else
                 }
             </select>
 
-            <select class="form-control filter-medium" @bind="Filter.UserId">
-                <option value="">Todos os Usuários</option>
-                @foreach (var user in UsersRef)
-                {
-                    <option value="@user.Id">@user.Name</option>
-                }
-            </select>
-
             <button class="btn btn-filter" @onclick="ApplyFilters">
                 <img src="img/lupa.png" alt="Buscar" class="btn-icon" />
             </button>
@@ -83,11 +75,10 @@ else
                         <td>@process.ProcessType?.Name</td>
                         <td>@process.Machine?.Name</td>
                         <td>
-                            @if (process.Occurrences?.Any() == true)
-                            {
-                                @string.Join(", ", process.Occurrences.Select(o => o.Name))
+                            @{
+                                var count = process.Occurrences?.Count ?? 0;
                             }
-                            else { <span>–</span> }
+                            @count 
                         </td>
                         <td>
                             <button class="btn btn-warning btn-sm" @onclick="() => OpenEditProcessModal(process)">

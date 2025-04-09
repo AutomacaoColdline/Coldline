@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "hf/HSVXf+izbWe8LFnaDgLAX2oix4ebV5qwl4iKKEPA=",
+  "Hash": "6Rk44a/FKBT3kYiNypegL7tfFfnPc3S1X76CPZ2yzVE=",
   "Source": "Presentation",
   "BasePath": "_content/Presentation",
   "Mode": "Default",
@@ -205,6 +205,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/uploads/Ingrid.png"
+    },
+    {
+      "Identity": "/app/Presentation/wwwroot/uploads/teste.png",
+      "SourceId": "Presentation",
+      "SourceType": "Discovered",
+      "ContentRoot": "/app/Presentation/wwwroot/",
+      "BasePath": "_content/Presentation",
+      "RelativePath": "uploads/teste.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/uploads/teste.png"
     }
   ]
 }

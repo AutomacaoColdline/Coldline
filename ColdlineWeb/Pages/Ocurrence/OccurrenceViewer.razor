@@ -1,0 +1,59 @@
+@page "/occurrenceViewer/{Id}"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+@using ColdlineWeb.Models
+
+@code {
+    [Parameter] public string Id { get; set; } = string.Empty;
+
+    private OccurrenceModel? occurrence;
+    private bool isLoading = true;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            occurrence = await Http.GetFromJsonAsync<OccurrenceModel>($"api/Occurrence/{Id}");
+        }
+        catch (Exception ex)
+        {
+            error = "Erro ao carregar a ocorrência.";
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void GoBack() => Navigation.NavigateTo("/home");
+
+}
+<link rel="stylesheet" href="/css/OccurrenceViewer.css" />
+
+@if (isLoading)
+{
+    <p>Carregando dados da ocorrência...</p>
+}
+else if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+else if (occurrence != null)
+{
+    <div class="occurrence-details">
+        <h4>Detalhes da Ocorrência</h4>
+        <div><strong>Código:</strong> @occurrence.CodeOccurrence</div>
+        <div><strong>Processo:</strong> @occurrence.Process.Name</div>
+        <div><strong>Tempo de Processo:</strong> @occurrence.ProcessTime</div>
+        <div><strong>Início:</strong> @occurrence.StartDate.ToString("dd/MM/yyyy HH:mm")</div>
+        <div><strong>Término:</strong> @(occurrence.EndDate.HasValue ? occurrence.EndDate.Value.ToString("dd/MM/yyyy HH:mm") : "Não finalizado")</div>
+        <div><strong>Tipo de Pausa:</strong> @occurrence.PauseType.Name</div>
+        <div><strong>Defeito:</strong> @occurrence.Defect.Name</div>
+        <div><strong>Usuário:</strong> @occurrence.User.Name</div>
+
+        <button class="btn btn-secondary mt-3" @onclick="GoBack">Voltar</button>
+    </div>
+}

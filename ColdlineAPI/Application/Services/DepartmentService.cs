@@ -24,7 +24,8 @@ namespace ColdlineAPI.Application.Services
         {
             var projection = Builders<Department>.Projection
                 .Include(d => d.Id)
-                .Include(d => d.Name);
+                .Include(d => d.Name)
+                .Include(d => d.Description);
 
             return await _departments.GetCollection()
                 .Find(Builders<Department>.Filter.Empty)

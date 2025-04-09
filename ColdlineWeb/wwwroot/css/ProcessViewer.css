@@ -1,0 +1,26 @@
+.process-details {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+}
+
+.process-details div {
+    margin-bottom: 8px;
+}
+
+.btn {
+    padding: 8px 14px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}

@@ -246,27 +246,33 @@ namespace ColdlineAPI.Application.Services
         public async Task<ProcessStatisticsDto> GetProcessStatisticsAsync(string processId, string processTypeId)
         {
             var process = await _processes.GetByIdAsync(p => p.Id == processId);
-            var filtered = await _processes.GetCollection().Find(p => p.Finished && p.ProcessType.Id == processTypeId && !string.IsNullOrEmpty(p.ProcessTime)).ToListAsync();
+            var filtered = await _processes.GetCollection()
+                .Find(p => p.Finished && p.ProcessType.Id == processTypeId && !string.IsNullOrEmpty(p.ProcessTime))
+                .ToListAsync();
 
             var durations = filtered
                 .Where(p => TimeSpan.TryParseExact(p.ProcessTime, @"hh\:mm\:ss", null, out _))
                 .Select(p => TimeSpan.Parse(p.ProcessTime))
                 .ToList();
 
-            if (!durations.Any()) return new ProcessStatisticsDto();
+            var dto = new ProcessStatisticsDto
+            {
+                ProcessTime = process?.ProcessTime ?? "00:00:00"
+            };
+
+            if (!durations.Any()) return dto;
 
             var average = TimeSpan.FromTicks((long)durations.Average(d => d.Ticks));
             var stdDev = TimeSpan.FromTicks((long)Math.Sqrt(durations.Average(d => Math.Pow(d.Ticks - durations.Average(x => x.Ticks), 2))));
             var upperLimit = average + (stdDev * 2);
 
-            return new ProcessStatisticsDto
-            {
-                ProcessTime = process?.ProcessTime,
-                AverageProcessTime = average.ToString(@"hh\:mm\:ss"),
-                StandardDeviation = stdDev.ToString(@"hh\:mm\:ss"),
-                UpperLimit = upperLimit.ToString(@"hh\:mm\:ss")
-            };
+            dto.AverageProcessTime = average.ToString(@"hh\:mm\:ss");
+            dto.StandardDeviation = stdDev.ToString(@"hh\:mm\:ss");
+            dto.UpperLimit = upperLimit.ToString(@"hh\:mm\:ss");
+
+            return dto;
         }
+
 
         private string CalculateProcessTime(DateTime startDate)
         {

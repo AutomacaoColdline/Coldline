@@ -164,6 +164,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZS9NYWNoaW5lVHlwZU1vZGFsLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/app/Pages/Machine/MachineViewer.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZS9NYWNoaW5lVmlld2VyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [/app/Pages/Ocurrence/OccurrenceViewer.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT2N1cnJlbmNlL09jY3VycmVuY2VWaWV3ZXIucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 

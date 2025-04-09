@@ -105,7 +105,12 @@ else
         @foreach (var machine in machines)
         {
             <div class="machine-card">
-                <div class="machine-card-header">Numero de série da máquina: @machine.IdentificationNumber</div>
+               <div class="machine-card-header">
+                    Número de série da máquina:
+                    <a href="@($"/machineViewer/{machine.Id}")" class="text-link">
+                        @machine.IdentificationNumber
+                    </a>
+                </div>
                 <div class="machine-card-body">
                     <p><strong>Nome:</strong> @machine.MachineType.Name</p>
                     <p><strong>Status:</strong> @machine.Status?.GetTranslatedStatus()</p>

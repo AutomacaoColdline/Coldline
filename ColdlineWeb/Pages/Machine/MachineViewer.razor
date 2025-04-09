@@ -1,0 +1,61 @@
+@page "/machineViewer/{Id}"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+@using ColdlineWeb.Models
+
+@code {
+    [Parameter] public string Id { get; set; } = string.Empty;
+
+    private MachineModel? machine;
+    private bool isLoading = true;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            machine = await Http.GetFromJsonAsync<MachineModel>($"api/Machine/{Id}");
+        }
+        catch (Exception ex)
+        {
+            error = "Erro ao carregar os dados da máquina.";
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void GoBack() => Navigation.NavigateTo("/machines");
+}
+
+<link rel="stylesheet" href="css/MachineViewer.css" />
+
+@if (isLoading)
+{
+    <p>Carregando detalhes da máquina...</p>
+}
+else if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+else if (machine != null)
+{
+    <div class="machine-details">
+        <h4>Detalhes da Máquina</h4>
+        <div><strong>Cliente:</strong> @machine.CustomerName</div>
+        <div><strong>Número de Identificação:</strong> @machine.IdentificationNumber</div>
+        <div><strong>Fase:</strong> @machine.Phase</div>
+        <div><strong>Voltagem:</strong> @machine.Voltage</div>
+        <div><strong>Status:</strong> @(machine.Status?.ToString() ?? "Desconhecido")</div>
+        <div><strong>Tipo de Máquina:</strong> @machine.MachineType?.Name</div>
+        <div><strong>Processo:</strong> @(machine.Process?.Name ?? "Nenhum")</div>
+        <div><strong>Qualidade:</strong> @(machine.Quality?.Name ?? "Nenhuma")</div>
+        <div><strong>Monitoramento:</strong> @(machine.Monitoring?.Name ?? "Nenhum")</div>
+        <div><strong>Tempo:</strong> @machine.Time</div>
+
+        <button class="btn btn-secondary mt-3" @onclick="GoBack">Voltar</button>
+    </div>
+}

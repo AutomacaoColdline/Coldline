@@ -15,11 +15,18 @@
 </div>
 
 <div class="config-content">
-    @if (SelectedTab == "Defects")
+    @if (isLoadingTab)
+    {
+        <div class="loader-wrapper">
+            <div class="custom-loader"></div>
+            <span class="loading-text">Carregando dados da aba...</span>
+        </div>
+    }
+    else if (SelectedTab == "Defects")
     {
         <button class="btn btn-primary mb-3" @onclick="OpenAddDefectModal">Adicionar Defeito</button>
 
-        @foreach (var item in Defects)
+        @foreach (var item in PagedDefects)
         {
             <div class="config-item">
                 <span><strong>@item.Name</strong> - @item.Description</span>
@@ -29,12 +36,26 @@
                 </div>
             </div>
         }
+        @if (PagedDefects.Count > 0)
+        {
+            <div class="pagination-wrapper">
+                <button class="btn btn-pagination" @onclick="GoToPreviousDefectPage" disabled="@(DefectPageNumber == 1)">
+                    <img src="img/seta-esquerda.png" class="pagination-icon" />
+                </button>
+
+                <span class="page-indicator">@DefectPageNumber de @TotalDefectPages</span>
+
+                <button class="btn btn-pagination" @onclick="GoToNextDefectPage" disabled="@(DefectPageNumber == TotalDefectPages)">
+                    <img src="img/seta-direita.png" class="pagination-icon" />
+                </button>
+            </div>
+        }
     }
     else if (SelectedTab == "Parts")
     {
         <button class="btn btn-primary mb-3" @onclick="OpenAddPartModal">Adicionar Peça</button>
 
-        @foreach (var item in Parts)
+        @foreach (var item in PagedParts)
         {
             <div class="config-item">
                 <span><strong>@item.Name</strong> - R$ @item.Value.ToString("F2")</span>
@@ -44,12 +65,26 @@
                 </div>
             </div>
         }
+        @if (PagedParts.Count > 0)
+        {
+            <div class="pagination-wrapper">
+                <button class="btn btn-pagination" @onclick="GoToPreviousPartPage" disabled="@(PartPageNumber == 1)">
+                    <img src="img/seta-esquerda.png" class="pagination-icon" />
+                </button>
+
+                <span class="page-indicator">@PartPageNumber de @TotalPartPages</span>
+
+                <button class="btn btn-pagination" @onclick="GoToNextPartPage" disabled="@(PartPageNumber == TotalPartPages)">
+                    <img src="img/seta-direita.png" class="pagination-icon" />
+                </button>
+            </div>
+        }
     }
     else if (SelectedTab == "PauseTypes")
     {
         <button class="btn btn-primary mb-3" @onclick="OpenAddPauseTypeModal">Adicionar Tipo de Pausa</button>
 
-        @foreach (var item in PauseTypes)
+        @foreach (var item in PagedPauseTypes)
         {
             <div class="config-item">
                 <span><strong>@item.Name</strong> - @item.Description</span>
@@ -59,12 +94,26 @@
                 </div>
             </div>
         }
+        @if (PagedPauseTypes.Count > 0)
+        {
+            <div class="pagination-wrapper">
+                <button class="btn btn-pagination" @onclick="GoToPreviousPauseTypePage" disabled="@(PauseTypePageNumber == 1)">
+                    <img src="img/seta-esquerda.png" class="pagination-icon" />
+                </button>
+
+                <span class="page-indicator">@PauseTypePageNumber de @TotalPauseTypePages</span>
+
+                <button class="btn btn-pagination" @onclick="GoToNextPauseTypePage" disabled="@(PauseTypePageNumber == TotalPauseTypePages)">
+                    <img src="img/seta-direita.png" class="pagination-icon" />
+                </button>
+            </div>
+        }
     }
     else if (SelectedTab == "ProcessTypes")
     {
         <button class="btn btn-primary mb-3" @onclick="OpenAddProcessTypeModal">Adicionar Tipo de Processo</button>
 
-        @foreach (var item in ProcessTypes)
+        @foreach (var item in PagedProcessTypes)
         {
             <div class="config-item">
                 <span><strong>@item.Name</strong> - @item.Description</span>
@@ -74,12 +123,26 @@
                 </div>
             </div>
         }
+        @if (PagedProcessTypes.Count > 0)
+        {
+            <div class="pagination-wrapper">
+                <button class="btn btn-pagination" @onclick="GoToPreviousProcessTypePage" disabled="@(ProcessTypePageNumber == 1)">
+                    <img src="img/seta-esquerda.png" class="pagination-icon" />
+                </button>
+
+                <span class="page-indicator">@ProcessTypePageNumber de @TotalProcessTypePages</span>
+
+                <button class="btn btn-pagination" @onclick="GoToNextProcessTypePage" disabled="@(ProcessTypePageNumber == TotalProcessTypePages)">
+                    <img src="img/seta-direita.png" class="pagination-icon" />
+                </button>
+            </div>
+        }
     }
     else if (SelectedTab == "UserTypes")
     {
         <button class="btn btn-primary mb-3" @onclick="OpenAddUserTypeModal">Adicionar Tipo de Usuário</button>
 
-        @foreach (var item in UserTypes)
+        @foreach (var item in PagedUserTypes)
         {
             <div class="config-item">
                 <span><strong>@item.Name</strong> - @item.Description</span>
@@ -89,12 +152,26 @@
                 </div>
             </div>
         }
+        @if (PagedUserTypes.Count > 0)
+        {
+            <div class="pagination-wrapper">
+                <button class="btn btn-pagination" @onclick="GoToPreviousUserTypePage" disabled="@(UserTypePageNumber == 1)">
+                    <img src="img/seta-esquerda.png" class="pagination-icon" />
+                </button>
+
+                <span class="page-indicator">@UserTypePageNumber de @TotalUserTypePages</span>
+
+                <button class="btn btn-pagination" @onclick="GoToNextUserTypePage" disabled="@(UserTypePageNumber == TotalUserTypePages)">
+                    <img src="img/seta-direita.png" class="pagination-icon" />
+                </button>
+            </div>
+        }
     }
     else if (SelectedTab == "MachineTypes")
     {
         <button class="btn btn-primary mb-3" @onclick="OpenAddMachineTypeModal">Adicionar Tipo de Máquina</button>
 
-        @foreach (var item in MachineTypes)
+        @foreach (var item in PagedMachineTypes)
         {
             <div class="config-item">
                 <span><strong>@item.Name</strong></span>
@@ -104,12 +181,26 @@
                 </div>
             </div>
         }
+        @if (PagedMachineTypes.Count > 0)
+        {
+            <div class="pagination-wrapper">
+                <button class="btn btn-pagination" @onclick="GoToPreviousMachineTypePage" disabled="@(MachineTypePageNumber == 1)">
+                    <img src="img/seta-esquerda.png" class="pagination-icon" />
+                </button>
+
+                <span class="page-indicator">@MachineTypePageNumber de @TotalMachineTypePages</span>
+
+                <button class="btn btn-pagination" @onclick="GoToNextMachineTypePage" disabled="@(MachineTypePageNumber == TotalMachineTypePages)">
+                    <img src="img/seta-direita.png" class="pagination-icon" />
+                </button>
+            </div>
+        }
     }
     else if (SelectedTab == "Departments")
     {
         <button class="btn btn-primary mb-3" @onclick="OpenAddDepartmentModal">Adicionar Departamento</button>
 
-        @foreach (var item in Departments)
+        @foreach (var item in PagedDepartments)
         {
             <div class="config-item">
                 <span><strong>@item.Name</strong> - @item.Description</span>
@@ -119,12 +210,26 @@
                 </div>
             </div>
         }
+        @if (PagedDepartments.Count > 0)
+        {
+            <div class="pagination-wrapper">
+                <button class="btn btn-pagination" @onclick="GoToPreviousDepartmentPage" disabled="@(DepartmentPageNumber == 1)">
+                    <img src="img/seta-esquerda.png" class="pagination-icon" />
+                </button>
+
+                <span class="page-indicator">@DepartmentPageNumber de @TotalDepartmentPages</span>
+
+                <button class="btn btn-pagination" @onclick="GoToNextDepartmentPage" disabled="@(DepartmentPageNumber == TotalDepartmentPages)">
+                    <img src="img/seta-direita.png" class="pagination-icon" />
+                </button>
+            </div>
+        }
     }
     else if (SelectedTab == "TypeDefects")
     {
         <button class="btn btn-primary mb-3" @onclick="OpenAddTypeDefectModal">Adicionar Tipo de Defeito</button>
 
-        @foreach (var item in TypeDefects)
+        @foreach (var item in PagedTypeDefects)
         {
             <div class="config-item">
                 <span><strong>@item.Name</strong> - @item.Description</span>
@@ -132,6 +237,20 @@
                     <button class="btn btn-sm btn-warning" @onclick="() => OpenEditTypeDefectModal(item)"><img src="img/editar.png" alt="Editar" style="width: 20px;" /></button>
                     <button class="btn btn-sm btn-danger" @onclick="() => DeleteTypeDefect(item.Id)"><img src="img/lixeira.png" alt="Excluir" style="width: 20px;" /></button>
                 </div>
+            </div>
+        }
+        @if (PagedTypeDefects.Count > 0)
+        {
+            <div class="pagination-wrapper">
+                <button class="btn btn-pagination" @onclick="GoToPreviousTypeDefectPage" disabled="@(TypeDefectPageNumber == 1)">
+                    <img src="img/seta-esquerda.png" class="pagination-icon" />
+                </button>
+
+                <span class="page-indicator">@TypeDefectPageNumber de @TotalTypeDefectPages</span>
+
+                <button class="btn btn-pagination" @onclick="GoToNextTypeDefectPage" disabled="@(TypeDefectPageNumber == TotalTypeDefectPages)">
+                    <img src="img/seta-direita.png" class="pagination-icon" />
+                </button>
             </div>
         }
     }

@@ -4,6 +4,8 @@ using ColdlineAPI.Domain.Entities;
 using ColdlineAPI.Domain.Enum;
 using ColdlineAPI.Application.Factories;
 using ColdlineAPI.Application.Repositories;
+using System.Text.RegularExpressions;
+
 
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -78,32 +80,16 @@ namespace ColdlineAPI.Application.Services
             var builder = Builders<Machine>.Filter;
             var filters = new List<FilterDefinition<Machine>>();
 
-            if (!string.IsNullOrEmpty(filter.CustomerName))
-                filters.Add(builder.Regex("customerName", new BsonRegularExpression(filter.CustomerName, "i")));
+            if (!string.IsNullOrWhiteSpace(filter.IdentificationNumber))
+            {
+                var pattern = Regex.Escape(filter.IdentificationNumber.Trim()); 
+                filters.Add(builder.Regex(m => m.IdentificationNumber, new BsonRegularExpression(pattern, "i")));
+            }
 
-            if (!string.IsNullOrEmpty(filter.IdentificationNumber))
-                filters.Add(builder.Eq("identificationNumber", filter.IdentificationNumber));
 
-            if (!string.IsNullOrEmpty(filter.Phase))
-                filters.Add(builder.Eq("phase", filter.Phase));
-
-            if (filter.Status != null)
-                filters.Add(builder.Eq("status", filter.Status));
-
-            if (!string.IsNullOrEmpty(filter.Voltage))
-                filters.Add(builder.Eq("voltage", filter.Voltage));
-
-            if (!string.IsNullOrEmpty(filter.ProcessId))
-                filters.Add(builder.Eq("process.id", filter.ProcessId));
-
-            if (!string.IsNullOrEmpty(filter.MachineTypeId))
-                filters.Add(builder.Eq("machineType.id", filter.MachineTypeId));
-
-            if (!string.IsNullOrEmpty(filter.QualityId))
-                filters.Add(builder.Eq("quality.id", filter.QualityId));
-
-            if (!string.IsNullOrEmpty(filter.MonitoringId))
-                filters.Add(builder.Eq("monitoring.id", filter.MonitoringId));
+            if (!string.IsNullOrWhiteSpace(filter.MachineTypeId))
+                filters.Add(builder.Eq(m => m.MachineType.Id, filter.MachineTypeId.Trim()));
+                
 
             var finalFilter = filters.Count > 0 ? builder.And(filters) : builder.Empty;
 

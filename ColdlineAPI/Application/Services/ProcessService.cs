@@ -21,14 +21,17 @@ namespace ColdlineAPI.Application.Services
         private readonly IMongoCollection<User> _users;
         private readonly IMongoCollection<ProcessType> _processTypes;
         private readonly IMongoCollection<Machine> _machines;
+        private readonly MongoRepository<Machine> _machinesRepo;
+        private const string SpecialProcessTypeId = "67f6b00f101359f06e303492";
 
-      public ProcessService(RepositoryFactory factory)
-    {
-        _processes = factory.CreateRepository<Process>("Processes");
-        _users = factory.CreateRepository<User>("Users").GetCollection();
-        _processTypes = factory.CreateRepository<ProcessType>("ProcessTypes").GetCollection();
-        _machines = factory.CreateRepository<Machine>("Machines").GetCollection();
-    }
+        public ProcessService(RepositoryFactory factory)
+        {
+            _processes = factory.CreateRepository<Process>("Processes");
+            _users = factory.CreateRepository<User>("Users").GetCollection();
+            _processTypes = factory.CreateRepository<ProcessType>("ProcessTypes").GetCollection();
+            _machines = factory.CreateRepository<Machine>("Machines").GetCollection();
+            _machinesRepo = factory.CreateRepository<Machine>("Machines");
+        }
 
         public async Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId, string? machineId, bool preIndustrialization, bool reWork)
         {
@@ -43,7 +46,7 @@ namespace ColdlineAPI.Application.Services
             {
                 var machine = await _machines.Find(m => m.Id == machineId).FirstOrDefaultAsync();
                 if (machine == null) throw new ArgumentException("Máquina não encontrada.");
-                machineReference = new ReferenceEntity { Id = machine.Id, Name = machine.MachineType.Name };
+                machineReference = new ReferenceEntity { Id = machine.Id, Name = machine.IdentificationNumber };
             }
 
             var now = GetCurrentCampoGrandeTime();
@@ -98,33 +101,35 @@ namespace ColdlineAPI.Application.Services
                 .Set(p => p.Finished, true)
                 .Set(p => p.EndDate, now);
 
+
             var resultProcess = await _processes.GetCollection().UpdateOneAsync(p => p.Id == processId, updateProcess);
             var resultUser = await _users.UpdateOneAsync(u => u.Id == user.Id, Builders<User>.Update.Set(u => u.CurrentProcess, null));
 
             return resultProcess.IsAcknowledged && resultProcess.ModifiedCount > 0 && resultUser.IsAcknowledged && resultUser.ModifiedCount > 0;
         }
 
+
         public async Task<List<Process>> GetAllProcessesAsync()
         {
             var processes = await _processes.GetAllAsync();
             foreach (var process in processes)
             {
-                var updatedTime = CalculateProcessTime(process.StartDate);
-                await UpdateProcessTimeInDatabase(process.Id, updatedTime);
-                process.ProcessTime = updatedTime;
+                var duration = await CalculateProcessTime(process.StartDate, process.EndDate);
+
+                process.ProcessTime = duration.ToString(@"hh\:mm\:ss");
+
+                await _processes.UpdateAsync(p => p.Id == process.Id, process); // Atualiza o processo com a nova duração
             }
+            
             return processes;
         }
 
         public async Task<Process?> GetProcessByIdAsync(string id)
         {
             var process = await _processes.GetByIdAsync(p => p.Id == id);
-            if (process != null)
-            {
-                var updatedTime = CalculateProcessTime(process.StartDate);
-                await UpdateProcessTimeInDatabase(process.Id, updatedTime);
-                process.ProcessTime = updatedTime;
-            }
+            var duration = await CalculateProcessTime(process.StartDate, process.EndDate);
+            process.ProcessTime = duration.ToString(@"hh\:mm\:ss");
+            await _processes.UpdateAsync(p => p.Id == id, process);
             return process;
         }
 
@@ -150,14 +155,14 @@ namespace ColdlineAPI.Application.Services
             int skip = (page - 1) * pageSize;
 
             var results = await _processes.GetCollection().Find(finalFilter).Skip(skip).Limit(pageSize).ToListAsync();
-
             foreach (var process in results)
             {
-                var updatedTime = CalculateProcessTime(process.StartDate);
-                await UpdateProcessTimeInDatabase(process.Id!, updatedTime);
-                process.ProcessTime = updatedTime;
-            }
+                var duration = await CalculateProcessTime(process.StartDate, process.EndDate);
 
+                process.ProcessTime = duration.ToString(@"hh\:mm\:ss");
+
+                await _processes.UpdateAsync(p => p.Id == process.Id, process);
+            }
             return results;
         }
 
@@ -165,6 +170,24 @@ namespace ColdlineAPI.Application.Services
         {
             if (string.IsNullOrEmpty(process.Id))
                 process.Id = ObjectId.GenerateNewId().ToString();
+
+            var duration = await CalculateProcessTime(process.StartDate, process.EndDate);
+            process.ProcessTime = duration.ToString(@"hh\:mm\:ss");
+            
+            if(process.ProcessType.Id == SpecialProcessTypeId){
+                var machine = await _machinesRepo.GetByIdAsync(p => p.Id == process.Machine.Id);
+                var processFilter = new ProcessFilter { MachineId = process.Machine.Id };
+                var processList = await SearchProcessAsync(processFilter);
+                var startdate = await CalculateMachineTime(processList);
+                var timeMachine = await CalculateProcessTime(startdate, process.EndDate);
+
+                await _machines.UpdateOneAsync(
+                    Builders<Machine>.Filter.Eq(m => m.Id, process.Machine.Id),
+                    Builders<Machine>.Update
+                        .Set(m => m.Status, MachineStatus.Finished)
+                        .Set(m => m.Process, null)
+                        .Set(m => m.Time, timeMachine.ToString(@"hh\:mm\:ss")));  
+            }
 
             await _processes.CreateAsync(process);
             return process;
@@ -175,8 +198,10 @@ namespace ColdlineAPI.Application.Services
             var existing = await _processes.GetByIdAsync(p => p.Id == id);
             if (existing == null) return false;
 
-            process.ProcessTime = CalculateProcessTime(existing.StartDate);
 
+            var duration = await CalculateProcessTime(process.StartDate, process.EndDate);
+            process.ProcessTime = duration.ToString(@"hh\:mm\:ss");
+                
             var update = Builders<Process>.Update
                 .Set(p => p.IdentificationNumber, process.IdentificationNumber ?? existing.IdentificationNumber)
                 .Set(p => p.ProcessTime, process.ProcessTime)
@@ -273,32 +298,61 @@ namespace ColdlineAPI.Application.Services
             return dto;
         }
 
-
-        private string CalculateProcessTime(DateTime startDate)
+        private async Task<DateTime> CalculateMachineTime(List<Process> processes)
         {
-            var now = GetCurrentCampoGrandeTime();
-            if (now < startDate) return "00:00:00";
+            if (processes == null || !processes.Any())
+                throw new ArgumentException("A lista de processos está vazia ou nula.");
 
-            TimeSpan workStart = TimeSpan.FromHours(7.5);
-            TimeSpan workEnd = TimeSpan.FromHours(17.5);
-            TimeSpan totalTime = TimeSpan.Zero;
-            DateTime currentDay = startDate.Date;
+            DateTime menorData = processes.Min(p => p.StartDate);
 
-            while (currentDay <= now.Date)
+            return menorData;
+        }
+
+
+        private async Task<TimeSpan> CalculateProcessTime(DateTime start, DateTime? end)
+        {
+            // Se end for nulo, usa o horário atual
+            DateTime endTime = end ?? DateTime.Now;
+
+            if (endTime <= start)
+                return TimeSpan.Zero;
+
+            TimeSpan total = TimeSpan.Zero;
+
+            // Períodos úteis por dia
+            var workPeriods = new List<(TimeSpan start, TimeSpan end)>
             {
-                DateTime start = currentDay == startDate.Date ? startDate : currentDay.Add(workStart);
-                DateTime end = currentDay == now.Date ? now : currentDay.Add(workEnd);
+                (TimeSpan.FromHours(7.5), TimeSpan.FromHours(11.5)),   // 07:30 – 11:30
+                (TimeSpan.FromHours(13.25), TimeSpan.FromHours(15.0)), // 13:15 – 15:00
+                (TimeSpan.FromHours(15.25), TimeSpan.FromHours(17.5))  // 15:15 – 17:30
+            };
 
-                if (start.TimeOfDay < workStart) start = currentDay.Add(workStart);
-                if (end.TimeOfDay > workEnd) end = currentDay.Add(workEnd);
+            DateTime currentDate = start.Date;
 
-                if (start < end && start.TimeOfDay >= workStart && start.TimeOfDay <= workEnd)
-                    totalTime += end - start;
+            while (currentDate <= endTime.Date)
+            {
+                if (currentDate.DayOfWeek != DayOfWeek.Saturday && currentDate.DayOfWeek != DayOfWeek.Sunday)
+                {
+                    foreach (var period in workPeriods)
+                    {
+                        DateTime periodStart = currentDate.Add(period.start);
+                        DateTime periodEnd = currentDate.Add(period.end);
 
-                currentDay = currentDay.AddDays(1);
+                        // Ajuste para o intervalo real
+                        DateTime effectiveStart = periodStart < start ? start : periodStart;
+                        DateTime effectiveEnd = periodEnd > endTime ? endTime : periodEnd;
+
+                        if (effectiveEnd > effectiveStart)
+                        {
+                            total += effectiveEnd - effectiveStart;
+                        }
+                    }
+                }
+
+                currentDate = currentDate.AddDays(1);
             }
 
-            return $"{(int)totalTime.TotalHours:D2}:{totalTime.Minutes:D2}:{totalTime.Seconds:D2}";
+            return total;
         }
 
         private DateTime GetCurrentCampoGrandeTime()

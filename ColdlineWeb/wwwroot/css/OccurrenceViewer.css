@@ -1,29 +1,92 @@
-.occurrence-details {
-    max-width: 600px;
-    margin: 30px auto;
+body {
+    background-color: #f0f8ff;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Container principal */
+.viewer-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 10px;
+}
+
+/* Box da ocorrência */
+.occurrence-box {
+    background-color: #fcfdff;
+    border-left: 6px solid #1a3fa3;
     padding: 20px;
-    background: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    font-size: 14px;
-}
-
-.occurrence-details h4 {
-    margin-bottom: 20px;
-}
-
-.occurrence-details div {
-    margin-bottom: 10px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-size: 15px;
+    line-height: 1.6;
     color: #333;
 }
 
-.btn {
-    padding: 8px 14px;
-    font-size: 14px;
-    border-radius: 4px;
-    cursor: pointer;
+.occurrence-box h3 {
+    font-size: 20px;
+    color: #1a3fa3;
+    margin-bottom: 16px;
 }
 
-.mt-3 {
-    margin-top: 1rem;
+/* Botão voltar */
+.btn-back {
+    background-color: #1a3fa3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 25px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.btn-back:hover {
+    background-color: #0f2e7a;
+}
+
+/* Loader animado */
+.loader-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 100px;
+}
+
+.custom-loader {
+    border: 6px solid #cce4f6;
+    border-top: 6px solid #1a3fa3;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+.loading-text {
+    margin-top: 15px;
+    color: #1a3fa3;
+    font-weight: 500;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsivo */
+@media (max-width: 600px) {
+    .viewer-container {
+        padding: 10px;
+    }
+
+    .occurrence-box {
+        font-size: 14px;
+    }
+
+    .btn-back {
+        width: 100%;
+    }
 }

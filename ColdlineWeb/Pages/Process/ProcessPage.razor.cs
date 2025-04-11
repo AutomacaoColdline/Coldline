@@ -69,7 +69,7 @@ namespace ColdlineWeb.Pages.Process
                 ProcessTypes = types.ConvertAll(t => new ReferenceEntity { Id = t.Id, Name = t.Name });
 
                 var machines = await MachineService.GetAllMachinesAsync();
-                Machines = machines.ConvertAll(m => new ReferenceEntity { Id = m.Id, Name = m.CustomerName });
+                Machines = machines.ConvertAll(m => new ReferenceEntity { Id = m.Id, Name = m.IdentificationNumber });
 
                 var occurrenceModels = await OccurrenceService.GetAllAsync();
                 Occurrences = occurrenceModels.ConvertAll(o => new ReferenceEntity { Id = o.Id, Name = o.CodeOccurrence });

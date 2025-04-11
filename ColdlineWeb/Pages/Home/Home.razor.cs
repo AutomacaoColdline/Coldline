@@ -17,27 +17,36 @@ namespace ColdlineWeb.Pages
         [Inject] public ProcessService ProcessService { get; set; } = default!;
 
         public Dictionary<string, ProcessStats> ProcessStatsByUserId = new();
+
         protected List<UserModel> users = new();
         protected List<MachineModel> machines = new();
         protected List<MachineModel> machinesCount = new();
 
-        protected int totalMachines, machinesWaitingProduction, machinesInProgress, machinesInOccurrence, machinesFinished;
+        protected int totalMachines;
+        protected int machinesWaitingProduction;
+        protected int machinesInProgress;
+        protected int machinesInOccurrence;
+        protected int machinesFinished;
+
         protected bool isLoading = true;
         protected string? errorMessage;
 
-        private int currentPage = 0;
-        private const int pageSize = 4;
+        // Usuários
+        protected int currentPage = 0;
+        protected const int pageSize = 4;
         protected List<UserModel> PaginatedUsers => users.Skip(currentPage * pageSize).Take(pageSize).ToList();
         protected bool isFirstPage => currentPage == 0;
         protected bool isLastPage => (currentPage + 1) * pageSize >= users.Count;
 
+        // Máquinas
+        protected int currentMachinePage = 1;
+        protected const int machinePageSize = 3;
+        protected bool isDraggingMachine;
+
         private double startX;
         private double currentX;
         private bool isDragging;
-        private int currentMachinePage = 1;
-        private const int machinePageSize = 3;
         private double machineStartX;
-        private bool isDraggingMachine;
 
         protected override async Task OnInitializedAsync()
         {
@@ -70,6 +79,7 @@ namespace ColdlineWeb.Pages
 
                 machines = await MachineService.SearchMachinesAsync(filter);
                 machinesCount = await MachineService.GetAllMachinesAsync();
+
                 totalMachines = machinesCount.Count;
                 machinesWaitingProduction = machinesCount.Count(m => m.Status == MachineStatus.WaitingProduction);
                 machinesInProgress = machinesCount.Count(m => m.Status == MachineStatus.InProgress);
@@ -128,6 +138,7 @@ namespace ColdlineWeb.Pages
             return new MarkupString($"<div class=\"indicator {colorClass}\"></div>");
         }
 
+        // Swipe para usuários
         protected void HandlePointerDown(PointerEventArgs e)
         {
             isDragging = true;
@@ -137,9 +148,7 @@ namespace ColdlineWeb.Pages
         protected void HandlePointerMove(PointerEventArgs e)
         {
             if (!isDragging) return;
-
             currentX = e.ClientX;
-            double deltaX = currentX - startX;
         }
 
         protected void HandlePointerUp(PointerEventArgs e)
@@ -149,7 +158,6 @@ namespace ColdlineWeb.Pages
             isDragging = false;
             double endX = e.ClientX;
             double diff = endX - startX;
-
             const double threshold = 50;
 
             if (diff > threshold && !isFirstPage)
@@ -163,6 +171,8 @@ namespace ColdlineWeb.Pages
 
             StateHasChanged();
         }
+
+        // Swipe para máquinas
         protected void HandleMachinePointerDown(PointerEventArgs e)
         {
             isDraggingMachine = true;
@@ -184,18 +194,15 @@ namespace ColdlineWeb.Pages
             }
             else if (diff < -threshold)
             {
-                // Tentativa de próxima página
                 currentMachinePage++;
                 await LoadMachines();
 
-                // Verifica se a nova página retornou menos que o limite (fim da paginação)
                 if (machines.Count < machinePageSize || machines.Count == 0)
                 {
-                    currentMachinePage--; // volta
-                    await LoadMachines(); // carrega a página anterior novamente
+                    currentMachinePage--;
+                    await LoadMachines();
                 }
             }
         }
-
     }
 }

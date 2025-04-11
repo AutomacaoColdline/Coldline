@@ -16,8 +16,7 @@ html, body {
     display: flex;
     justify-content: space-around;
     background-color: #0c5bd2; /* Azul padrão do sistema */
-    padding: 10px 0;
-    border-bottom: 2px solid #0a4bbf;
+    padding: 9px 0;
 }
 
 .tab-button {
@@ -162,4 +161,81 @@ button.btn-secondary:hover {
     .config-item .action-buttons {
         margin-top: 10px;
     }
+}
+/* 🔄 Animação de carregamento */
+.loader-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 0;
+}
+
+.custom-loader {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #1c63e7;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 12px;
+}
+
+.loading-text {
+    font-size: 15px;
+    color: #142c59;
+    font-weight: 500;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+/* ================================================
+   🔢 PAGINAÇÃO PADRÃO PARA ABA CONFIGURATION
+   ================================================ */
+   .pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* Botões */
+.btn-pagination {
+    background-color: #cce4f6 !important;
+    border: 1px solid #99c9ed !important;
+    color: #000 !important;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    padding: 0;
+    transition: background-color 0.2s ease;
+}
+
+.btn-pagination:hover {
+    background-color: #b4d8f2 !important;
+}
+
+.btn-pagination:disabled {
+    background-color: #e0e0e0 !important;
+    border-color: #cfcfcf !important;
+    color: #999 !important;
+    cursor: not-allowed;
+}
+
+/* Ícones de seta */
+.pagination-icon {
+    width: 16px;
+    height: 16px;
+}
+
+/* Número da página */
+.page-indicator {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #142c59;
 }

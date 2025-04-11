@@ -16,9 +16,11 @@ body, .page {
 
 .search-filters {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap; /* permite quebra em telas menores */
+    justify-content: center; /* centraliza os elementos */
     align-items: center;
     gap: 0.75rem;
+    text-align: center;
 }
 
 .search-filters .form-control {
@@ -216,4 +218,44 @@ body, .page {
     font-weight: bold;
     font-size: 1rem;
     color: #142c59;
+}
+/* ================================================
+   🔄 LOADER ANIMADO PADRÃO
+   ================================================ */
+   .loader-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 50px;
+}
+
+.custom-loader {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #0c5bd2; /* azul padrão */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+.loading-text {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.text-link {
+    color: #0c5bd2;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.text-link:hover {
+    text-decoration: underline;
 }

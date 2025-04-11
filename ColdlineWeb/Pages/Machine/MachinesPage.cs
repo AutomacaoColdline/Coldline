@@ -28,7 +28,7 @@ namespace ColdlineWeb.Pages
 
         protected int pageNumber = 1;
         protected int totalPages = 1;
-        protected const int defaultPageSize = 10;
+        protected const int defaultPageSize = 4;
 
         protected bool CanGoNext => pageNumber < totalPages;
         protected bool CanGoPrevious => pageNumber > 1;

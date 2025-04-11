@@ -1,48 +1,28 @@
 {
   "Files": [
     {
-      "Id": "/app/Presentation/wwwroot/uploads/Bruno.png",
-      "PackagePath": "staticwebassets/uploads/Bruno.png"
+      "Id": "/app/Presentation/wwwroot/uploads/Cicero Inacio Caetano de Melo.png",
+      "PackagePath": "staticwebassets/uploads/Cicero Inacio Caetano de Melo.png"
     },
     {
-      "Id": "/app/Presentation/wwwroot/uploads/Caio.png",
-      "PackagePath": "staticwebassets/uploads/Caio.png"
-    },
-    {
-      "Id": "/app/Presentation/wwwroot/uploads/Daniel.png",
-      "PackagePath": "staticwebassets/uploads/Daniel.png"
-    },
-    {
-      "Id": "/app/Presentation/wwwroot/uploads/Fabio.png",
-      "PackagePath": "staticwebassets/uploads/Fabio.png"
+      "Id": "/app/Presentation/wwwroot/uploads/Douglas Fabiano Neves.png",
+      "PackagePath": "staticwebassets/uploads/Douglas Fabiano Neves.png"
     },
     {
       "Id": "/app/Presentation/wwwroot/uploads/Franke Allan Costa Freitas.png",
       "PackagePath": "staticwebassets/uploads/Franke Allan Costa Freitas.png"
     },
     {
-      "Id": "/app/Presentation/wwwroot/uploads/Gabriel.png",
-      "PackagePath": "staticwebassets/uploads/Gabriel.png"
+      "Id": "/app/Presentation/wwwroot/uploads/Jhony da Silva Alves.png",
+      "PackagePath": "staticwebassets/uploads/Jhony da Silva Alves.png"
     },
     {
-      "Id": "/app/Presentation/wwwroot/uploads/Heitor.png",
-      "PackagePath": "staticwebassets/uploads/Heitor.png"
+      "Id": "/app/Presentation/wwwroot/uploads/Luiz Felipe Nunes Assis.png",
+      "PackagePath": "staticwebassets/uploads/Luiz Felipe Nunes Assis.png"
     },
     {
-      "Id": "/app/Presentation/wwwroot/uploads/Ingrid.png",
-      "PackagePath": "staticwebassets/uploads/Ingrid.png"
-    },
-    {
-      "Id": "/app/Presentation/wwwroot/uploads/adao.png",
-      "PackagePath": "staticwebassets/uploads/adao.png"
-    },
-    {
-      "Id": "/app/Presentation/wwwroot/uploads/eduardo.png",
-      "PackagePath": "staticwebassets/uploads/eduardo.png"
-    },
-    {
-      "Id": "/app/Presentation/wwwroot/uploads/teste.png",
-      "PackagePath": "staticwebassets/uploads/teste.png"
+      "Id": "/app/Presentation/wwwroot/uploads/Raphael Nantes Lima.png",
+      "PackagePath": "staticwebassets/uploads/Raphael Nantes Lima.png"
     },
     {
       "Id": "obj/Debug/net8.0/staticwebassets/msbuild.Presentation.Microsoft.AspNetCore.StaticWebAssets.props",

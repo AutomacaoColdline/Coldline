@@ -11,7 +11,10 @@
 
 @if (isLoading)
 {
-    <p>Carregando usuários e máquinas...</p>
+    <div class="loader-wrapper">
+        <div class="custom-loader"></div>
+        <span class="loading-text">Carregando...</span>
+    </div>
 }
 else if (!string.IsNullOrEmpty(errorMessage))
 {
@@ -34,89 +37,123 @@ else
          @onpointermove="HandlePointerMove"
          @onpointerup="HandlePointerUp">
 
-        <div class="user-table-card">
-            <table class="user-table">
-                <thead>
-                    <tr>
-                        <th>Foto</th>
-                        <th>Nome</th>
-                        <th>Processo Atual</th>
-                        <th>Tempo de Processo</th>
-                        <th>Tempo Médio</th>
-                        <th>Tempo limite</th>
-                        <th>Ocorrência Atual</th>
-                        <th>Indicador</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var user in PaginatedUsers)
-                    {
+        <div class="user-pagination-arrows">
+            @if (users.Count > pageSize)
+            {
+                <button class="btn-pagination left-arrow" @onclick="() => currentPage--" disabled="@isFirstPage">
+                    <img src="img/seta-esquerda.png" alt="Anterior" />
+                </button>
+            }
+
+            <div class="user-table-card">
+                <table class="user-table">
+                    <thead>
                         <tr>
-                            <td><img class="user-photo" src="@($"http://10.0.0.44:5000/uploads/{user.UrlPhoto}")" alt="Foto de @user.Name" /></td>
-                            <td>@user.Name</td>
-                            <td>
-                                @if (user.CurrentProcess != null)
-                                {
-                                    <a href="@($"/processViewer/{user.CurrentProcess.Id}")" class="text-link">
-                                        @user.CurrentProcess.Name
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span>Nenhum</span>
-                                }
-                            </td>
-                            @if (ProcessStatsByUserId.TryGetValue(user.Id, out var stat))
-                            {
-                                <td>@stat.ProcessTime</td>
-                                <td>@stat.Avg</td>
-                                <td>@stat.Upper</td>
-                            }
-                            else
-                            {
-                                <td>Nenhum</td>
-                                <td>Nenhum</td>
-                                <td>Nenhum</td>
-                            }
-                            <td>
-                                @if (user.CurrentOccurrence != null && !string.IsNullOrEmpty(user.CurrentOccurrence.Id))
-                                {
-                                    <a href="@($"/occurrenceViewer/{user.CurrentOccurrence.Id}")" class="text-link">
-                                        @user.CurrentOccurrence.Name
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span>Nenhuma</span>
-                                }
-                            </td>
-                            <td>@(RenderIndicator(user, stat))</td>
+                            <th>Foto</th>
+                            <th>Nome</th>
+                            <th>Processo Atual</th>
+                            <th>Tempo de Processo</th>
+                            <th>Tempo Médio</th>
+                            <th>Tempo limite</th>
+                            <th>Ocorrência Atual</th>
+                            <th>Indicador</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in PaginatedUsers)
+                        {
+                            <tr>
+                                <td><img class="user-photo" src="@($"http://10.0.0.44:5000/uploads/{user.UrlPhoto}?t={DateTime.UtcNow.Ticks}")" alt="Foto de @user.Name" /></td>
+                                <td>@user.Name</td>
+                                <td>
+                                    @if (user.CurrentProcess != null)
+                                    {
+                                        <a href="@($"/processViewer/{user.CurrentProcess.Id}")" class="text-link">
+                                            @user.CurrentProcess.Name
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span>Nenhum</span>
+                                    }
+                                </td>
+                                @if (ProcessStatsByUserId.TryGetValue(user.Id, out var stat))
+                                {
+                                    <td>@stat.ProcessTime</td>
+                                    <td>@stat.Avg</td>
+                                    <td>@stat.Upper</td>
+                                }
+                                else
+                                {
+                                    <td>Nenhum</td>
+                                    <td>Nenhum</td>
+                                    <td>Nenhum</td>
+                                }
+                                <td>
+                                    @if (user.CurrentOccurrence != null && !string.IsNullOrEmpty(user.CurrentOccurrence.Id))
+                                    {
+                                        <a href="@($"/occurrenceViewer/{user.CurrentOccurrence.Id}")" class="text-link">
+                                            @user.CurrentOccurrence.Name
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span>Nenhuma</span>
+                                    }
+                                </td>
+                                <td>@(RenderIndicator(user, stat))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (users.Count > pageSize)
+            {
+                <button class="btn-pagination right-arrow" @onclick="() => currentPage++" disabled="@isLastPage">
+                    <img src="img/seta-direita.png" alt="Próxima" />
+                </button>
+            }
         </div>
     </div>
 
-    <!-- Lista de máquinas -->
-   <div class="machine-list"
-        @onpointerdown="HandleMachinePointerDown"
-        @onpointerup="HandleMachinePointerUp">
-        @foreach (var machine in machines)
+    <!-- Lista de máquinas com swipe -->
+    <div class="machine-pagination-arrows">
+        @if (machinesCount.Count > machinePageSize)
         {
-            <div class="machine-card">
-               <div class="machine-card-header">
-                    Número de série da máquina:
-                    <a href="@($"/machineViewer/{machine.Id}")" class="text-link">
-                        @machine.IdentificationNumber
-                    </a>
+            <button class="btn-pagination left-arrow" @onclick="async () => { currentMachinePage--; await LoadMachines(); }" disabled="@(currentMachinePage == 1)">
+                <img src="img/seta-esquerda.png" class="pagination-icon" />
+            </button>
+        }
+
+        <div class="machine-list"
+            @onpointerdown="HandleMachinePointerDown"
+            @onpointerup="HandleMachinePointerUp">
+            @foreach (var machine in machines)
+            {
+                <div class="machine-card">
+                    <div class="machine-card-header">
+                        Número de série da máquina:
+                        <a href="@($"/machineViewer/{machine.Id}")" class="text-link">
+                            @machine.IdentificationNumber
+                        </a>
+                    </div>
+                    <div class="machine-card-body">
+                        <p><strong>Nome:</strong> @machine.MachineType.Name</p>
+                        <p><strong>Status:</strong> @machine.Status?.GetTranslatedStatus()</p>
+                        <p><strong>Processo:</strong> @(machine.Process?.Name ?? "Nenhum")</p>
+                    </div>
                 </div>
-                <div class="machine-card-body">
-                    <p><strong>Nome:</strong> @machine.MachineType.Name</p>
-                    <p><strong>Status:</strong> @machine.Status?.GetTranslatedStatus()</p>
-                    <p><strong>Processo:</strong> @(machine.Process?.Name ?? "Nenhum")</p>
-                </div>
-            </div>
+            }
+        </div>
+
+        @if (machinesCount.Count > machinePageSize)
+        {
+            <button class="btn-pagination right-arrow" @onclick="async () => { currentMachinePage++; await LoadMachines(); }"
+                    disabled="@(currentMachinePage >= Math.Ceiling((double)machinesCount.Count / machinePageSize))">
+                <img src="img/seta-direita.png" class="pagination-icon" />
+            </button>
         }
     </div>
+
 }

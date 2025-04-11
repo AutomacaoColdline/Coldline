@@ -4,7 +4,10 @@
 
 @if (isLoading)
 {
-    <p>Carregando...</p>
+    <div class="loader-wrapper">
+        <div class="custom-loader"></div>
+        <span class="loading-text">Carregando...</span>
+    </div>
 }
 else if (!string.IsNullOrEmpty(errorMessage))
 {
@@ -65,11 +68,15 @@ else
                     <tr>
                         <td>@(machine.MachineType?.Name ?? "Sem Tipo")</td>
                         <td>@machine.CustomerName</td>
-                        <td>@machine.IdentificationNumber</td>
+                        <td>
+                            <a class="text-link" href="@($"/machineViewer/{machine.Id}")">
+                                @machine.IdentificationNumber
+                            </a>
+                        </td>
                         <td>@machine.Phase</td>
                         <td>@machine.Voltage</td>
-                        <td>@(machine.Process?.Name ?? "Sem Processo")</td>
-                        <td>@(machine.Quality?.Name ?? "Sem Qualidade")</td>
+                        <td>@(machine.Process?.Name ?? "Não iniciado")</td>
+                        <td>@(machine.Quality?.Name ?? "Não disponivel")</td>
                         <td>@(machine.Monitoring?.Name ?? "Sem Monitoramento")</td>
                         <td>
                             <button class="btn btn-warning btn-sm" @onclick="() => OpenEditMachineModal(machine)">

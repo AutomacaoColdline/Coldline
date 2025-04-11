@@ -5,7 +5,10 @@
 
 @if (IsLoading)
 {
-    <p>Carregando...</p>
+    <div class="loader-wrapper">
+        <div class="custom-loader"></div>
+        <span class="loading-text">Carregando...</span>
+    </div>
 }
 else if (!string.IsNullOrEmpty(ErrorMessage))
 {
@@ -66,14 +69,22 @@ else
                 @foreach (var process in ProcessList)
                 {
                     <tr>
-                        <td>@process.IdentificationNumber</td>
+                        <td>
+                            <a class="text-link" href="@($"/processViewer/{process.Id}")">
+                                @process.IdentificationNumber
+                            </a>
+                        </td>
                         <td>@process.ProcessTime</td>
                         <td>@process.StartDate.ToString("dd/MM/yyyy HH:mm")</td>
                         <td>@(process.EndDate?.ToString("dd/MM/yyyy HH:mm") ?? "Não finalizado")</td>
                         <td>@process.User?.Name</td>
                         <td>@process.Department?.Name</td>
                         <td>@process.ProcessType?.Name</td>
-                        <td>@process.Machine?.Name</td>
+                        <td>
+                            @(string.IsNullOrWhiteSpace(process.Machine?.Name) 
+                                ? "Não há máquina vinculada" 
+                                : process.Machine.Name)
+                        </td>
                         <td>
                             @{
                                 var count = process.Occurrences?.Count ?? 0;

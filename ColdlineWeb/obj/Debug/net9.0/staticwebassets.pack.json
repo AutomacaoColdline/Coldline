@@ -29,6 +29,10 @@
       "PackagePath": "staticwebassets/css/Machine.css"
     },
     {
+      "Id": "/app/wwwroot/css/MachineViewer.css",
+      "PackagePath": "staticwebassets/css/MachineViewer.css"
+    },
+    {
       "Id": "/app/wwwroot/css/OccurrenceForm.css",
       "PackagePath": "staticwebassets/css/OccurrenceForm.css"
     },

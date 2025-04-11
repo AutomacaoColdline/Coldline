@@ -37,5 +37,8 @@ namespace ColdlineAPI.Domain.Entities
         public string IdentificationNumber { get; set; } = string.Empty;
         [BsonElement("urlPhoto")]
         public string UrlPhoto { get; set; } = string.Empty;
+        [BsonElement("work hour cost")]
+        public string WorkHourCost { get; set; } = string.Empty;
+        
     }
 }

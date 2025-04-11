@@ -80,7 +80,7 @@ namespace ColdlineAPI.Application.Services
             var collection = _users.GetCollection();
             var findOptions = new FindOptions<User, User>
             {
-                Projection = Builders<User>.Projection.Include(u => u.Id).Include(u => u.Name).Include(u => u.Email).Include(u => u.UserType).Include(u => u.Department).Include(u => u.IdentificationNumber).Include(u => u.UrlPhoto),
+                Projection = Builders<User>.Projection.Include(u => u.Id).Include(u => u.Name).Include(u => u.Email).Include(u => u.UserType).Include(u => u.Department).Include(u => u.IdentificationNumber).Include(u => u.UrlPhoto).Include(u => u.WorkHourCost),
                 Sort = Builders<User>.Sort.Ascending(u => u.Name)
             };
 
@@ -134,7 +134,8 @@ namespace ColdlineAPI.Application.Services
                 .Set(u => u.CurrentProcess, user.CurrentProcess)
                 .Set(u => u.CurrentOccurrence, user.CurrentOccurrence)
                 .Set(u => u.UrlPhoto, user.UrlPhoto ?? existingUser.UrlPhoto)
-                .Set(u => u.IdentificationNumber, user.IdentificationNumber ?? existingUser.IdentificationNumber);
+                .Set(u => u.IdentificationNumber, user.IdentificationNumber ?? existingUser.IdentificationNumber)
+                .Set(u => u.WorkHourCost, user.WorkHourCost);
 
             var collection = _users.GetCollection();
             await collection.UpdateOneAsync(u => u.Id == id, update);

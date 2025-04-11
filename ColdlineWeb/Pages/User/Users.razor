@@ -8,7 +8,10 @@
 
 @if (isLoading)
 {
-    <p>Carregando...</p>
+    <div class="loader-wrapper">
+        <div class="custom-loader"></div>
+        <span class="loading-text">Carregando...</span>
+    </div>
 }
 else if (!string.IsNullOrEmpty(errorMessage))
 {
@@ -48,12 +51,7 @@ else
 
             <button class="btn btn-primary" @onclick="ApplyFilters" aria-label="Buscar">
                 <img src="img/lupa.png" alt="Buscar" style="width: 16px; height: 16px;" />
-            </button>
-
-            <button class="btn btn-success mb-3" >
-                <img src="img/relatorio.png" alt="Novo relatorio" style="width: 16px; height: 16px;" />
-            </button>
-            
+            </button>  
         </div>
     </div>
 
@@ -67,6 +65,7 @@ else
                     <th>ID</th>
                     <th>Nome</th>
                     <th>Email</th>
+                    <th>Custo hora</th>
                     <th>Tipo de Usuário</th>
                     <th>Departamento</th>
                     <th>Ações</th>
@@ -86,6 +85,7 @@ else
                         <td>@user.IdentificationNumber</td>
                         <td>@user.Name</td>
                         <td>@user.Email</td>
+                        <td>@user.WorkHourCost</td>
                         <td>@(user.UserType?.Name ?? "Sem Tipo")</td>
                         <td>@(user.Department?.Name ?? "Sem Departamento")</td>
                         <td>

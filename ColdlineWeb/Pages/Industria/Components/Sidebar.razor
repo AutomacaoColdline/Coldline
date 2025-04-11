@@ -9,7 +9,7 @@
     {
         <div class="user-avatar">
             <div class="user-avatar">
-        <img src="@($"http://10.0.0.44:5000/uploads/{User.UrlPhoto}")" 
+        <img src="@($"http://10.0.0.44:5000/uploads/{User.UrlPhoto}?t={DateTime.UtcNow.Ticks}")" 
              alt="Foto do Usuário" 
              width="80" 
              onerror="this.onerror=null; this.src='https://via.placeholder.com/80';">

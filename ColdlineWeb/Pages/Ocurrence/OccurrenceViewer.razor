@@ -4,6 +4,37 @@
 
 @using ColdlineWeb.Models
 
+<link rel="stylesheet" href="/css/OccurrenceViewer.css" />
+
+@if (isLoading)
+{
+    <div class="loader-wrapper">
+        <div class="custom-loader"></div>
+        <span class="loading-text">Carregando ocorrência...</span>
+    </div>
+}
+else if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+else if (occurrence != null)
+{
+    <div class="viewer-container">
+        <div class="occurrence-box">
+            <h3>📋 Detalhes da Ocorrência</h3>
+            <div><strong>Código:</strong> @occurrence.CodeOccurrence</div>
+            <div><strong>Tempo de Processo:</strong> @occurrence.ProcessTime</div>
+            <div><strong>Início:</strong> @occurrence.StartDate.ToString("dd/MM/yyyy HH:mm")</div>
+            <div><strong>Término:</strong> @(occurrence.EndDate?.ToString("dd/MM/yyyy HH:mm") ?? "Não finalizado")</div>
+            <div><strong>Tipo de Pausa:</strong> @occurrence.PauseType?.Name</div>
+            <div><strong>Defeito:</strong> @(occurrence.Defect?.Name ?? "Nenhum")</div>
+            <div><strong>Usuário:</strong> @occurrence.User.Name</div>
+        </div>
+
+        <button class="btn-back" @onclick="GoBack">← Voltar</button>
+    </div>
+}
+
 @code {
     [Parameter] public string Id { get; set; } = string.Empty;
 
@@ -29,31 +60,4 @@
     }
 
     private void GoBack() => Navigation.NavigateTo("/home");
-
-}
-<link rel="stylesheet" href="/css/OccurrenceViewer.css" />
-
-@if (isLoading)
-{
-    <p>Carregando dados da ocorrência...</p>
-}
-else if (!string.IsNullOrEmpty(error))
-{
-    <div class="alert alert-danger">@error</div>
-}
-else if (occurrence != null)
-{
-    <div class="occurrence-details">
-        <h4>Detalhes da Ocorrência</h4>
-        <div><strong>Código:</strong> @occurrence.CodeOccurrence</div>
-        <div><strong>Processo:</strong> @occurrence.Process.Name</div>
-        <div><strong>Tempo de Processo:</strong> @occurrence.ProcessTime</div>
-        <div><strong>Início:</strong> @occurrence.StartDate.ToString("dd/MM/yyyy HH:mm")</div>
-        <div><strong>Término:</strong> @(occurrence.EndDate.HasValue ? occurrence.EndDate.Value.ToString("dd/MM/yyyy HH:mm") : "Não finalizado")</div>
-        <div><strong>Tipo de Pausa:</strong> @occurrence.PauseType.Name</div>
-        <div><strong>Defeito:</strong> @occurrence.Defect.Name</div>
-        <div><strong>Usuário:</strong> @occurrence.User.Name</div>
-
-        <button class="btn btn-secondary mt-3" @onclick="GoBack">Voltar</button>
-    </div>
 }

@@ -10,6 +10,7 @@ namespace ColdlineWeb.Models{
         public ReferenceEntity? CurrentOccurrence { get; set; }
         public string IdentificationNumber { get; set; } = string.Empty;
         public string UrlPhoto { get; set; } = string.Empty;
+        public string WorkHourCost { get; set; } = string.Empty;
     }
 
 

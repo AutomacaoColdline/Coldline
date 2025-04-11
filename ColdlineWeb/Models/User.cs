@@ -8,4 +8,5 @@ public class User
     public string UserType { get; set; } = string.Empty;
     public string Department { get; set; } = string.Empty;
     public string IdentificationNumber { get; set; } = string.Empty;
+    public string WorkHourCost { get; set; } = string.Empty;
 }

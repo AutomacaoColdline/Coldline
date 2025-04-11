@@ -1,26 +1,106 @@
 @page "/machineViewer/{Id}"
-@inject HttpClient Http
+
+@using ColdlineWeb.Services
+@inject MachineService MachineService
+@inject ProcessService ProcessService
 @inject NavigationManager Navigation
 
 @using ColdlineWeb.Models
+@using ColdlineWeb.Models.Filter
+@using ColdlineWeb.Helpers
+
+
+<link rel="stylesheet" href="css/MachineViewer.css" />
+
+@if (isLoading)
+{
+    <div class="loader-wrapper">
+        <div class="custom-loader"></div>
+        <span class="loading-text">Carregando detalhes da máquina...</span>
+    </div>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else if (machine != null)
+{
+    <div class="viewer-container">
+        <div class="machine-box">
+            <h3>🔧 Detalhes da Máquina</h3>
+            <div><strong>Cliente:</strong> @machine.CustomerName</div>
+            <div><strong>Identificação:</strong> @machine.IdentificationNumber</div>
+            <div><strong>Fase:</strong> @machine.Phase</div>
+            <div><strong>Voltagem:</strong> @machine.Voltage</div>
+            <div><strong>Status:</strong> @(machine.Status?.ToPortugueseString() ?? "Desconhecido")</div>
+            <div><strong>Tipo de Máquina:</strong> @machine.MachineType?.Name</div>
+            <div><strong>Qualidade:</strong> @(machine.Quality?.Name ?? "Não disponivel")</div>
+            <div><strong>Monitoramento:</strong> @(machine.Monitoring?.Name ?? "Nenhum")</div>
+            <div><strong>Tempo:</strong> @machine.Time</div>
+        </div>
+
+        <div class="processes-box">
+            <h3>📋 Processos com esta Máquina</h3>
+            @if (processes.Count == 0)
+            {
+                <div class="no-info">Nenhum processo encontrado para esta máquina.</div>
+            }
+            else
+            {
+                @foreach (var proc in processes)
+                {
+                    <div class="process-card">
+                        <div><strong>Nº Identificação:</strong> @proc.IdentificationNumber</div>
+                        <div><strong>Início:</strong> @proc.StartDate.ToString("dd/MM/yyyy HH:mm")</div>
+                        <div><strong>Término:</strong> @(proc.EndDate?.ToString("dd/MM/yyyy HH:mm") ?? "Não finalizado")</div>
+                        <div><strong>Tempo Total:</strong> @proc.ProcessTime</div>
+                        <div><strong>Usuário:</strong> @proc.User.Name</div>
+                        <div><strong>Departamento:</strong> @proc.Department.Name</div>
+                        <div><strong>Tipo de Processo:</strong> @proc.ProcessType.Name</div>
+                        <div><strong>Re-trabalho:</strong> @(proc.ReWork ? "Sim" : "Não")</div>
+                        <div><strong>Pré-Industrialização:</strong> @(proc.PreIndustrialization == true ? "Sim" : proc.PreIndustrialization == false ? "Não" : "Não informado")</div>
+                        <div><strong>Ocorrências:</strong> @(proc.Occurrences?.Count ?? 0)</div>
+                    </div>
+                }
+            }
+        </div>
+
+        <button class="btn-back" @onclick="GoBack">← Voltar</button>
+    </div>
+}
 
 @code {
     [Parameter] public string Id { get; set; } = string.Empty;
 
     private MachineModel? machine;
+    private List<ProcessModel> processes = new();
     private bool isLoading = true;
-    private string? error;
+    private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            machine = await Http.GetFromJsonAsync<MachineModel>($"api/Machine/{Id}");
+            machine = await MachineService.GetMachineByIdAsync(Id);
+            if (machine == null)
+            {
+                errorMessage = "Máquina não encontrada.";
+                return;
+            }
+
+            var filter = new ProcessFilterModel
+            {
+                MachineId = machine.Id,
+                Page = 1,
+                PageSize = 100
+            };
+
+            processes = await ProcessService.SearchProcessesAsync(filter);
         }
         catch (Exception ex)
         {
-            error = "Erro ao carregar os dados da máquina.";
-            Console.WriteLine(ex);
+            errorMessage = "Erro ao carregar informações.";
+            Console.WriteLine(ex.Message);
         }
         finally
         {
@@ -28,34 +108,5 @@
         }
     }
 
-    private void GoBack() => Navigation.NavigateTo("/machines");
-}
-
-<link rel="stylesheet" href="css/MachineViewer.css" />
-
-@if (isLoading)
-{
-    <p>Carregando detalhes da máquina...</p>
-}
-else if (!string.IsNullOrEmpty(error))
-{
-    <div class="alert alert-danger">@error</div>
-}
-else if (machine != null)
-{
-    <div class="machine-details">
-        <h4>Detalhes da Máquina</h4>
-        <div><strong>Cliente:</strong> @machine.CustomerName</div>
-        <div><strong>Número de Identificação:</strong> @machine.IdentificationNumber</div>
-        <div><strong>Fase:</strong> @machine.Phase</div>
-        <div><strong>Voltagem:</strong> @machine.Voltage</div>
-        <div><strong>Status:</strong> @(machine.Status?.ToString() ?? "Desconhecido")</div>
-        <div><strong>Tipo de Máquina:</strong> @machine.MachineType?.Name</div>
-        <div><strong>Processo:</strong> @(machine.Process?.Name ?? "Nenhum")</div>
-        <div><strong>Qualidade:</strong> @(machine.Quality?.Name ?? "Nenhuma")</div>
-        <div><strong>Monitoramento:</strong> @(machine.Monitoring?.Name ?? "Nenhum")</div>
-        <div><strong>Tempo:</strong> @machine.Time</div>
-
-        <button class="btn btn-secondary mt-3" @onclick="GoBack">Voltar</button>
-    </div>
+    private void GoBack() => Navigation.NavigateTo("/home");
 }

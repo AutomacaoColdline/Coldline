@@ -1,0 +1,99 @@
+.viewer-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+    background: url('../img/bg.png') no-repeat center center fixed;
+    background-size: cover;
+    backdrop-filter: blur(4px);
+    border-radius: 12px;
+}
+
+.machine-box, .processes-box {
+    background: #f9fcff;
+    border: 1px solid #dce9f9;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+h3 {
+    color: #1c3c93;
+    margin-bottom: 16px;
+    font-size: 1.2rem;
+}
+
+.process-card {
+    background: #eef5fd;
+    border-left: 5px solid #1c3c93;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.process-card div {
+    margin-bottom: 6px;
+}
+
+.no-info {
+    font-style: italic;
+    color: #666;
+}
+
+.btn-back {
+    background-color: #1c3c93;
+    color: #fff;
+    padding: 10px 18px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    margin: 0 auto;
+    display: block;
+}
+
+.btn-back:hover {
+    background-color: #274bb0;
+}
+
+.loader-wrapper {
+    text-align: center;
+    padding-top: 60px;
+}
+
+.custom-loader {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #1c3c93;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    margin: auto;
+    animation: spin 1s linear infinite;
+}
+
+.loading-text {
+    margin-top: 12px;
+    font-size: 14px;
+    color: #1c3c93;
+    font-weight: 500;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@media screen and (max-width: 768px) {
+    .viewer-container {
+        padding: 15px;
+    }
+
+    .machine-box, .processes-box {
+        padding: 15px;
+    }
+
+    .process-card {
+        font-size: 13px;
+    }
+}

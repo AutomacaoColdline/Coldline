@@ -2,15 +2,18 @@
 @using ColdlineWeb.Models
 @using ColdlineWeb.Services
 @inject ProcessService ProcessService
+@inject OccurrenceService OccurrenceService
+@inject MachineService MachineService
 @inject NavigationManager Navigation
 
 <link rel="stylesheet" href="css/ProcessViewer.css" />
 
-<h3>Detalhes do Processo</h3>
-
 @if (isLoading)
 {
-    <p>Carregando dados do processo...</p>
+    <div class="loader-wrapper">
+        <div class="custom-loader"></div>
+        <span class="loading-text">Carregando...</span>
+    </div>
 }
 else if (process == null)
 {
@@ -18,26 +21,73 @@ else if (process == null)
 }
 else
 {
-    <div class="process-details">
-        <div><strong>Nº Identificação:</strong> @process.IdentificationNumber</div>
-        <div><strong>Início:</strong> @process.StartDate.ToString("dd/MM/yyyy HH:mm")</div>
-        <div><strong>Término:</strong> @(process.EndDate?.ToString("dd/MM/yyyy HH:mm") ?? "Não finalizado")</div>
-        <div><strong>Tempo Total:</strong> @process.ProcessTime</div>
-        <div><strong>Usuário:</strong> @process.User?.Name</div>
-        <div><strong>Departamento:</strong> @process.Department?.Name</div>
-        <div><strong>Tipo de Processo:</strong> @process.ProcessType?.Name</div>
-        <div><strong>Máquina:</strong> @process.Machine?.Name</div>
-        <div><strong>Ocorrências:</strong> @(process.Occurrences?.Count ?? 0)</div>
-        <div><strong>Re-trabalho:</strong> @(process.ReWork ? "Sim" : "Não")</div>
-        <div><strong>Pré-Industrialização:</strong> @(process.PreIndustrialization == true ? "Sim" : process.PreIndustrialization == false ? "Não" : "Não informado")</div>
-    </div>
+    <div class="viewer-container">
+        <div class="process-box">
+            <h3>🛠️ Detalhes do Processo</h3>
+            <div><strong>Nº Identificação:</strong> @process.IdentificationNumber</div>
+            <div><strong>Início:</strong> @process.StartDate.ToString("dd/MM/yyyy HH:mm")</div>
+            <div><strong>Término:</strong> @(process.EndDate?.ToString("dd/MM/yyyy HH:mm") ?? "Não finalizado")</div>
+            <div><strong>Tempo Total:</strong> @process.ProcessTime</div>
+            <div><strong>Usuário:</strong> @process.User.Name</div>
+            <div><strong>Departamento:</strong> @process.Department.Name</div>
+            <div><strong>Tipo de Processo:</strong> @process.ProcessType.Name</div>
+            <div><strong>Re-trabalho:</strong> @(process.ReWork ? "Sim" : "Não")</div>
+            <div><strong>Pré-Industrialização:</strong> @(process.PreIndustrialization == true ? "Sim" : process.PreIndustrialization == false ? "Não" : "Não informado")</div>
+        </div>
 
-    <button class="btn btn-secondary mt-3" @onclick="@GoBack">Voltar</button>
+        <div class="machine-box">
+            <h3>🔧 Máquina</h3>
+            @if (machine != null)
+            {
+                <div><strong>Identificação:</strong> @machine.IdentificationNumber</div>
+                <div><strong>Nome do Cliente:</strong> @machine.CustomerName</div>
+                <div><strong>Tipo:</strong> @machine.MachineType.Name</div>
+                <div><strong>Fase:</strong> @machine.Phase</div>
+                <div><strong>Voltagem:</strong> @machine.Voltage</div>
+                <div><strong>Status:</strong> @machine.Status?.ToString()</div>
+                <div><strong>Tempo:</strong> @machine.Time</div>
+                <div><strong>Qualidade:</strong> @(machine.Quality?.Name ?? "Nenhum")</div>
+                <div><strong>Monitoramento:</strong> @(machine.Monitoring?.Name ?? "Nenhum")</div>
+            }
+            else
+            {
+                <div class="no-info">Nenhuma máquina vinculada ao processo.</div>
+            }
+        </div>
+
+        <div class="occurrence-box">
+            <h3>📋 Ocorrências</h3>
+            @if (occurrences != null && occurrences.Count > 0)
+            {
+                @foreach (var occ in occurrences)
+                {
+                    <div class="occurrence-card">
+                        <div><strong>Código:</strong> @occ.CodeOccurrence</div>
+                        <div><strong>Tipo de Pausa:</strong> @occ.PauseType.Name</div>
+                        <div><strong>Defeito:</strong> @(occ.Defect?.Name ?? "Nenhum")</div>
+                        <div><strong>Usuário:</strong> @occ.User.Name</div>
+                        <div><strong>Tempo:</strong> @occ.ProcessTime</div>
+                        <div><strong>Início:</strong> @occ.StartDate.ToString("dd/MM/yyyy HH:mm")</div>
+                        <div><strong>Término:</strong> @(occ.EndDate?.ToString("dd/MM/yyyy HH:mm") ?? "Não finalizado")</div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="no-info">Nenhuma ocorrência registrada.</div>
+            }
+        </div>
+
+        <button class="btn-back" @onclick="GoBack">← Voltar</button>
+    </div>
 }
 
 @code {
     [Parameter] public string Id { get; set; } = string.Empty;
+
     private ProcessModel? process;
+    private MachineModel? machine;
+    private List<OccurrenceModel> occurrences = new();
     private bool isLoading = true;
 
     protected override async Task OnInitializedAsync()
@@ -45,6 +95,24 @@ else
         try
         {
             process = await ProcessService.GetProcessByIdAsync(Id);
+
+            if (process != null)
+            {
+                if (!string.IsNullOrEmpty(process.Machine?.Id))
+                {
+                    machine = await MachineService.GetMachineByIdAsync(process.Machine.Id);
+                }
+
+                if (process.Occurrences != null && process.Occurrences.Any())
+                {
+                    foreach (var refOcc in process.Occurrences)
+                    {
+                        var occurrence = await OccurrenceService.GetByIdAsync(refOcc.Id);
+                        if (occurrence != null)
+                            occurrences.Add(occurrence);
+                    }
+                }
+            }
         }
         catch
         {
@@ -56,8 +124,5 @@ else
         }
     }
 
-    void GoBack()
-    {
-        Navigation.NavigateTo("/home");
-    }
+    void GoBack() => Navigation.NavigateTo("/home");
 }

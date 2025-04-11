@@ -1,42 +1,88 @@
 @page "/quality"
+@using ColdlineWeb.Services
+@inject ProcessService ProcessService
 
-<link rel="stylesheet" href="css/Quality.css" />
+<h3>Plano Cartesiano - Tempo de Processo por Usuário</h3>
 
-<div class="card">
-    <h3>Plano Cartesiano</h3>
-    <div class="chart-wrapper">
-        <div class="y-axis">
-            <div>40</div>
-            <div>35</div>
-            <div>30</div>
-            <div>25</div>
-            <div>20</div>
-            <div>15</div>
-            <div>10</div>
-            <div>5</div>
-            <div>0</div>
-        </div>
-
-        <div class="chart-container">
-            <div class="chart-grid">
-                <div class="axis-y"></div>
-                <div class="axis-x"></div>
-
-                <div class="chart-bars">
-                    <div class="bar" style="height: 25px;" title="Alice: 5 anos"></div>
-                    <div class="bar" style="height: 75px;" title="Bruno: 15 anos"></div>
-                    <div class="bar" style="height: 105px;" title="Carla: 21 anos"></div>
-                    <div class="bar" style="height: 135px;" title="Daniel: 27 anos"></div>
-                    <div class="bar" style="height: 165px;" title="Elaine: 33 anos"></div>
-                </div>
+@if (isLoading)
+{
+    <p>Carregando dados...</p>
+}
+else if (processes.Count == 0)
+{
+    <p>Nenhum processo encontrado para esta máquina.</p>
+}
+else
+{
+    <div class="card">
+        <div class="chart-wrapper">
+            <div class="y-axis">
+                @foreach (var label in yLabels)
+                {
+                    <div>@label</div>
+                }
             </div>
-            <div class="x-labels">
-                <span>Alice</span>
-                <span>Bruno</span>
-                <span>Carla</span>
-                <span>Daniel</span>
-                <span>Elaine</span>
+
+            <div class="chart-container">
+                <div class="chart-grid">
+                    <div class="axis-y"></div>
+                    <div class="axis-x"></div>
+
+                    <div class="chart-bars">
+                        @foreach (var p in processes)
+                        {
+                            var height = ConvertToMinutes(p.ProcessTime) * 5; // escala: 1 min = 5px
+                            <div class="bar"
+                                 style="height:@($"{height}px");"
+                                 title="@($"{p.User.Name}: {FormatTime(p.ProcessTime)}")">
+                                <span></span>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="x-labels">
+                    @foreach (var p in processes)
+                    {
+                        <span>@p.User.Name</span>
+                    }
+                </div>
             </div>
         </div>
     </div>
-</div>
+}
+
+@code {
+    private List<ProcessModel> processes = new();
+    private bool isLoading = true;
+    private string machineId = "67f9742d1245ed61de16b02c"; // Substitua por binding ou valor real
+
+    private readonly List<int> yLabels = new() { 40, 35, 30, 25, 20, 15, 10, 5, 0 };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var filter = new ProcessFilterModel
+        {
+            MachineId = machineId,
+            PageSize = 100
+        };
+
+        processes = await ProcessService.SearchProcessesAsync(filter);
+        isLoading = false;
+    }
+
+    private int ConvertToMinutes(string timeStr)
+    {
+        if (TimeSpan.TryParse(timeStr, out var time))
+        {
+            return (int)Math.Round(time.TotalMinutes);
+        }
+        return 0;
+    }
+
+    private string FormatTime(string timeStr)
+    {
+        return TimeSpan.TryParse(timeStr, out var time)
+            ? time.ToString(@"hh\:mm\:ss")
+            : timeStr;
+    }
+}

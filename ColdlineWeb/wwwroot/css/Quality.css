@@ -102,7 +102,7 @@ body {
     color: white;
     font-size: 12px;
     transition: height 0.3s ease;
-    margin-bottom: 2px; /* espaço entre barra e eixo x */
+    margin-bottom: 2px;
 }
 
 .x-labels {
@@ -113,4 +113,12 @@ body {
     font-weight: bold;
     margin-top: 10px;
     width: 100%;
+}
+
+.x-labels span {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
 }

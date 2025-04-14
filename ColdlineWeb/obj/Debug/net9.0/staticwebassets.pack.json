@@ -33,6 +33,10 @@
       "PackagePath": "staticwebassets/css/MachineViewer.css"
     },
     {
+      "Id": "/app/wwwroot/css/NumberMachineByTypeMachine.css",
+      "PackagePath": "staticwebassets/css/NumberMachineByTypeMachine.css"
+    },
+    {
       "Id": "/app/wwwroot/css/NumberMachineDate.css",
       "PackagePath": "staticwebassets/css/NumberMachineDate.css"
     },
@@ -199,6 +203,10 @@
     {
       "Id": "/app/wwwroot/index.html",
       "PackagePath": "staticwebassets/index.html"
+    },
+    {
+      "Id": "/app/wwwroot/js/numberMachineByTypeMachine.js",
+      "PackagePath": "staticwebassets/js/numberMachineByTypeMachine.js"
     },
     {
       "Id": "/app/wwwroot/js/numberMachineDate.js",

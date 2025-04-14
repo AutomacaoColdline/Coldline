@@ -33,6 +33,30 @@
       "PackagePath": "staticwebassets/css/MachineViewer.css"
     },
     {
+      "Id": "/app/wwwroot/css/NumberMachineDate.css",
+      "PackagePath": "staticwebassets/css/NumberMachineDate.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/NumberOcurrenceDate.css",
+      "PackagePath": "staticwebassets/css/NumberOcurrenceDate.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/NumberOcurrencesByUsers.css",
+      "PackagePath": "staticwebassets/css/NumberOcurrencesByUsers.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/NumberProcessByTypeProcess.css",
+      "PackagePath": "staticwebassets/css/NumberProcessByTypeProcess.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/NumberProcessByUsers.css",
+      "PackagePath": "staticwebassets/css/NumberProcessByUsers.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/NumberProcessDate.css",
+      "PackagePath": "staticwebassets/css/NumberProcessDate.css"
+    },
+    {
       "Id": "/app/wwwroot/css/OccurrenceForm.css",
       "PackagePath": "staticwebassets/css/OccurrenceForm.css"
     },
@@ -157,6 +181,10 @@
       "PackagePath": "staticwebassets/img/relatorio.png"
     },
     {
+      "Id": "/app/wwwroot/img/reports.png",
+      "PackagePath": "staticwebassets/img/reports.png"
+    },
+    {
       "Id": "/app/wwwroot/img/seta-direita.png",
       "PackagePath": "staticwebassets/img/seta-direita.png"
     },
@@ -171,6 +199,30 @@
     {
       "Id": "/app/wwwroot/index.html",
       "PackagePath": "staticwebassets/index.html"
+    },
+    {
+      "Id": "/app/wwwroot/js/numberMachineDate.js",
+      "PackagePath": "staticwebassets/js/numberMachineDate.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/numberOcurrenceDate.js",
+      "PackagePath": "staticwebassets/js/numberOcurrenceDate.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/numberOcurrencesByUsers.js",
+      "PackagePath": "staticwebassets/js/numberOcurrencesByUsers.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/numberProcessByTypeProcess.js",
+      "PackagePath": "staticwebassets/js/numberProcessByTypeProcess.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/numberProcessByUsers.js",
+      "PackagePath": "staticwebassets/js/numberProcessByUsers.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/numberProcessDate.js",
+      "PackagePath": "staticwebassets/js/numberProcessDate.js"
     },
     {
       "Id": "/app/wwwroot/lib/bootstrap/dist/css/bootstrap-grid.css",

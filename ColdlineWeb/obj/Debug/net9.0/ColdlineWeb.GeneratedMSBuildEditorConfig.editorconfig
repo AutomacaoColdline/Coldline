@@ -188,6 +188,34 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvY2Vzcy9Qcm9jZXNzVmlld2VyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/app/Pages/Quality/NumberMachineByTypeMachine.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJNYWNoaW5lQnlUeXBlTWFjaGluZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality/NumberMachineDate.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJNYWNoaW5lRGF0ZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality/NumberOcurrenceDate.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJPY3VycmVuY2VEYXRlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality/NumberOcurrencesByUsers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJPY3VycmVuY2VzQnlVc2Vycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality/NumberProcessByTypeProcess.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJQcm9jZXNzQnlUeXBlUHJvY2Vzcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality/NumberProcessByUsers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJQcm9jZXNzQnlVc2Vycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality/NumberProcessDate.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJQcm9jZXNzRGF0ZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/app/Pages/Quality/Quality.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9RdWFsaXR5LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 

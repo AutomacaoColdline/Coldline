@@ -1,0 +1,54 @@
+@inject IJSRuntime JS
+<link rel="stylesheet" href="css/NumberMachineByTypeMachine.css" />
+
+<div class="filtro-container">
+    <label>De:
+        <input @bind="startDate" type="date" />
+    </label>
+    <label>Até:
+        <input @bind="endDate" type="date" />
+    </label>
+    <label>Tipo de Gráfico:
+        <select @bind="chartType">
+            <option value="bar">Barra</option>
+            <option value="line">Linha</option>
+        </select>
+    </label>
+    <button @onclick="GerarGraficoPorTipoMaquina">
+        <img src="img/lupa.png" alt="Buscar" class="btn-icon" />
+    </button>
+</div>
+
+<div class="grafico-container">
+    <canvas id="machineTypeChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/numberMachineByTypeMachine.js"></script>
+
+@code {
+    private DateTime startDate = DateTime.Today.AddDays(-7);
+    private DateTime endDate = DateTime.Today;
+    private string chartType = "bar";
+
+    private async Task GerarGraficoPorTipoMaquina()
+    {
+        var dados = GerarDadosFicticios(startDate, endDate);
+        await JS.InvokeVoidAsync("renderizarGraficoTipoMaquina", dados.Labels, dados.Values, chartType);
+    }
+
+    private (List<string> Labels, List<int> Values) GerarDadosFicticios(DateTime start, DateTime end)
+    {
+        var tipos = new[] { "Injetora", "Torno", "Fresadora", "CNC", "Laser", "Montadora" };
+        var labels = new List<string>();
+        var values = new List<int>();
+
+        foreach (var tipo in tipos)
+        {
+            labels.Add(tipo);
+            values.Add(Random.Shared.Next(3, 30));
+        }
+
+        return (labels, values);
+    }
+}

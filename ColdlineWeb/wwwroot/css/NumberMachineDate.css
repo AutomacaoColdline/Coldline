@@ -1,0 +1,77 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", sans-serif;
+    background-color: #f5f6fa;
+    overflow-x: hidden;
+}
+
+/* Container dos filtros */
+.filtro-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    margin: 20px auto; /* Centraliza horizontalmente */
+    flex-wrap: wrap;
+    max-width: 1000px;  /* Mesma largura do gráfico */
+    width: 100%;
+}
+
+/* Inputs, selects e botões do filtro */
+.filtro-container input,
+.filtro-container select,
+.filtro-container button {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 0.95rem;
+}
+
+/* Estilo do botão */
+.filtro-container button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    padding: 6px 10px;
+}
+
+/* Hover do botão */
+.filtro-container button:hover {
+    background-color: #0056b3;
+}
+
+/* Ícone dentro do botão */
+.filtro-container .btn-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+/* Container do gráfico */
+.grafico-container {
+    background: white;
+    border-radius: 10px;
+    margin: 0 auto 20px;
+    padding: 20px;
+    max-width: 1000px;
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+/* Gráfico responsivo */
+.grafico-container canvas {
+    width: 100% !important;
+    height: auto !important;
+}

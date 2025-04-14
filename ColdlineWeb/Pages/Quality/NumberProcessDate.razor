@@ -1,0 +1,93 @@
+@inject IJSRuntime JS
+<link rel="stylesheet" href="css/NumberProcessDate.css" />
+
+<div class="filtro-container">
+    <label>De: <input @bind="startDate" type="datetime-local" /></label>
+    <label>Até: <input @bind="endDate" type="datetime-local" /></label>
+    <label>Tipo de Gráfico:
+        <select @bind="chartType">
+            <option value="bar">Barra</option>
+            <option value="line">Linha</option>
+        </select>
+    </label>
+    <button @onclick="AplicarFiltro">
+        <img src="img/lupa.png" alt="Buscar" class="btn-icon" />
+    </button>
+</div>
+
+<div class="grafico-container">
+    <canvas id="processChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/numberProcessDate.js"></script>
+
+@code {
+    private DateTime startDate = DateTime.Today.AddDays(-7);
+    private DateTime endDate = DateTime.Today;
+    private string chartType = "bar";
+
+    private async Task AplicarFiltro()
+    {
+        var data = GerarDados(startDate, endDate);
+        await JS.InvokeVoidAsync("renderizarGraficoProcess", data.Labels, data.Values, chartType);
+    }
+
+    private (List<string> Labels, List<int> Values) GerarDados(DateTime start, DateTime end)
+    {
+        var labels = new List<string>();
+        var values = new List<int>();
+        var daysDiff = (end - start).TotalDays;
+
+        if (daysDiff < 1)
+        {
+            for (int h = 0; h < 24; h++)
+            {
+                labels.Add($"{h}h");
+                values.Add(Random.Shared.Next(0, 10));
+            }
+        }
+        else if (daysDiff <= 7)
+        {
+            for (var dt = start; dt <= end; dt = dt.AddDays(1))
+            {
+                if (dt.DayOfWeek is >= DayOfWeek.Monday and <= DayOfWeek.Friday)
+                {
+                    labels.Add(dt.ToString("dd/MM/yyyy"));
+                    values.Add(Random.Shared.Next(0, 10));
+                }
+            }
+        }
+        else if (daysDiff <= 31)
+        {
+            int semana = 1;
+            for (var dt = start; dt <= end; dt = dt.AddDays(7))
+            {
+                labels.Add($"Semana {semana++}");
+                values.Add(Random.Shared.Next(0, 20));
+            }
+        }
+        else if (daysDiff <= 366)
+        {
+            var dt = new DateTime(start.Year, start.Month, 1);
+            while (dt <= end)
+            {
+                labels.Add(dt.ToString("MMM yy", new System.Globalization.CultureInfo("pt-BR")));
+                values.Add(Random.Shared.Next(0, 100));
+                dt = dt.AddMonths(1);
+            }
+        }
+        else
+        {
+            var dt = new DateTime(start.Year, 1, 1);
+            while (dt <= end)
+            {
+                labels.Add(dt.Year.ToString());
+                values.Add(Random.Shared.Next(0, 500));
+                dt = dt.AddYears(1);
+            }
+        }
+
+        return (labels, values);
+    }
+}

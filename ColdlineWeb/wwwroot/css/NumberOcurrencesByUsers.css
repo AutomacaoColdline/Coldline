@@ -1,0 +1,70 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", sans-serif;
+    background-color: #f5f6fa;
+    overflow-x: hidden;
+}
+
+.filtro-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    margin: 20px auto;
+    flex-wrap: wrap;
+    max-width: 1000px;
+    width: 100%;
+}
+
+.filtro-container input,
+.filtro-container select,
+.filtro-container button {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 0.95rem;
+}
+
+.filtro-container button {
+    background-color: #dc3545; /* tom vermelho para ocorrências */
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    padding: 6px 10px;
+}
+
+.filtro-container button:hover {
+    background-color: #a71d2a;
+}
+
+.filtro-container .btn-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+.grafico-container {
+    background: white;
+    border-radius: 10px;
+    margin: 0 auto 20px;
+    padding: 20px;
+    max-width: 1000px;
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.grafico-container canvas {
+    width: 100% !important;
+    height: auto !important;
+}

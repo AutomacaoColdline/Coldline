@@ -1,88 +1,57 @@
-@page "/quality"
-@using ColdlineWeb.Services
-@inject ProcessService ProcessService
+@page "/reports"
+<link rel="stylesheet" href="css/Quality.css" />
 
-<h3>Plano Cartesiano - Tempo de Processo por Usuário</h3>
-
-@if (isLoading)
-{
-    <p>Carregando dados...</p>
-}
-else if (processes.Count == 0)
-{
-    <p>Nenhum processo encontrado para esta máquina.</p>
-}
-else
-{
-    <div class="card">
-        <div class="chart-wrapper">
-            <div class="y-axis">
-                @foreach (var label in yLabels)
-                {
-                    <div>@label</div>
-                }
-            </div>
-
-            <div class="chart-container">
-                <div class="chart-grid">
-                    <div class="axis-y"></div>
-                    <div class="axis-x"></div>
-
-                    <div class="chart-bars">
-                        @foreach (var p in processes)
-                        {
-                            var height = ConvertToMinutes(p.ProcessTime) * 5; // escala: 1 min = 5px
-                            <div class="bar"
-                                 style="height:@($"{height}px");"
-                                 title="@($"{p.User.Name}: {FormatTime(p.ProcessTime)}")">
-                                <span></span>
-                            </div>
-                        }
-                    </div>
-                </div>
-                <div class="x-labels">
-                    @foreach (var p in processes)
-                    {
-                        <span>@p.User.Name</span>
-                    }
-                </div>
-            </div>
+<div class="tab-bar">
+    <button class="tab-button @(selectedChart == null ? "active" : "")" @onclick="@(() => ExibirChart(null))">Nada</button>
+    <div class="tab-button dropdown">
+        <button class="tab-button @(selectedChart == "numberProcessByUsers" ? "active" : "")">Quantidade</button>
+        <div class="dropdown-content">
+            <button @onclick="@(() => ExibirChart("numberProcessDate"))">Processos por data</button>
+            <button @onclick="@(() => ExibirChart("numberMachineDate"))">Máquinas por data</button>
+            <button @onclick="@(() => ExibirChart("numberOcurrenceDate"))">Ocorrencias por data</button>
+            <button @onclick="@(() => ExibirChart("numberProcessByUsers"))">Processos por usuário</button>
+            <button @onclick="@(() => ExibirChart("numberOcurrencesByUsers"))">Ocorrencias por usuário</button>
+            <button @onclick="@(() => ExibirChart("numberProcessByTypeProcess"))">Processos por tipo de processo</button>
+            <button @onclick="@(() => ExibirChart("numberMachineByTypeMachine"))">Maquinas por tipo de maquina</button>
         </div>
     </div>
+</div>
+
+@if (selectedChart == "numberProcessDate")
+{
+    <NumberProcessDate />
+}
+else if (selectedChart == "numberMachineDate")
+{
+    <NumberMachineDate />
+}
+else if (selectedChart == "numberOcurrenceDate")
+{
+    <NumberOcurrenceDate />
+}
+
+else if (selectedChart == "numberProcessByUsers")
+{
+    <NumberProcessByUsers />
+}
+else if (selectedChart == "numberOcurrencesByUsers")
+{
+    <NumberOcurrencesByUsers />
+}
+else if (selectedChart == "numberProcessByTypeProcess")
+{
+    <NumberProcessByTypeProcess />
+}
+else if (selectedChart == "numberMachineByTypeMachine")
+{
+    <NumberMachineByTypeMachine />
 }
 
 @code {
-    private List<ProcessModel> processes = new();
-    private bool isLoading = true;
-    private string machineId = "67f9742d1245ed61de16b02c"; // Substitua por binding ou valor real
+    private string? selectedChart;
 
-    private readonly List<int> yLabels = new() { 40, 35, 30, 25, 20, 15, 10, 5, 0 };
-
-    protected override async Task OnInitializedAsync()
+    private void ExibirChart(string? chart)
     {
-        var filter = new ProcessFilterModel
-        {
-            MachineId = machineId,
-            PageSize = 100
-        };
-
-        processes = await ProcessService.SearchProcessesAsync(filter);
-        isLoading = false;
-    }
-
-    private int ConvertToMinutes(string timeStr)
-    {
-        if (TimeSpan.TryParse(timeStr, out var time))
-        {
-            return (int)Math.Round(time.TotalMinutes);
-        }
-        return 0;
-    }
-
-    private string FormatTime(string timeStr)
-    {
-        return TimeSpan.TryParse(timeStr, out var time)
-            ? time.ToString(@"hh\:mm\:ss")
-            : timeStr;
+        selectedChart = chart;
     }
 }

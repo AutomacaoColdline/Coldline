@@ -8,8 +8,6 @@
                     <h5 class="modal-title">@((IsEditing ? "Editar Processo" : "Adicionar Processo"))</h5>
                 </div>
                 <div class="modal-body">
-                    <label>Número de Identificação:</label>
-                    <input class="form-control" @bind="CurrentProcess.IdentificationNumber" />
                     <label>Data de Início:</label>
                     <input type="datetime-local" class="form-control" @bind="CurrentProcess.StartDate" />
                     <label>Data de Término:</label>
@@ -35,19 +33,22 @@
                             <option value="@pt.Id">@pt.Name</option>
                         }
                     </select>
-                    <label>Máquina:</label>
-                    <select class="form-control" @bind="CurrentProcess.Machine.Id">
-                        @foreach (var machine in Machines)
-                        {
-                            <option value="@machine.Id">@machine.Name</option>
-                        }
-                    </select>
                     <label>Pré-Industrialização:</label>
-                    <select class="form-control" @bind="CurrentProcess.PreIndustrialization">
+                    <select class="form-control" @bind="selectedPreIndValue" @bind:event="onchange">
                         <option value="">Selecione</option>
                         <option value="true">Sim</option>
                         <option value="false">Não</option>
                     </select>
+                    @if (selectedPreIndValue != "true")
+                    {
+                        <label>Máquina:</label>
+                        <select class="form-control" @bind="CurrentProcess.Machine.Id">
+                            @foreach (var machine in Machines)
+                            {
+                                <option value="@machine.Id">@machine.Name</option>
+                            }
+                        </select>
+                    }
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" @onclick="OnClose">Cancelar</button>
@@ -72,4 +73,21 @@
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
     [Parameter] public EventCallback<ChangeEventArgs> OnOccurrenceSelection { get; set; }
+    private string? selectedPreIndValue
+    {
+        get => CurrentProcess.PreIndustrialization.HasValue
+            ? CurrentProcess.PreIndustrialization.Value.ToString().ToLower()
+            : "";
+        set
+        {
+            if (bool.TryParse(value, out var result))
+            {
+                CurrentProcess.PreIndustrialization = result;
+            }
+            else
+            {
+                CurrentProcess.PreIndustrialization = null;
+            }
+        }
+    }
 }

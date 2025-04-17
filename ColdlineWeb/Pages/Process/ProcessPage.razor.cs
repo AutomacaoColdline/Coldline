@@ -48,6 +48,7 @@ namespace ColdlineWeb.Pages.Process
 
         protected bool ShowProcessTypeModal = false;
         protected ProcessTypeModel NewProcessType = new();
+        
 
         protected override async Task OnInitializedAsync()
         {
@@ -159,7 +160,7 @@ namespace ColdlineWeb.Pages.Process
             CurrentProcess.Department.Name = Departments.FirstOrDefault(d => d.Id == CurrentProcess.Department.Id)?.Name ?? "Desconhecido";
             CurrentProcess.ProcessType.Name = ProcessTypes.FirstOrDefault(pt => pt.Id == CurrentProcess.ProcessType.Id)?.Name ?? "Desconhecido";
             CurrentProcess.Machine.Name = Machines.FirstOrDefault(m => m.Id == CurrentProcess.Machine.Id)?.Name ?? "Desconhecido";
-
+            
             CurrentProcess.Occurrences = Occurrences
                 .Where(o => SelectedOccurrences.Contains(o.Id))
                 .Select(o => new ReferenceEntity { Id = o.Id, Name = o.Name })
@@ -232,5 +233,6 @@ namespace ColdlineWeb.Pages.Process
                 Console.WriteLine(ex.Message);
             }
         }
+        
     }
 }

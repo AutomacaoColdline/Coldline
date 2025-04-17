@@ -40,7 +40,7 @@ namespace ColdlineWeb.Pages
 
         // Máquinas
         protected int currentMachinePage = 1;
-        protected const int machinePageSize = 3;
+        protected const int machinePageSize = 6;
         protected bool isDraggingMachine;
 
         private double startX;

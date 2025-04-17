@@ -181,6 +181,7 @@ namespace ColdlineAPI.Application.Services
 
             var duration = await CalculateProcessTime(process.StartDate, process.EndDate);
             process.ProcessTime = duration.ToString(@"hh\:mm\:ss");
+            process.IdentificationNumber = GenerateNumericCode();
             
             if(process.ProcessType.Id == SpecialProcessTypeId){
                 var machine = await _machinesRepo.GetByIdAsync(p => p.Id == process.Machine.Id);

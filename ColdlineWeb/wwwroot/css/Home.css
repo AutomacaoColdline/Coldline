@@ -15,9 +15,6 @@ html, body {
     -ms-user-select: none;
 }
 
-/* ================================================
-   📌 BARRA DE ESTATÍSTICAS DAS MÁQUINAS (TOPO)
-   ================================================ */
 .machine-stats {
     width: 100%;
     padding: 0 10px;
@@ -37,9 +34,6 @@ html, body {
     line-height: 1.2;
 }
 
-/* ================================================
-   📌 WRAPPER DA TABELA DE USUÁRIOS
-   ================================================ */
 .user-table-wrapper {
     max-width: 1200px;
     margin: 40px auto 20px;
@@ -49,12 +43,9 @@ html, body {
     touch-action: pan-y;
 }
 
-/* ================================================
-   📌 CARTÃO DA TABELA CENTRAL
-   ================================================ */
 .user-table-card {
     flex: 1;
-    background: #fff;
+    background: #ffffff;
     border-radius: 8px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     padding: 15px;
@@ -62,9 +53,6 @@ html, body {
     touch-action: none;
 }
 
-/* ================================================
-   📌 TABELA DE USUÁRIOS
-   ================================================ */
 .user-table {
     width: 100%;
     border-collapse: collapse;
@@ -72,12 +60,12 @@ html, body {
 
 .user-table thead tr {
     background-color: #99c9ed;
-    color: #000;
+    color: #000000;
 }
 
 .user-table th,
 .user-table td {
-    border: 1px solid #ddd;
+    border: 1px solid #dddddd;
     padding: 10px;
     text-align: center;
     font-size: 14px;
@@ -92,12 +80,9 @@ html, body {
     height: 50px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #ccc;
+    border: 2px solid #cccccc;
 }
 
-/* ================================================
-   📌 INDICADOR DE OCORRÊNCIA
-   ================================================ */
 .indicator {
     width: 15px;
     height: 15px;
@@ -114,25 +99,28 @@ html, body {
     background-color: #28a745;
 }
 
-/* ================================================
-   📌 LISTA DE MÁQUINAS
-   ================================================ */
 .machine-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 12px;
     justify-content: center;
     margin-top: 20px;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .machine-card {
     background: #fff59d;
-    color: #000;
+    color: #000000;
     border-radius: 8px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    width: 320px;
     transition: transform 0.3s ease;
     overflow: hidden;
+    width: calc(100% / 6 - 12px);
+    min-width: 130px;
+    padding: 6px;
+    font-size: 0.7rem;
+    box-sizing: border-box;
 }
 
 .machine-card:hover {
@@ -140,26 +128,24 @@ html, body {
 }
 
 .machine-card-header {
-    font-size: 16px;
+    font-size: 0.85rem;
     font-weight: bold;
-    padding: 10px;
+    padding: 6px;
     background-color: rgba(255, 255, 255, 0.1);
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .machine-card-body {
-    padding: 10px 15px;
+    padding: 6px 10px;
+    font-size: 0.7rem;
 }
 
 .machine-card-body p {
-    margin: 8px 0;
-    font-size: 14px;
-    color: #000;
+    margin: 6px 0;
+    font-size: 13px;
+    color: #000000;
 }
 
-/* ================================================
-   📌 PAGINAÇÃO PADRONIZADA
-   ================================================ */
 .pagination-container {
     display: flex;
     justify-content: center;
@@ -171,7 +157,7 @@ html, body {
 .btn-pagination {
     background-color: #cce4f6 !important;
     border-color: #99c9ed !important;
-    color: #000 !important;
+    color: #000000 !important;
     border-radius: 6px;
     height: 36px;
     width: 36px;
@@ -180,6 +166,7 @@ html, body {
     justify-content: center;
     transition: background-color 0.2s ease;
     padding: 0;
+    z-index: 1;
 }
 
 .btn-pagination:hover {
@@ -189,7 +176,7 @@ html, body {
 .btn-pagination:disabled {
     background-color: #e0e0e0 !important;
     border-color: #cfcfcf !important;
-    color: #666 !important;
+    color: #666666 !important;
     cursor: not-allowed;
 }
 
@@ -204,9 +191,6 @@ html, body {
     color: #142c59;
 }
 
-/* ================================================
-   📌 RESPONSIVO
-   ================================================ */
 @media screen and (max-width: 768px) {
     .machine-stats {
         flex-wrap: wrap;
@@ -247,9 +231,6 @@ html, body {
     }
 }
 
-/* ================================================
-   📌 TEXT-LINK E LOADER PADRÃO
-   ================================================ */
 .text-link {
     color: #0c5bd2;
     text-decoration: none;
@@ -280,7 +261,7 @@ html, body {
 
 .loading-text {
     font-size: 14px;
-    color: #333;
+    color: #333333;
     font-weight: 500;
 }
 
@@ -288,6 +269,7 @@ html, body {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
 .user-pagination-arrows {
     position: relative;
     display: flex;
@@ -295,21 +277,24 @@ html, body {
     align-items: center;
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .btn-pagination.left-arrow {
     position: absolute;
-    left: -50px;
+    left: -40px;
     top: 50%;
     transform: translateY(-50%);
 }
 
 .btn-pagination.right-arrow {
     position: absolute;
-    right: -50px;
+    right: -40px;
     top: 50%;
     transform: translateY(-50%);
 }
+
 .machine-pagination-arrows {
     position: relative;
     display: flex;
@@ -317,26 +302,20 @@ html, body {
     align-items: center;
     max-width: 1200px;
     margin: 20px auto;
-}
-
-.machine-pagination-arrows .machine-list {
-    flex: 1;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .machine-pagination-arrows .btn-pagination.left-arrow {
     position: absolute;
-    left: 20px;
+    left: -40px;
     top: 50%;
     transform: translateY(-50%);
 }
 
 .machine-pagination-arrows .btn-pagination.right-arrow {
     position: absolute;
-    right: 20px;
+    right: -40px;
     top: 50%;
     transform: translateY(-50%);
 }

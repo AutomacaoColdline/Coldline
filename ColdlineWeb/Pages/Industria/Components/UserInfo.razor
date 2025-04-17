@@ -8,6 +8,51 @@
     [Parameter] public List<OccurrenceModel> ProcessOccurrences { get; set; } = new();
     private bool showOccurrenceForm = false;
     private string errorMessage = "";
+    protected TimeSpan elapsedTime;
+    protected System.Timers.Timer? _timer;
+    protected TimeSpan occurrenceElapsedTime;
+    protected System.Timers.Timer? _occurrenceTimer;
+    private Dictionary<string, TimeSpan> _occurrenceTimes = new();
+    protected OccurrenceModel? ActiveOccurrence;
+    private string occurrenceWarningMessage = "";
+
+
+    protected void StartTimer()
+    {
+        _timer = new System.Timers.Timer(1000); // 1 segundo
+        _timer.Elapsed += async (sender, args) =>
+        {
+            elapsedTime = elapsedTime.Add(TimeSpan.FromSeconds(1));
+            await InvokeAsync(StateHasChanged);
+        };
+        _timer.AutoReset = true;
+        _timer.Enabled = true;
+    }
+    protected void StopTimer()
+    {
+        _timer?.Stop();
+        _timer?.Dispose();
+        _timer = null;
+    }
+
+    protected string GetFormattedTime()
+    {
+        if (ProcessOccurrences.Any(o => !o.Finished))
+        {
+            // Ocorrência em aberto → mostrar apenas o tempo vindo da API
+            var fixedTime = ParseTime(ProcessDetails?.ProcessTime);
+            return $"{fixedTime.Hours:D2}:{fixedTime.Minutes:D2}:{fixedTime.Seconds:D2}";
+        }
+
+        // Caso contrário, exibe o tempo atualizado
+        return $"{elapsedTime.Hours:D2}:{elapsedTime.Minutes:D2}:{elapsedTime.Seconds:D2}";
+    }
+
+
+    protected TimeSpan ParseTime(string? timeString)
+    {
+        return TimeSpan.TryParse(timeString, out var result) ? result : TimeSpan.Zero;
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -15,7 +60,33 @@
         {
             var occurrenceIds = ProcessDetails.Occurrences?.Select(o => o.Id).ToList() ?? new List<string>();
             ProcessOccurrences = await IndustriaService.GetOccurrencesByProcessAsync(occurrenceIds);
+            elapsedTime = ParseTime(ProcessDetails.ProcessTime);
+            StartTimer(); // Inicia o cronômetro
+            ActiveOccurrence = ProcessOccurrences.FirstOrDefault(o => !o.Finished);
+            if (ActiveOccurrence != null)
+            {
+                var baseTime = ParseTime(ActiveOccurrence.ProcessTime);
+                _occurrenceTimes[ActiveOccurrence.Id] = baseTime;
+                StartOccurrenceTimer();
+            }
         }
+    }
+    protected void StartOccurrenceTimer()
+    {
+        StopOccurrenceTimer(); // evita timer duplicado
+
+        _occurrenceTimer = new System.Timers.Timer(1000); // 1s
+        _occurrenceTimer.Elapsed += async (sender, args) =>
+        {
+            if (ActiveOccurrence != null && _occurrenceTimes.ContainsKey(ActiveOccurrence.Id))
+            {
+                _occurrenceTimes[ActiveOccurrence.Id] = _occurrenceTimes[ActiveOccurrence.Id].Add(TimeSpan.FromSeconds(1));
+            }
+
+            await InvokeAsync(StateHasChanged);
+        };
+        _occurrenceTimer.AutoReset = true;
+        _occurrenceTimer.Enabled = true;
     }
 
     private async Task StartOccurrence(StartOccurrenceModel occurrenceModel)
@@ -27,7 +98,10 @@
         {
             ProcessOccurrences.Add(newOccurrence);
             ProcessDetails!.Occurrences.Add(new ReferenceEntity { Id = newOccurrence.Id, Name = newOccurrence.CodeOccurrence });
-
+            
+            ActiveOccurrence = newOccurrence;
+            _occurrenceTimes[newOccurrence.Id] = ParseTime(newOccurrence.ProcessTime);
+            StartOccurrenceTimer();
             showOccurrenceForm = false;
             StateHasChanged();
         }
@@ -41,12 +115,20 @@
             var occurrence = ProcessOccurrences.FirstOrDefault(o => o.Id == occurrenceId);
             if (occurrence != null) occurrence.Finished = true;
 
-            StateHasChanged();
+            ActiveOccurrence = null;
+            StopOccurrenceTimer();
         }
         else
         {
             errorMessage = "Erro ao finalizar a ocorrência.";
         }
+    }
+
+    protected void StopOccurrenceTimer()
+    {
+        _occurrenceTimer?.Stop();
+        _occurrenceTimer?.Dispose();
+        _occurrenceTimer = null;
     }
 
     private async Task FinalizeProcess()
@@ -60,6 +142,7 @@
         bool success = await IndustriaService.EndProcessAsync(ProcessDetails.Id);
         if (success)
         {
+            StopTimer();
             Navigation.NavigateTo("/industria", forceLoad: true);
         }
         else
@@ -83,6 +166,34 @@
 
         return hasActiveOccurrence ? "indicator-red" : "indicator-green"; 
     }
+    protected string GetFormattedOccurrenceTime(OccurrenceModel occurrence)
+    {
+        if (!occurrence.Finished && _occurrenceTimes.TryGetValue(occurrence.Id, out var runningTime))
+        {
+            return $"{runningTime.Hours:D2}:{runningTime.Minutes:D2}:{runningTime.Seconds:D2}";
+        }
+
+        var baseTime = ParseTime(occurrence.ProcessTime);
+        return $"{baseTime.Hours:D2}:{baseTime.Minutes:D2}:{baseTime.Seconds:D2}";
+    }
+    private void TryOpenOccurrenceForm()
+    {
+        // Se existir ocorrência ativa, não abre o modal
+        if (ProcessOccurrences.Any(o => !o.Finished))
+        {
+            occurrenceWarningMessage = "Já existe uma ocorrência em andamento. Finalize-a antes de iniciar outra.";
+            showOccurrenceForm = false;
+        }
+        else
+        {
+            // Sem ocorrências ativas → limpa aviso e abre o modal
+            occurrenceWarningMessage = "";
+            showOccurrenceForm = true;
+        }
+
+        StateHasChanged();
+    }
+
 }
 
 <div class="process-header">
@@ -92,11 +203,11 @@
     <div class="process-info">
         <strong>Tipo:</strong> @ProcessDetails.ProcessType?.Name |
         <strong>Máquina:</strong> @(ProcessDetails.Machine?.Name ?? "Não aplicável") |
-        <strong>Tempo decorrido:</strong> @ProcessDetails.ProcessTime |
+        <strong>Tempo decorrido:</strong> @GetFormattedTime() | |
         <strong>Pré-industrialização:</strong> @(ProcessDetails.PreIndustrialization ?? false ? "Sim" : "Não")
     </div>
     
-    <button class="btn-register-occurrence" @onclick="() => showOccurrenceForm = true">
+    <button class="btn-register-occurrence" @onclick="TryOpenOccurrenceForm">
         Registrar Ocorrência
     </button>
 
@@ -114,6 +225,10 @@
 {
     <p class="text-danger">@errorMessage</p>
 }
+@if (!string.IsNullOrEmpty(occurrenceWarningMessage))
+{
+    <p class="text-warning">@occurrenceWarningMessage</p>
+}
 
 @if (ProcessOccurrences != null && ProcessOccurrences.Any())
 {
@@ -124,7 +239,7 @@
             <div class="occurrence-item">
                 <span><strong>Tipo de Pausa:</strong> @occurrence.PauseType.Name</span>
                 <span><strong>Defeito:</strong> @(occurrence.Defect?.Name ?? "Não informado")</span>
-                <span><strong>Tempo:</strong> @occurrence.ProcessTime</span>
+                <span><strong>Tempo:</strong> @GetFormattedOccurrenceTime(occurrence)</span>
 
                 @if (!occurrence.Finished)
                 {
@@ -136,5 +251,14 @@
                 }
             </div>
         }
+    </div>
+}
+@if (!string.IsNullOrEmpty(occurrenceWarningMessage))
+{
+    <div class="overlay">
+        <div class="modal-warning">
+            <p>@occurrenceWarningMessage</p>
+            <button class="btn btn-warning" @onclick="() => occurrenceWarningMessage = string.Empty">Fechar</button>
+        </div>
     </div>
 }

@@ -13,8 +13,20 @@
       "PackagePath": "staticwebassets/css/Configuration.css"
     },
     {
+      "Id": "/app/wwwroot/css/CostsByTypeMachine.css",
+      "PackagePath": "staticwebassets/css/CostsByTypeMachine.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/CostsByTypeProcess.css",
+      "PackagePath": "staticwebassets/css/CostsByTypeProcess.css"
+    },
+    {
       "Id": "/app/wwwroot/css/Home.css",
       "PackagePath": "staticwebassets/css/Home.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/IdleTimeByUsers.css",
+      "PackagePath": "staticwebassets/css/IdleTimeByUsers.css"
     },
     {
       "Id": "/app/wwwroot/css/Industria.css",
@@ -31,6 +43,18 @@
     {
       "Id": "/app/wwwroot/css/MachineViewer.css",
       "PackagePath": "staticwebassets/css/MachineViewer.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/NumberBrokenPartByTypeProcess.css",
+      "PackagePath": "staticwebassets/css/NumberBrokenPartByTypeProcess.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/NumberBrokenPartByUsers.css",
+      "PackagePath": "staticwebassets/css/NumberBrokenPartByUsers.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/NumberBrokenPartDate.css",
+      "PackagePath": "staticwebassets/css/NumberBrokenPartDate.css"
     },
     {
       "Id": "/app/wwwroot/css/NumberMachineByTypeMachine.css",
@@ -87,6 +111,30 @@
     {
       "Id": "/app/wwwroot/css/Sidebar.css",
       "PackagePath": "staticwebassets/css/Sidebar.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/TimeMachineByTypeMachine.css",
+      "PackagePath": "staticwebassets/css/TimeMachineByTypeMachine.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/TimeOccurrenceByUsers.css",
+      "PackagePath": "staticwebassets/css/TimeOccurrenceByUsers.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/TimeOcurrenceByTypeProcess.css",
+      "PackagePath": "staticwebassets/css/TimeOcurrenceByTypeProcess.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/TimeProcessByTypeProcess.css",
+      "PackagePath": "staticwebassets/css/TimeProcessByTypeProcess.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/TimeProcessByUsers.css",
+      "PackagePath": "staticwebassets/css/TimeProcessByUsers.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/TimeProcessByUsersIndividual.css",
+      "PackagePath": "staticwebassets/css/TimeProcessByUsersIndividual.css"
     },
     {
       "Id": "/app/wwwroot/css/User.css",
@@ -205,6 +253,30 @@
       "PackagePath": "staticwebassets/index.html"
     },
     {
+      "Id": "/app/wwwroot/js/costsByTypeMachine.js",
+      "PackagePath": "staticwebassets/js/costsByTypeMachine.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/costsByTypeProcess.js",
+      "PackagePath": "staticwebassets/js/costsByTypeProcess.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/idleTimeByUsers.js",
+      "PackagePath": "staticwebassets/js/idleTimeByUsers.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/numberBrokenPartByTypeProcess.js",
+      "PackagePath": "staticwebassets/js/numberBrokenPartByTypeProcess.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/numberBrokenPartByUsers.js",
+      "PackagePath": "staticwebassets/js/numberBrokenPartByUsers.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/numberBrokenPartDate.js",
+      "PackagePath": "staticwebassets/js/numberBrokenPartDate.js"
+    },
+    {
       "Id": "/app/wwwroot/js/numberMachineByTypeMachine.js",
       "PackagePath": "staticwebassets/js/numberMachineByTypeMachine.js"
     },
@@ -231,6 +303,30 @@
     {
       "Id": "/app/wwwroot/js/numberProcessDate.js",
       "PackagePath": "staticwebassets/js/numberProcessDate.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/timeMachineByTypeMachine.js",
+      "PackagePath": "staticwebassets/js/timeMachineByTypeMachine.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/timeOccurrenceByUsers.js",
+      "PackagePath": "staticwebassets/js/timeOccurrenceByUsers.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/timeOcurrenceByTypeProcess.js",
+      "PackagePath": "staticwebassets/js/timeOcurrenceByTypeProcess.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/timeProcessByTypeProcess.js",
+      "PackagePath": "staticwebassets/js/timeProcessByTypeProcess.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/timeProcessByUsers.js",
+      "PackagePath": "staticwebassets/js/timeProcessByUsers.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/timeProcessByUsersIndividual.js",
+      "PackagePath": "staticwebassets/js/timeProcessByUsersIndividual.js"
     },
     {
       "Id": "/app/wwwroot/lib/bootstrap/dist/css/bootstrap-grid.css",

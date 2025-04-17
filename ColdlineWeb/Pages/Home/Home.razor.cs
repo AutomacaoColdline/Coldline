@@ -48,11 +48,15 @@ namespace ColdlineWeb.Pages
         private bool isDragging;
         private double machineStartX;
 
+        private Dictionary<string, TimeSpan> runningTimers = new();
+        private System.Timers.Timer? timer;
+
         protected override async Task OnInitializedAsync()
         {
             await LoadUsers();
             await LoadMachines();
             await CalculateAverageTimeForEachUser();
+            StartTimer();
         }
 
         protected async Task LoadUsers()
@@ -114,29 +118,38 @@ namespace ColdlineWeb.Pages
                     ProcessTime = stats.ProcessTime,
                     Avg = stats.AverageProcessTime,
                     Std = stats.StandardDeviation,
-                    Upper = stats.UpperLimit
+                    Upper = stats.UpperLimit,
+                    ProcessTypeName = stats.ProcessTypeName,
+                    OcorrenceTypeName = stats.OcorrenceTypeName
                 };
             }
         }
 
-        protected MarkupString RenderIndicator(UserModel user, ProcessStats? stat)
+        protected MarkupString RenderIndicator(UserModel user)
         {
-            bool hasOccurrence = user.CurrentOccurrence?.Name != null && user.CurrentOccurrence.Name != "Nenhuma";
+            string color;
+            string tooltip;
 
-            bool isExceed = false;
-            if (stat != null
-                && TimeSpan.TryParse(stat.ProcessTime, out var processTs)
-                && TimeSpan.TryParse(stat.Upper, out var upperTs))
+            if (user.CurrentOccurrence != null && !string.IsNullOrEmpty(user.CurrentOccurrence.Id))
             {
-                isExceed = processTs > upperTs;
+                color = "red";
+                tooltip = "Usuário em ocorrência";
+            }
+            else if (user.CurrentProcess != null)
+            {
+                color = "green";
+                tooltip = "Usuário em processo";
+            }
+            else
+            {
+                color = "red";
+                tooltip = "Usuário sem processo";
             }
 
-            string colorClass = (hasOccurrence || isExceed)
-                ? "indicator-red"
-                : "indicator-green";
-
-            return new MarkupString($"<div class=\"indicator {colorClass}\"></div>");
+            return new MarkupString($"<div class='indicator {color}' title='{tooltip}'></div>");
         }
+
+        
 
         // Swipe para usuários
         protected void HandlePointerDown(PointerEventArgs e)
@@ -204,5 +217,51 @@ namespace ColdlineWeb.Pages
                 }
             }
         }
+
+        protected void StartTimer()
+        {
+            foreach (var (userId, stat) in ProcessStatsByUserId)
+            {
+                if (!runningTimers.ContainsKey(userId))
+                {
+                    if (TimeSpan.TryParseExact(stat.ProcessTime, new[] { @"hh\:mm\:ss", @"mm\:ss" }, null, out var parsedTime))
+                    {
+                        runningTimers[userId] = parsedTime;
+                    }
+                    else
+                    {
+                        runningTimers[userId] = TimeSpan.Zero;
+                    }
+                }
+            }
+
+            timer = new System.Timers.Timer(1000);
+            timer.Elapsed += (s, e) =>
+            {
+                foreach (var userId in runningTimers.Keys.ToList())
+                {
+                    runningTimers[userId] = runningTimers[userId].Add(TimeSpan.FromSeconds(1));
+                }
+
+                InvokeAsync(StateHasChanged);
+            };
+            timer.Start();
+        }
+        protected string GetRunningTimeForUser(string userId)
+        {
+            var user = users.FirstOrDefault(u => u.Id == userId);
+            if (user?.CurrentOccurrence != null && !string.IsNullOrEmpty(user.CurrentOccurrence.Id))
+            {
+                if (ProcessStatsByUserId.TryGetValue(userId, out var stat))
+                {
+                    return stat.ProcessTime;
+                }
+                return "00:00:00";
+            }
+            return runningTimers.TryGetValue(userId, out var time)
+                ? time.ToString(@"hh\:mm\:ss")
+                : "00:00:00";
+        }
+
     }
 }

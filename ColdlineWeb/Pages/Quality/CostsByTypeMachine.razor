@@ -1,0 +1,59 @@
+@inject IJSRuntime JS
+<link rel="stylesheet" href="css/CostsByTypeMachine.css" />
+
+<div class="filtro-container">
+    <label>De:
+        <input @bind="startDate" type="date" />
+    </label>
+    <label>Até:
+        <input @bind="endDate" type="date" />
+    </label>
+    <label>Tipo de Gráfico:
+        <select @bind="chartType">
+            <option value="bar">Barra</option>
+            <option value="line">Linha</option>
+        </select>
+    </label>
+    <button @onclick="GerarGraficoCustoPorTipoDeMaquina">
+        <img src="img/lupa.png" alt="Buscar" class="btn-icon" />
+    </button>
+</div>
+
+<div class="grafico-container">
+    <canvas id="typeMachineCostChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/costsByTypeMachine.js"></script>
+
+@code {
+    private DateTime startDate = DateTime.Today.AddDays(-7);
+    private DateTime endDate = DateTime.Today;
+    private string chartType = "bar";
+
+    private async Task GerarGraficoCustoPorTipoDeMaquina()
+    {
+        var dados = GerarDadosFicticios(startDate, endDate);
+        await JS.InvokeVoidAsync("renderizarGraficoCustoPorTipoDeMaquina", 
+            dados.Labels.ToArray(), 
+            dados.Values.Select(v => (double)v).ToArray(), 
+            chartType);
+
+    }
+
+    private (List<string> Labels, List<decimal> Values) GerarDadosFicticios(DateTime start, DateTime end)
+    {
+        var tipos = new[] { "Cold 5", "Cold 10", "Cold 15", "Cold 10S" };
+        var labels = new List<string>();
+        var values = new List<decimal>();
+
+        foreach (var tipo in tipos)
+        {
+            labels.Add(tipo);
+            values.Add(Math.Round(Random.Shared.Next(500, 8000) + (decimal)Random.Shared.NextDouble(), 2));
+        }
+
+        return (labels, values);
+    }
+
+}

@@ -5,7 +5,7 @@
     display: flex;
     justify-content: space-around;
     background-color: #0c5bd2; /* Azul padrão do sistema */
-    padding: 9px 0;
+    padding: 0px 0;
 }
 
 .tab-button {

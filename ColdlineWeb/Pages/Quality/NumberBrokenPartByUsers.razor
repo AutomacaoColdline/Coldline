@@ -1,0 +1,54 @@
+@inject IJSRuntime JS
+<link rel="stylesheet" href="css/NumberBrokenPartByUsers.css" />
+
+<div class="filtro-container">
+    <label>De:
+        <input @bind="startDate" type="date" />
+    </label>
+    <label>Até:
+        <input @bind="endDate" type="date" />
+    </label>
+    <label>Tipo de Gráfico:
+        <select @bind="chartType">
+            <option value="bar">Barra</option>
+            <option value="line">Linha</option>
+        </select>
+    </label>
+    <button @onclick="GerarGraficoPorUsuarios">
+        <img src="img/lupa.png" alt="Buscar" class="btn-icon" />
+    </button>
+</div>
+
+<div class="grafico-container">
+    <canvas id="brokenPartsChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/numberBrokenPartByUsers.js"></script>
+
+@code {
+    private DateTime startDate = DateTime.Today.AddDays(-7);
+    private DateTime endDate = DateTime.Today;
+    private string chartType = "bar";
+
+    private async Task GerarGraficoPorUsuarios()
+    {
+        var dados = GerarDadosFicticios(startDate, endDate);
+        await JS.InvokeVoidAsync("renderizarGraficoPecasQuebradas", dados.Labels, dados.Values, chartType);
+    }
+
+    private (List<string> Labels, List<int> Values) GerarDadosFicticios(DateTime start, DateTime end)
+    {
+        var usuarios = new[] { "Cicero", "Douglas", "Franke", "Jhony", "Luiz", "Raphael" };
+        var labels = new List<string>();
+        var values = new List<int>();
+
+        foreach (var user in usuarios)
+        {
+            labels.Add(user);
+            values.Add(Random.Shared.Next(0, 20)); // número aleatório de peças quebradas
+        }
+
+        return (labels, values);
+    }
+}

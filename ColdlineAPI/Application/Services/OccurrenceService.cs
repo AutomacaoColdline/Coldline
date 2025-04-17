@@ -35,9 +35,9 @@ namespace ColdlineAPI.Application.Services
             var occurrence = await _occurrences.GetByIdAsync(o => o.Id == id);
             if (occurrence != null)
             {
-                string updatedTime = CalculateOccurrenceTime(occurrence.StartDate);
-                await UpdateOccurrenceTimeInDatabase(occurrence.Id, updatedTime);
-                occurrence.ProcessTime = updatedTime;
+                var updatedTime = await CalculateOcurrenceTime(occurrence.StartDate, occurrence.EndDate);
+                occurrence.ProcessTime = updatedTime.ToString(@"hh\:mm\:ss");
+                await _occurrences.UpdateAsync(p => p.Id == id, occurrence);
             }
             return occurrence;
         }
@@ -131,38 +131,51 @@ namespace ColdlineAPI.Application.Services
                    resultUser.IsAcknowledged && resultUser.ModifiedCount > 0;
         }
 
-        public async Task<bool> UpdateOccurrenceTimeInDatabase(string occurrenceId, string processTime)
+        private DateTime GetCurrentCampoGrandeTime()
         {
-            var update = Builders<Occurrence>.Update.Set(o => o.ProcessTime, processTime);
-            var result = await _occurrences.GetCollection().UpdateOneAsync(o => o.Id == occurrenceId, update);
-            return result.IsAcknowledged && result.ModifiedCount > 0;
+            return TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("America/Campo_Grande"));
         }
 
-        private string CalculateOccurrenceTime(DateTime startDate)
+        private async Task<TimeSpan> CalculateOcurrenceTime(DateTime start, DateTime? end)
         {
-            var now = TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("America/Campo_Grande"));
-            if (now < startDate) return "00:00:00";
+            DateTime endTime = end ?? GetCurrentCampoGrandeTime();
 
-            TimeSpan workStart = TimeSpan.FromHours(7.5);
-            TimeSpan workEnd = TimeSpan.FromHours(17.5);
-            TimeSpan totalTime = TimeSpan.Zero;
-            DateTime currentDay = startDate.Date;
+            TimeSpan total = TimeSpan.Zero;
 
-            while (currentDay <= now.Date)
+            // Períodos úteis por dia
+            var workPeriods = new List<(TimeSpan start, TimeSpan end)>
             {
-                DateTime start = currentDay == startDate.Date ? startDate : currentDay.Add(workStart);
-                DateTime end = currentDay == now.Date ? now : currentDay.Add(workEnd);
+                (TimeSpan.FromHours(7.5), TimeSpan.FromHours(11.5)),   // 07:30 – 11:30
+                (TimeSpan.FromHours(13.25), TimeSpan.FromHours(15.0)), // 13:15 – 15:00
+                (TimeSpan.FromHours(15.25), TimeSpan.FromHours(17.5))  // 15:15 – 17:30
+            };
 
-                if (start.TimeOfDay < workStart) start = currentDay.Add(workStart);
-                if (end.TimeOfDay > workEnd) end = currentDay.Add(workEnd);
+            DateTime currentDate = start.Date;
 
-                if (start < end && start.TimeOfDay >= workStart && start.TimeOfDay <= workEnd)
-                    totalTime += end - start;
+            while (currentDate <= endTime.Date)
+            {
+                if (currentDate.DayOfWeek != DayOfWeek.Saturday && currentDate.DayOfWeek != DayOfWeek.Sunday)
+                {
+                    foreach (var period in workPeriods)
+                    {
+                        DateTime periodStart = currentDate.Add(period.start);
+                        DateTime periodEnd = currentDate.Add(period.end);
 
-                currentDay = currentDay.AddDays(1);
+                        // Ajuste para o intervalo real
+                        DateTime effectiveStart = periodStart < start ? start : periodStart;
+                        DateTime effectiveEnd = periodEnd > endTime ? endTime : periodEnd;
+
+                        if (effectiveEnd > effectiveStart)
+                        {
+                            total += effectiveEnd - effectiveStart;
+                        }
+                    }
+                }
+
+                currentDate = currentDate.AddDays(1);
             }
 
-            return $"{(int)totalTime.TotalHours:D2}:{totalTime.Minutes:D2}:{totalTime.Seconds:D2}";
+            return total;
         }
 
         private static string GenerateNumericCode() => new Random().Next(100000, 999999).ToString();

@@ -1,0 +1,66 @@
+@page "/reports/timeprocessbyusersindividual"
+@inject IJSRuntime JS
+<link rel="stylesheet" href="css/TimeProcessByUsersIndividual.css" />
+
+<div class="filtro-container">
+    <label>Usuário:
+        <select @bind="selectedUser">
+            @foreach (var user in usuariosDisponiveis)
+            {
+                <option value="@user">@user</option>
+            }
+        </select>
+    </label>
+    <label>De:
+        <input @bind="startDate" type="date" />
+    </label>
+    <label>Até:
+        <input @bind="endDate" type="date" />
+    </label>
+    <label>Tipo de Gráfico:
+        <select @bind="chartType">
+            <option value="bar">Barra</option>
+            <option value="line">Linha</option>
+        </select>
+    </label>
+    <button @onclick="GerarGrafico">
+        <img src="img/lupa.png" alt="Buscar" class="btn-icon" />
+    </button>
+</div>
+
+<div class="grafico-container">
+    <canvas id="userIndividualChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/timeProcessByUsersIndividual.js"></script>
+
+@code {
+    private DateTime startDate = DateTime.Today.AddDays(-7);
+    private DateTime endDate = DateTime.Today;
+    private string selectedUser = "Cicero";
+    private string chartType = "bar";
+
+    private List<string> usuariosDisponiveis = new() { "Cicero", "Douglas", "Franke", "Jhony", "Luiz", "Raphael" };
+
+    private async Task GerarGrafico()
+    {
+        var dados = GerarDadosFicticiosPorUsuario(selectedUser, startDate, endDate);
+        await JS.InvokeVoidAsync("renderizarGraficoUsuarioIndividual", dados.Labels, dados.Values, selectedUser, chartType);
+    }
+
+    private (List<string> Labels, List<int> Values) GerarDadosFicticiosPorUsuario(string usuario, DateTime start, DateTime end)
+    {
+        var tiposProcesso = new[] { "Montagem", "Solda", "Inspeção", "Embalagem", "Teste" };
+        var labels = new List<string>();
+        var values = new List<int>();
+
+        foreach (var tipo in tiposProcesso)
+        {
+            labels.Add(tipo);
+            values.Add(Random.Shared.Next(15, 300)); // entre 15 e 300 minutos
+        }
+
+        return (labels, values);
+    }
+}

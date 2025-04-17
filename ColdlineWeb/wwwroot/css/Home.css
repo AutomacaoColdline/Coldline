@@ -99,10 +99,11 @@ html, body {
    📌 INDICADOR DE OCORRÊNCIA
    ================================================ */
 .indicator {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
+    width: 15px;
+    height: 15px;
     border-radius: 50%;
+    display: inline-block;
+    margin: 0 auto;
 }
 
 .indicator-red {
@@ -338,4 +339,12 @@ html, body {
     right: 20px;
     top: 50%;
     transform: translateY(-50%);
+}
+
+.indicator.red {
+    background-color: #dc3545;
+}
+
+.indicator.green {
+    background-color: #28a745;
 }

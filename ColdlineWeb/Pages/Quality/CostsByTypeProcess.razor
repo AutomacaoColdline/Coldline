@@ -1,0 +1,55 @@
+@page "/reports/costs-by-type"
+@inject IJSRuntime JS
+<link rel="stylesheet" href="css/CostsByTypeProcess.css" />
+
+<div class="filtro-container">
+    <label>De:
+        <input @bind="startDate" type="date" />
+    </label>
+    <label>Até:
+        <input @bind="endDate" type="date" />
+    </label>
+    <label>Tipo de Gráfico:
+        <select @bind="chartType">
+            <option value="bar">Barra</option>
+            <option value="line">Linha</option>
+        </select>
+    </label>
+    <button @onclick="GerarGraficoCustoPorTipoDeProcesso">
+        <img src="img/lupa.png" alt="Buscar" class="btn-icon" />
+    </button>
+</div>
+
+<div class="grafico-container">
+    <canvas id="costTypeProcessChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/costsByTypeProcess.js"></script>
+
+@code {
+    private DateTime startDate = DateTime.Today.AddDays(-7);
+    private DateTime endDate = DateTime.Today;
+    private string chartType = "bar";
+
+    private async Task GerarGraficoCustoPorTipoDeProcesso()
+    {
+        var dados = GerarDadosFicticios(startDate, endDate);
+        await JS.InvokeVoidAsync("renderizarGraficoCustoPorTipoDeProcesso", dados.Labels, dados.Values, chartType);
+    }
+
+    private (List<string> Labels, List<decimal> Values) GerarDadosFicticios(DateTime start, DateTime end)
+    {
+        var tipos = new[] { "Solda", "Elétrica", "Montagem", "Higienização", "Teste" };
+        var labels = new List<string>();
+        var values = new List<decimal>();
+
+        foreach (var tipo in tipos)
+        {
+            labels.Add(tipo);
+            values.Add(Random.Shared.Next(500, 5000)); // valores entre R$500 e R$5000
+        }
+
+        return (labels, values);
+    }
+}

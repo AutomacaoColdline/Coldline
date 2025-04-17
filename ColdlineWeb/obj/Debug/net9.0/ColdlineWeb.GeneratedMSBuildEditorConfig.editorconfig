@@ -188,6 +188,30 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvY2Vzcy9Qcm9jZXNzVmlld2VyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/app/Pages/Quality/CostsByTypeMachine.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9Db3N0c0J5VHlwZU1hY2hpbmUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality/CostsByTypeProcess.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9Db3N0c0J5VHlwZVByb2Nlc3MucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality/IdleTimeByUsers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9JZGxlVGltZUJ5VXNlcnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality/NumberBrokenPartByTypeProcess.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJCcm9rZW5QYXJ0QnlUeXBlUHJvY2Vzcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality/NumberBrokenPartByUsers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJCcm9rZW5QYXJ0QnlVc2Vycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality/NumberBrokenPartDate.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJCcm9rZW5QYXJ0RGF0ZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/app/Pages/Quality/NumberMachineByTypeMachine.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJNYWNoaW5lQnlUeXBlTWFjaGluZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
@@ -218,6 +242,30 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/app/Pages/Quality/Quality.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9RdWFsaXR5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality/TimeMachineByTypeMachine.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9UaW1lTWFjaGluZUJ5VHlwZU1hY2hpbmUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality/TimeOccurrenceByUsers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9UaW1lT2NjdXJyZW5jZUJ5VXNlcnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality/TimeOcurrenceByTypeProcess.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9UaW1lT2N1cnJlbmNlQnlUeXBlUHJvY2Vzcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality/TimeProcessByTypeProcess.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9UaW1lUHJvY2Vzc0J5VHlwZVByb2Nlc3MucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality/TimeProcessByUsers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9UaW1lUHJvY2Vzc0J5VXNlcnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/Quality/TimeProcessByUsersIndividual.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9UaW1lUHJvY2Vzc0J5VXNlcnNJbmRpdmlkdWFsLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/User/DepartmentModal.razor]

@@ -1,0 +1,54 @@
+@inject IJSRuntime JS
+<link rel="stylesheet" href="css/TimeOcurrenceByTypeProcess.css" />
+
+<div class="filtro-container">
+    <label>De:
+        <input @bind="startDate" type="date" />
+    </label>
+    <label>Até:
+        <input @bind="endDate" type="date" />
+    </label>
+    <label>Tipo de Gráfico:
+        <select @bind="chartType">
+            <option value="bar">Barra</option>
+            <option value="line">Linha</option>
+        </select>
+    </label>
+    <button @onclick="GerarGraficoTempoOcorrenciaPorTipo">
+        <img src="img/lupa.png" alt="Buscar" class="btn-icon" />
+    </button>
+</div>
+
+<div class="grafico-container">
+    <canvas id="ocurrenceTypeChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/timeOcurrenceByTypeProcess.js"></script>
+
+@code {
+    private DateTime startDate = DateTime.Today.AddDays(-7);
+    private DateTime endDate = DateTime.Today;
+    private string chartType = "bar";
+
+    private async Task GerarGraficoTempoOcorrenciaPorTipo()
+    {
+        var dados = GerarDadosFicticios(startDate, endDate);
+        await JS.InvokeVoidAsync("renderizarGraficoTempoOcorrenciaPorTipo", dados.Labels, dados.Values, chartType);
+    }
+
+    private (List<string> Labels, List<int> Values) GerarDadosFicticios(DateTime start, DateTime end)
+    {
+        var tipos = new[] { "Solda", "Elétrica", "Montagem", "Higienização", "Teste" };
+        var labels = new List<string>();
+        var values = new List<int>();
+
+        foreach (var tipo in tipos)
+        {
+            labels.Add(tipo);
+            values.Add(Random.Shared.Next(5, 120)); // minutos entre 5 e 120
+        }
+
+        return (labels, values);
+    }
+}

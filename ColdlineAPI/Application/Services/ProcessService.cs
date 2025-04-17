@@ -19,6 +19,7 @@ namespace ColdlineAPI.Application.Services
     {
         private readonly MongoRepository<Process> _processes;
         private readonly IMongoCollection<User> _users;
+        private readonly IMongoCollection<Occurrence> _occurrences;
         private readonly IMongoCollection<ProcessType> _processTypes;
         private readonly IMongoCollection<Machine> _machines;
         private readonly MongoRepository<Machine> _machinesRepo;
@@ -31,6 +32,7 @@ namespace ColdlineAPI.Application.Services
             _processTypes = factory.CreateRepository<ProcessType>("ProcessTypes").GetCollection();
             _machines = factory.CreateRepository<Machine>("Machines").GetCollection();
             _machinesRepo = factory.CreateRepository<Machine>("Machines");
+            _occurrences = factory.CreateRepository<Occurrence>("Occurrences").GetCollection();
         }
 
         public async Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId, string? machineId, bool preIndustrialization, bool reWork)
@@ -127,9 +129,15 @@ namespace ColdlineAPI.Application.Services
         public async Task<Process?> GetProcessByIdAsync(string id)
         {
             var process = await _processes.GetByIdAsync(p => p.Id == id);
-            var duration = await CalculateProcessTime(process.StartDate, process.EndDate);
-            process.ProcessTime = duration.ToString(@"hh\:mm\:ss");
-            await _processes.UpdateAsync(p => p.Id == id, process);
+            var user = await _users.Find(u => u.Id == process.User.Id).FirstOrDefaultAsync();
+
+            if(user.CurrentOccurrence != null){
+                var duration = await CalculateProcessTime(process.StartDate, process.EndDate);
+                process.ProcessTime = duration.ToString(@"hh\:mm\:ss");
+                await _processes.UpdateAsync(p => p.Id == id, process);
+
+            }
+            
             return process;
         }
 
@@ -271,6 +279,9 @@ namespace ColdlineAPI.Application.Services
         public async Task<ProcessStatisticsDto> GetProcessStatisticsAsync(string processId, string processTypeId)
         {
             var process = await _processes.GetByIdAsync(p => p.Id == processId);
+            var user = await _users.Find(u => u.Id == process.User.Id).FirstOrDefaultAsync();
+
+
             var filtered = await _processes.GetCollection()
                 .Find(p => p.Finished && p.ProcessType.Id == processTypeId && !string.IsNullOrEmpty(p.ProcessTime))
                 .ToListAsync();
@@ -286,11 +297,20 @@ namespace ColdlineAPI.Application.Services
             };
 
             if (!durations.Any()) return dto;
+            
+            if(user.CurrentOccurrence != null){
+                var ocurrence = await _occurrences.Find(u => u.Id == user.CurrentOccurrence.Id).FirstOrDefaultAsync();
+                dto.OcorrenceTypeName = ocurrence.PauseType.Name;
+            }
+            else{
+                dto.OcorrenceTypeName = "Nenhuma";
+            }
 
             var average = TimeSpan.FromTicks((long)durations.Average(d => d.Ticks));
             var stdDev = TimeSpan.FromTicks((long)Math.Sqrt(durations.Average(d => Math.Pow(d.Ticks - durations.Average(x => x.Ticks), 2))));
             var upperLimit = average + (stdDev * 2);
 
+            dto.ProcessTypeName = process.ProcessType.Name;
             dto.AverageProcessTime = average.ToString(@"hh\:mm\:ss");
             dto.StandardDeviation = stdDev.ToString(@"hh\:mm\:ss");
             dto.UpperLimit = upperLimit.ToString(@"hh\:mm\:ss");
@@ -311,11 +331,7 @@ namespace ColdlineAPI.Application.Services
 
         private async Task<TimeSpan> CalculateProcessTime(DateTime start, DateTime? end)
         {
-            // Se end for nulo, usa o horário atual
-            DateTime endTime = end ?? DateTime.Now;
-
-            if (endTime <= start)
-                return TimeSpan.Zero;
+            DateTime endTime = end ?? GetCurrentCampoGrandeTime();
 
             TimeSpan total = TimeSpan.Zero;
 

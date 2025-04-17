@@ -47,7 +47,6 @@ namespace ColdlineWeb.Pages.Industria
                 isLoading = false;
             }
         }
-
         private async Task LoadUser(string id)
         {
             user = await IndustriaService.GetUserByIdentificationNumber(id);

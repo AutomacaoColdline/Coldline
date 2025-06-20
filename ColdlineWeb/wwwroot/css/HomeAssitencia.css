@@ -1,0 +1,109 @@
+/* Layout base */
+body {
+    background-color: #f4f8fb;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    min-height: 100vh;
+    background-color: #0056b3;
+    display: flex;
+    flex-direction: column;
+    border-right: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+.sidebar-header {
+    background-color: #004494;
+    text-align: center;
+    padding: 1.2rem 1rem;
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .nav-link {
+    color: #ffffff;
+    padding: 0.85rem 1.25rem;
+    transition: background-color 0.3s ease-in-out;
+    font-weight: 500;
+    border-radius: 0;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background-color: #003875;
+    text-decoration: none;
+}
+
+.sidebar .bi {
+    margin-right: 10px;
+}
+
+/* Main content */
+.content {
+    padding: 1.5rem 2rem;
+    background-color: transparent;
+    flex-grow: 1;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+/* Headings */
+h2 {
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+/* Table styling */
+.table {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table th {
+    background-color: #e9f1fb;
+    color: #333;
+    font-weight: 600;
+    border: none;
+}
+
+.table td, .table th {
+    vertical-align: middle;
+    border: none;
+    padding: 0.75rem 1rem;
+}
+
+/* Remove default padding/margin on body and container */
+html, body, .container-fluid, .d-flex {
+    padding: 0;
+    margin: 0;
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+        min-height: auto;
+    }
+
+    .sidebar .nav-item {
+        flex: 1;
+        text-align: center;
+    }
+
+    .content {
+        padding: 1rem;
+    }
+}

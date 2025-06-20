@@ -9,10 +9,11 @@
     private string selectedMachineId = "";
     private bool preIndustrialization = false;
     private bool reWork = false;
+    public bool prototype = false;
 
     private bool CanStartProcess =>
         !string.IsNullOrWhiteSpace(selectedProcessTypeId) &&
-        (preIndustrialization || !string.IsNullOrWhiteSpace(selectedMachineId));
+        (preIndustrialization || prototype || !string.IsNullOrWhiteSpace(selectedMachineId));
 
     private async Task HandleStartProcess()
     {
@@ -22,8 +23,10 @@
         {
             ProcessTypeId = selectedProcessTypeId,
             PreIndustrialization = preIndustrialization,
+            Prototype = prototype,
+
             ReWork = reWork,
-            MachineId = preIndustrialization ? null : selectedMachineId 
+            MachineId = preIndustrialization || prototype ? null : selectedMachineId 
         };
 
         await OnStartProcess.InvokeAsync(processModel);
@@ -31,9 +34,16 @@
 
     private void TogglePreIndustrialization()
     {
-        if (preIndustrialization)
+        if (preIndustrialization||prototype)
         {
             selectedMachineId = ""; // Limpa a seleção da máquina ao ativar pré-industrialização
+        }
+    }
+    private void TogglePrototype()
+    {
+        if (prototype || preIndustrialization)
+        {
+            selectedMachineId = ""; // Limpa a seleção da máquina ao ativar protótipo
         }
     }
 }
@@ -52,7 +62,7 @@
         </select>
     </div>
 
-    @if (!preIndustrialization)  
+    @if (!preIndustrialization||!prototype)  
     {
         <div class="form-group">
             <label>Máquina</label>
@@ -69,6 +79,10 @@
     <div class="form-group checkbox-group">
         <input type="checkbox" id="preIndustrialization" @bind="preIndustrialization" @bind:after="TogglePreIndustrialization" />
         <label for="preIndustrialization">Pré-industrialização</label>
+    </div>
+    <div class="form-group checkbox-group">
+        <input type="checkbox" id="prototype" @bind="prototype" @bind:after="TogglePrototype" />
+        <label for="prototype">Protótipo</label>
     </div>
     <div class="form-group checkbox-group">
         <input type="checkbox" id="reWork" @bind="reWork"/>

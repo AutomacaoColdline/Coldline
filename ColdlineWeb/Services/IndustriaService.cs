@@ -79,13 +79,14 @@ namespace ColdlineWeb.Services
         }
 
         // 🔹 Iniciar um novo processo
-        public async Task<bool> StartProcessAsync(string identificationNumber, string processTypeId, bool preIndustrialization, string? machineId = null)
+        public async Task<bool> StartProcessAsync(string identificationNumber, string processTypeId, bool preIndustrialization, bool prototype,string? machineId = null)
         {
             var request = new
             {
                 IdentificationNumber = identificationNumber,
                 ProcessTypeId = processTypeId,
                 PreIndustrialization = preIndustrialization,
+                Prototype = prototype,
                 MachineId = machineId
             };
 

@@ -33,6 +33,7 @@ else
             <div><strong>Tipo de Processo:</strong> @process.ProcessType.Name</div>
             <div><strong>Re-trabalho:</strong> @(process.ReWork ? "Sim" : "Não")</div>
             <div><strong>Pré-Industrialização:</strong> @(process.PreIndustrialization == true ? "Sim" : process.PreIndustrialization == false ? "Não" : "Não informado")</div>
+            <div><strong>Prótotipo:</strong> @(process.Prototype == true ? "Sim" : process.Prototype == false ? "Não" : "Não informado")</div>
         </div>
 
         <div class="machine-box">

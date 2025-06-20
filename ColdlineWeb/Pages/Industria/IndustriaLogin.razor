@@ -3,17 +3,34 @@
 @inject HttpClient Http
 @inject NavigationManager Navigation
 @using ColdlineWeb.Models
+@using Microsoft.AspNetCore.Components.Web
 
+<link rel="stylesheet" href="css/Industria.css" />
 
-<link rel="stylesheet" href="css/Industria.css">
-<img src="img/logofundo.png" class="background-image-login" alt="Logo Fundo">
+<img src="img/logofundo.png" class="background-image-login" alt="Logo Fundo" />
+
+@if (isLoading)
+{
+    <div class="loader-overlay">
+        <div class="loader"></div>
+    </div>
+}
+
 <div class="login-container">
     <div class="login-card">
+        
         @if (!string.IsNullOrEmpty(errorMessage))
         {
             <div class="alert alert-danger text-center">@errorMessage</div>
         }
-        <input class="form-control text-center" @bind="identificationNumber" placeholder="Digite seu número de identificação" />
+
+        <input class="form-control text-center"
+               @bind="identificationNumber"
+               @bind:event="oninput"
+               placeholder="Digite seu número de identificação"
+               inputmode="numeric"
+               pattern="\d*"
+               @onkeypress="HandleKeyPress" />
 
         <button class="btn btn-primary w-100 mt-3" @onclick="Login">Login</button>
     </div>
@@ -22,6 +39,7 @@
 @code {
     private string identificationNumber = string.Empty;
     private string? errorMessage;
+    private bool isLoading = false;
 
     private async Task Login()
     {
@@ -30,6 +48,9 @@
             errorMessage = "Por favor, digite um número de identificação.";
             return;
         }
+
+        isLoading = true;
+        errorMessage = string.Empty;
 
         try
         {
@@ -48,6 +69,17 @@
         {
             errorMessage = "Erro na requisição. Tente novamente.";
         }
+        finally
+        {
+            isLoading = false;
+        }
     }
 
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await Login();
+        }
+    }
 }

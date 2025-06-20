@@ -25,6 +25,10 @@
       "PackagePath": "staticwebassets/css/Home.css"
     },
     {
+      "Id": "/app/wwwroot/css/HomeAssitencia.css",
+      "PackagePath": "staticwebassets/css/HomeAssitencia.css"
+    },
+    {
       "Id": "/app/wwwroot/css/IdleTimeByUsers.css",
       "PackagePath": "staticwebassets/css/IdleTimeByUsers.css"
     },

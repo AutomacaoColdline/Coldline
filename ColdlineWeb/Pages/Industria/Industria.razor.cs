@@ -90,6 +90,7 @@ namespace ColdlineWeb.Pages.Industria
                 user.IdentificationNumber, 
                 processModel.ProcessTypeId, 
                 processModel.PreIndustrialization, 
+                processModel.Prototype,
                 processModel.MachineId // Pode ser null se for pré-industrialização
             );
 

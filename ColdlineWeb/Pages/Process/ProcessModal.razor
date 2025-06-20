@@ -10,8 +10,10 @@
                 <div class="modal-body">
                     <label>Data de Início:</label>
                     <input type="datetime-local" class="form-control" @bind="CurrentProcess.StartDate" />
+                    
                     <label>Data de Término:</label>
                     <input type="datetime-local" class="form-control" @bind="CurrentProcess.EndDate" />
+                    
                     <label>Usuário:</label>
                     <select class="form-control" @bind="CurrentProcess.User.Id">
                         @foreach (var user in UsersRef)
@@ -19,6 +21,7 @@
                             <option value="@user.Id">@user.Name</option>
                         }
                     </select>
+                    
                     <label>Departamento:</label>
                     <select class="form-control" @bind="CurrentProcess.Department.Id">
                         @foreach (var dept in Departments)
@@ -26,6 +29,7 @@
                             <option value="@dept.Id">@dept.Name</option>
                         }
                     </select>
+                    
                     <label>Tipo de Processo:</label>
                     <select class="form-control" @bind="CurrentProcess.ProcessType.Id">
                         @foreach (var pt in ProcessTypes)
@@ -33,21 +37,37 @@
                             <option value="@pt.Id">@pt.Name</option>
                         }
                     </select>
-                    <label>Pré-Industrialização:</label>
-                    <select class="form-control" @bind="selectedPreIndValue" @bind:event="onchange">
-                        <option value="">Selecione</option>
-                        <option value="true">Sim</option>
-                        <option value="false">Não</option>
-                    </select>
-                    @if (selectedPreIndValue != "true")
-                    {
-                        <label>Máquina:</label>
-                        <select class="form-control" @bind="CurrentProcess.Machine.Id">
-                            @foreach (var machine in Machines)
-                            {
-                                <option value="@machine.Id">@machine.Name</option>
-                            }
+                    
+                    <div class="form-group">
+                        <label>Pré-Industrialização:</label>
+                        <select class="form-control" @bind="selectedPreIndValue" @bind:event="onchange">
+                            <option value="">Selecione</option>
+                            <option value="true">Sim</option>
+                            <option value="false">Não</option>
                         </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Protótipo:</label>
+                        <select class="form-control" @bind="selectedPrototypeValue" @bind:event="onchange">
+                            <option value="">Selecione</option>
+                            <option value="true">Sim</option>
+                            <option value="false">Não</option>
+                        </select>
+                    </div>
+                    
+                    @if (ShouldShowMachineField)
+                    {
+                        <div class="form-group">
+                            <label>Máquina:</label>
+                            <select class="form-control" @bind="CurrentProcess.Machine.Id">
+                                <option value="">Selecione uma máquina</option>
+                                @foreach (var machine in Machines)
+                                {
+                                    <option value="@machine.Id">@machine.Name</option>
+                                }
+                            </select>
+                        </div>
                     }
                 </div>
                 <div class="modal-footer">
@@ -73,20 +93,35 @@
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
     [Parameter] public EventCallback<ChangeEventArgs> OnOccurrenceSelection { get; set; }
-    private string? selectedPreIndValue
+
+    private bool ShouldShowMachineField => 
+    CurrentProcess.PreIndustrialization.HasValue && 
+    CurrentProcess.Prototype.HasValue &&
+    !CurrentProcess.PreIndustrialization.Value && 
+    !CurrentProcess.Prototype.Value;
+
+    private string selectedPreIndValue
     {
-        get => CurrentProcess.PreIndustrialization.HasValue
-            ? CurrentProcess.PreIndustrialization.Value.ToString().ToLower()
-            : "";
+        get => CurrentProcess.PreIndustrialization.ToString().ToLower();
         set
         {
             if (bool.TryParse(value, out var result))
             {
                 CurrentProcess.PreIndustrialization = result;
+                StateHasChanged();
             }
-            else
+        }
+    }
+
+    private string selectedPrototypeValue
+    {
+        get => CurrentProcess.Prototype.ToString().ToLower();
+        set
+        {
+            if (bool.TryParse(value, out var result))
             {
-                CurrentProcess.PreIndustrialization = null;
+                CurrentProcess.Prototype = result;
+                StateHasChanged();
             }
         }
     }

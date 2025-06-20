@@ -47,6 +47,7 @@ namespace ColdlineWeb.Pages
         private double currentX;
         private bool isDragging;
         private double machineStartX;
+        protected string CacheBuster { get; set; } = DateTime.UtcNow.Ticks.ToString();
 
         private Dictionary<string, TimeSpan> runningTimers = new();
         private System.Timers.Timer? timer;

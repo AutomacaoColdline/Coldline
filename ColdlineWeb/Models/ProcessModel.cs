@@ -15,6 +15,7 @@ namespace ColdlineWeb.Models{
         public bool? PreIndustrialization { get; set; }
         public bool Finished { get; set; }
         public bool ReWork { get; set; }
+        public bool? Prototype { get; set; }
     }
 
 

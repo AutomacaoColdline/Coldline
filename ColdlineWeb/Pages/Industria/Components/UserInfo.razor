@@ -15,19 +15,25 @@
     private Dictionary<string, TimeSpan> _occurrenceTimes = new();
     protected OccurrenceModel? ActiveOccurrence;
     private string occurrenceWarningMessage = "";
+    private DateTime _startTimestamp;
 
 
     protected void StartTimer()
     {
-        _timer = new System.Timers.Timer(1000); // 1 segundo
+        _startTimestamp = DateTime.UtcNow - elapsedTime; // já inclui o tempo salvo do banco
+
+        _timer = new System.Timers.Timer(1000);
         _timer.Elapsed += async (sender, args) =>
         {
-            elapsedTime = elapsedTime.Add(TimeSpan.FromSeconds(1));
+            var now = DateTime.UtcNow;
+            elapsedTime = now - _startTimestamp;
+
             await InvokeAsync(StateHasChanged);
         };
         _timer.AutoReset = true;
         _timer.Enabled = true;
     }
+    
     protected void StopTimer()
     {
         _timer?.Stop();

@@ -1,19 +1,16 @@
-
 /* 📌 Imagem de Fundo */
 .background-image-login {
-    position: fixed; /* Fixa a imagem no fundo */
+    position: fixed;
     top: 0;
     left: 0;
-    width: 100vw; /* Ocupa toda a largura da tela */
-    height: 100vh; /* Ocupa toda a altura da tela */
+    width: 100vw;
+    height: 100vh;
     max-width: 100%;
     max-height: 100%;
-    object-fit: cover; /* Garante que a imagem cubra toda a tela sem distorcer */
-    z-index: -1; /* Mantém a imagem atrás de todos os elementos */
-    opacity: 0.3; /* Mantém um nível de transparência */
+    object-fit: cover;
+    z-index: -1;
+    opacity: 0.3;
 }
-
-
 
 /* 📌 Container de Login */
 .login-container {
@@ -34,5 +31,33 @@
     border-radius: 10px;
     text-align: center;
     position: relative;
-    z-index: 2; /* Mantém acima da imagem de fundo */
+    z-index: 2;
+}
+
+/* 📌 Loader (Animação de carregando) */
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.loader {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #007bff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

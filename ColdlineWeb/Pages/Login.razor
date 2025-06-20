@@ -7,12 +7,8 @@
     <div class="login-box">
         <h2>Login</h2>
         <div>
-            <label>Usuário:</label>
+            <label>ID</label>
             <input @bind="Username" type="text" class="input-field" />
-        </div>
-        <div>
-            <label>Senha:</label>
-            <input @bind="Password" type="password" class="input-field" />
         </div>
         <button class="login-button" @onclick="HandleLogin">Entrar</button>
     </div>
@@ -61,12 +57,31 @@
 </style>
 
 @code {
-    private string Username { get; set; }
-    private string Password { get; set; }
+    private string Username { get; set; } = string.Empty;
 
     private void HandleLogin()
     {
-        // Simulação de autenticação
-        Navigation.NavigateTo("/home");
+        var input = Username.Trim();
+
+        switch (input)
+        {
+            case "001":
+            case "241":
+                Navigation.NavigateTo("/home");
+                break;
+            case "002":
+            case "252":
+            case "242":
+            case "247":
+                Navigation.NavigateTo("/homeAssistencia");
+                break;
+            case "000":
+            case "81":
+                Navigation.NavigateTo("/setup");
+                break;
+            default:
+                // Opcional: exibir alerta ou mensagem de erro
+                break;
+        }
     }
 }

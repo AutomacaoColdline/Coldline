@@ -7,8 +7,6 @@
 
 <link rel="stylesheet" href="css/Home.css">
 
-<PageTitle>Home</PageTitle>
-
 @if (isLoading)
 {
     <div class="loader-wrapper">
@@ -63,7 +61,7 @@ else
                         @foreach (var user in PaginatedUsers)
                         {
                             <tr>
-                                <td><img class="user-photo" src="@($"http://10.0.0.44:5000/uploads/{user.UrlPhoto}?t={DateTime.UtcNow.Ticks}")" alt="Foto de @user.Name" /></td>
+                                <td><img class="user-photo" src="@($"http://10.0.0.44:5000/uploads/{user.UrlPhoto}?t={CacheBuster}")" alt="Foto de @user.Name" /></td>
                                 <td>@user.Name</td>
                                 @if (ProcessStatsByUserId.TryGetValue(user.Id, out var stat))
                                 {

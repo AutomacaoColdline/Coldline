@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using ColdlineWeb.Util;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Filter;
+using ColdlineWeb.Models.Enum;
+
 using System.Text.Json;
 
 
@@ -85,6 +87,23 @@ namespace ColdlineWeb.Services
 
             return items ?? new List<MachineModel>();
         }
+        public async Task<bool> FinalizeMachineAsync(string id)
+        {
+            // Busca a máquina atual para não sobrescrever campos
+            var machine = await GetMachineByIdAsync(id);
+            if (machine == null)
+                return false;
+
+            machine.Status = MachineStatus.Finished;
+            machine.Process = null;
+            machine.Monitoring = null;
+            machine.Quality = null;
+
+            var response = await _http.PutAsJsonAsync($"api/Machine/{id}", machine);
+            return response.IsSuccessStatusCode;
+        }
+
+
 
     }
 }

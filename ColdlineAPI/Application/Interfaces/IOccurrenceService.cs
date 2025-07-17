@@ -9,6 +9,8 @@ namespace ColdlineAPI.Application.Interfaces
     {
         Task<List<Occurrence>> GetAllOccurrencesAsync();
         Task<Occurrence?> GetOccurrenceByIdAsync(string id);
+        Task<List<OccurrenceDateChartDto>> GetOccurrenceCountByDateAsync(DateTime start, DateTime end);
+        Task<List<OccurrenceUserChartDto>> GetOccurrenceCountByUserAsync(DateTime start, DateTime end);
         Task<Occurrence> CreateOccurrenceAsync(Occurrence Occurrence);
         Task<bool> UpdateOccurrenceAsync(string id, Occurrence Occurrence);
         Task<bool> DeleteOccurrenceAsync(string id);

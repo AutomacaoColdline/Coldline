@@ -1,13 +1,15 @@
 @page "/reports/timeprocessbyusersindividual"
 @inject IJSRuntime JS
+@inject HttpClient Http
+
 <link rel="stylesheet" href="css/TimeProcessByUsersIndividual.css" />
 
 <div class="filtro-container">
     <label>Usuário:
-        <select @bind="selectedUser">
+        <select @bind="selectedUserId">
             @foreach (var user in usuariosDisponiveis)
             {
-                <option value="@user">@user</option>
+                <option value="@user.Id">@user.Name</option>
             }
         </select>
     </label>
@@ -21,6 +23,14 @@
         <select @bind="chartType">
             <option value="bar">Barra</option>
             <option value="line">Linha</option>
+        </select>
+    </label>
+    <label>
+        Pré-Industrialização:
+       <select @bind="PreIndustrializationString">
+            <option value="">Todos</option>
+            <option value="true">Sim</option>
+            <option value="false">Não</option>
         </select>
     </label>
     <button @onclick="GerarGrafico">
@@ -38,29 +48,97 @@
 @code {
     private DateTime startDate = DateTime.Today.AddDays(-7);
     private DateTime endDate = DateTime.Today;
-    private string selectedUser = "Cicero";
+    private string selectedUserId = "";
     private string chartType = "bar";
+    private string preIndustrializationString = "";
+    private bool? preIndustrialization = null;
 
-    private List<string> usuariosDisponiveis = new() { "Cicero", "Douglas", "Franke", "Jhony", "Luiz", "Raphael" };
+    private string PreIndustrializationString
+    {
+        get => preIndustrializationString;
+        set
+        {
+            preIndustrializationString = value;
+            preIndustrialization = value.ToLowerInvariant() switch
+            {
+                "true" => true,
+                "false" => false,
+                _ => null
+            };
+        }
+    }
+
+    private List<UsuarioDto> usuariosDisponiveis = new();
+
+    public class UsuarioDto
+    {
+        public string Id { get; set; } = "";
+        public string Name { get; set; } = "";
+    }
+
+    public class IndividualProcessDto
+    {
+        public string ProcessId { get; set; } = "";
+        public string IdentificationNumber { get; set; } = "";
+        public string ProcessTypeName { get; set; } = "";
+        public DateTime StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string ProcessTime { get; set; } = "00:00:00";
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var users = await Http.GetFromJsonAsync<List<UsuarioDto>>("api/User");
+        if (users != null)
+        {
+            usuariosDisponiveis = users;
+            selectedUserId = usuariosDisponiveis.FirstOrDefault()?.Id ?? "";
+        }
+    }
 
     private async Task GerarGrafico()
     {
-        var dados = GerarDadosFicticiosPorUsuario(selectedUser, startDate, endDate);
-        await JS.InvokeVoidAsync("renderizarGraficoUsuarioIndividual", dados.Labels, dados.Values, selectedUser, chartType);
-    }
+        if (string.IsNullOrWhiteSpace(selectedUserId))
+            return;
 
-    private (List<string> Labels, List<int> Values) GerarDadosFicticiosPorUsuario(string usuario, DateTime start, DateTime end)
-    {
-        var tiposProcesso = new[] { "Montagem", "Solda", "Inspeção", "Embalagem", "Teste" };
-        var labels = new List<string>();
-        var values = new List<int>();
+        Console.WriteLine($"DEBUG >> preIndustrializationString: '{preIndustrializationString}'");
 
-        foreach (var tipo in tiposProcesso)
+        var requestData = new
         {
-            labels.Add(tipo);
-            values.Add(Random.Shared.Next(15, 300)); // entre 15 e 300 minutos
-        }
+            startDate = startDate.ToUniversalTime(),
+            endDate = endDate.ToUniversalTime(),
+            preIndustrialization = preIndustrialization
+        };
 
-        return (labels, values);
+        var response = await Http.PostAsJsonAsync($"api/Process/chart/individual-time-by-user/{selectedUserId}", requestData);
+        if (!response.IsSuccessStatusCode)
+            return;
+
+        var result = await response.Content.ReadFromJsonAsync<List<IndividualProcessDto>>();
+        if (result == null)
+            return;
+
+        var labels = result.Select(x => $"{x.ProcessTypeName.Trim()} ({x.IdentificationNumber})").ToList();
+
+        var values = result.Select(x =>
+        {
+            try
+            {
+                var parts = x.ProcessTime.Split(':');
+                if (parts.Length == 3)
+                {
+                    int h = int.Parse(parts[0]);
+                    int m = int.Parse(parts[1]);
+                    int s = int.Parse(parts[2]);
+                    return Math.Round(h * 60.0 + m + s / 60.0, 2);
+                }
+            }
+            catch { }
+            return 0.0;
+        }).ToList();
+
+        var userName = usuariosDisponiveis.FirstOrDefault(u => u.Id == selectedUserId)?.Name ?? "Usuário";
+
+        await JS.InvokeVoidAsync("renderizarGraficoUsuarioIndividual", labels, values, userName, chartType);
     }
 }

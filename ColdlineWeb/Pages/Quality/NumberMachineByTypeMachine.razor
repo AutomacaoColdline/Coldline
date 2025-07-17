@@ -1,4 +1,6 @@
 @inject IJSRuntime JS
+@inject HttpClient Http
+
 <link rel="stylesheet" href="css/NumberMachineByTypeMachine.css" />
 
 <div class="filtro-container">
@@ -31,24 +33,31 @@
     private DateTime endDate = DateTime.Today;
     private string chartType = "bar";
 
-    private async Task GerarGraficoPorTipoMaquina()
+    private class MachineByTypeDto
     {
-        var dados = GerarDadosFicticios(startDate, endDate);
-        await JS.InvokeVoidAsync("renderizarGraficoTipoMaquina", dados.Labels, dados.Values, chartType);
+        public string Type { get; set; } = "";
+        public int Count { get; set; }
     }
 
-    private (List<string> Labels, List<int> Values) GerarDadosFicticios(DateTime start, DateTime end)
+    private async Task GerarGraficoPorTipoMaquina()
     {
-        var tipos = new[] { "Cold 5", "Cold 15", "Cold 10", "Cold 10S" };
-        var labels = new List<string>();
-        var values = new List<int>();
-
-        foreach (var tipo in tipos)
+        var body = new
         {
-            labels.Add(tipo);
-            values.Add(Random.Shared.Next(3, 30));
-        }
+            startDate = startDate.ToUniversalTime(),
+            endDate = endDate.ToUniversalTime()
+        };
 
-        return (labels, values);
+        var response = await Http.PostAsJsonAsync("api/Machine/count-by-type", body);
+        if (!response.IsSuccessStatusCode)
+            return;
+
+        var result = await response.Content.ReadFromJsonAsync<List<MachineByTypeDto>>();
+        if (result == null)
+            return;
+
+        var labels = result.Select(x => x.Type).ToList();
+        var values = result.Select(x => x.Count).ToList();
+
+        await JS.InvokeVoidAsync("renderizarGraficoTipoMaquina", labels, values, chartType);
     }
 }

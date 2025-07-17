@@ -1,4 +1,5 @@
 @inject IJSRuntime JS
+@inject HttpClient Http
 <link rel="stylesheet" href="css/NumberProcessByTypeProcess.css" />
 
 <div class="filtro-container">
@@ -33,22 +34,35 @@
 
     private async Task GerarGraficoPorTipoProcesso()
     {
-        var dados = GerarDadosFicticios(startDate, endDate);
-        await JS.InvokeVoidAsync("renderizarGraficoTipoProcesso", dados.Labels, dados.Values, chartType);
+        var data = new
+        {
+            startDate = startDate.ToUniversalTime(),
+            endDate = endDate.ToUniversalTime()
+        };
+
+        var response = await Http.PostAsJsonAsync("http://10.0.0.44:5000/api/Process/chart/by-type-and-date", data);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<List<ProcessTypeChartDto>>();
+            if (result is not null)
+            {
+                var labels = result.Select(r => r.ProcessTypeName).ToList();
+                var values = result.Select(r => r.Quantity).ToList();
+                await JS.InvokeVoidAsync("renderizarGraficoTipoProcesso", labels, values, chartType);
+            }
+        }
+        else
+        {
+            // Logar erro ou exibir alerta ao usuário
+            Console.Error.WriteLine("Erro ao buscar dados da API.");
+        }
     }
 
-    private (List<string> Labels, List<int> Values) GerarDadosFicticios(DateTime start, DateTime end)
+    public class ProcessTypeChartDto
     {
-        var tipos = new[] { "Solda", "Montagem", "Eletrica", "Inspeção", "Higenização", "Embalagem" };
-        var labels = new List<string>();
-        var values = new List<int>();
-
-        foreach (var tipo in tipos)
-        {
-            labels.Add(tipo);
-            values.Add(Random.Shared.Next(5, 50));
-        }
-
-        return (labels, values);
+        public string ProcessTypeName { get; set; } = string.Empty;
+        public string Date { get; set; } = string.Empty; // opcional
+        public int Quantity { get; set; }
     }
 }

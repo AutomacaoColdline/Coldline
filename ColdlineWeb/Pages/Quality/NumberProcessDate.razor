@@ -1,4 +1,6 @@
 @inject IJSRuntime JS
+@inject HttpClient Http
+
 <link rel="stylesheet" href="css/NumberProcessDate.css" />
 
 <div class="filtro-container">
@@ -27,67 +29,41 @@
     private DateTime endDate = DateTime.Today;
     private string chartType = "bar";
 
-    private async Task AplicarFiltro()
+    public class ProcessByDateDto
     {
-        var data = GerarDados(startDate, endDate);
-        await JS.InvokeVoidAsync("renderizarGraficoProcess", data.Labels, data.Values, chartType);
+        public string Date { get; set; } = string.Empty;
+        public int Quantity { get; set; }
     }
 
-    private (List<string> Labels, List<int> Values) GerarDados(DateTime start, DateTime end)
+    public class DateRangeRequest
     {
-        var labels = new List<string>();
-        var values = new List<int>();
-        var daysDiff = (end - start).TotalDays;
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+    }
 
-        if (daysDiff < 1)
+    private async Task AplicarFiltro()
+    {
+        var requestData = new DateRangeRequest
         {
-            for (int h = 0; h < 24; h++)
-            {
-                labels.Add($"{h}h");
-                values.Add(Random.Shared.Next(0, 10));
-            }
-        }
-        else if (daysDiff <= 7)
+            StartDate = startDate,
+            EndDate = endDate
+        };
+
+        var response = await Http.PostAsJsonAsync("api/Process/chart/by-date", requestData);
+
+        if (response.IsSuccessStatusCode)
         {
-            for (var dt = start; dt <= end; dt = dt.AddDays(1))
+            var result = await response.Content.ReadFromJsonAsync<List<ProcessByDateDto>>();
+            if (result != null)
             {
-                if (dt.DayOfWeek is >= DayOfWeek.Monday and <= DayOfWeek.Friday)
-                {
-                    labels.Add(dt.ToString("dd/MM/yyyy"));
-                    values.Add(Random.Shared.Next(0, 10));
-                }
-            }
-        }
-        else if (daysDiff <= 31)
-        {
-            int semana = 1;
-            for (var dt = start; dt <= end; dt = dt.AddDays(7))
-            {
-                labels.Add($"Semana {semana++}");
-                values.Add(Random.Shared.Next(0, 20));
-            }
-        }
-        else if (daysDiff <= 366)
-        {
-            var dt = new DateTime(start.Year, start.Month, 1);
-            while (dt <= end)
-            {
-                labels.Add(dt.ToString("MMM yy", new System.Globalization.CultureInfo("pt-BR")));
-                values.Add(Random.Shared.Next(0, 100));
-                dt = dt.AddMonths(1);
+                var labels = result.Select(p => p.Date).ToList();
+                var values = result.Select(p => p.Quantity).ToList();
+                await JS.InvokeVoidAsync("renderizarGraficoProcess", labels, values, chartType);
             }
         }
         else
         {
-            var dt = new DateTime(start.Year, 1, 1);
-            while (dt <= end)
-            {
-                labels.Add(dt.Year.ToString());
-                values.Add(Random.Shared.Next(0, 500));
-                dt = dt.AddYears(1);
-            }
+            Console.WriteLine("Erro ao buscar dados da API.");
         }
-
-        return (labels, values);
     }
 }

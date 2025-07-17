@@ -49,5 +49,7 @@ namespace ColdlineAPI.Domain.Entities
         public bool? PreIndustrialization { get; set; }
         [BsonElement("ReWork")]
         public bool? ReWork { get; set; }
+         [BsonElement("Prototype")]
+        public bool? Prototype { get; set; }
     }
 }

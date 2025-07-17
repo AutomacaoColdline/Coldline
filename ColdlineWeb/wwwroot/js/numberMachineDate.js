@@ -1,10 +1,12 @@
 window.renderizarGraficoMachine = (labels, data, type) => {
     const ctx = document.getElementById('machineChart').getContext('2d');
 
-    // Evita erro caso não seja uma instância válida de Chart
     if (window.machineChart instanceof Chart) {
         window.machineChart.destroy();
     }
+
+    const maxValue = Math.max(...data);
+    const stepSize = Math.ceil(maxValue / 5) || 1;
 
     window.machineChart = new Chart(ctx, {
         type: type,
@@ -39,7 +41,15 @@ window.renderizarGraficoMachine = (labels, data, type) => {
                     }
                 },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    suggestedMax: maxValue + stepSize,
+                    ticks: {
+                        stepSize: stepSize
+                    },
+                    title: {
+                        display: true,
+                        text: 'Máquinas'
+                    }
                 }
             }
         }

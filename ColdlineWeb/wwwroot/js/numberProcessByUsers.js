@@ -1,44 +1,26 @@
-window.renderizarGraficoUsuarios = (labels, data, type) => {
+function renderizarGraficoUsuarios(labels, values, chartType) {
     const ctx = document.getElementById('processChart').getContext('2d');
-
-    if (window.processChart instanceof Chart) {
-        window.processChart.destroy();
+    if (window.graficoUsuarios) {
+        window.graficoUsuarios.destroy();
     }
 
-    window.processChart = new Chart(ctx, {
-        type: type,
+    window.graficoUsuarios = new Chart(ctx, {
+        type: chartType,
         data: {
             labels: labels,
             datasets: [{
-                label: 'Processos por Usuário',
-                data: data,
-                backgroundColor: 'rgba(40, 167, 69, 0.5)',
-                borderColor: 'rgba(40, 167, 69, 1)',
-                borderWidth: 1,
-                fill: type === 'line' ? false : true,
-                tension: 0.3
+                label: 'Quantidade de Processos',
+                data: values,
+                borderWidth: 1
             }]
         },
         options: {
             responsive: true,
-            plugins: {
-                legend: { display: true },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false
-                }
-            },
             scales: {
-                x: {
-                    ticks: {
-                        maxRotation: 45,
-                        minRotation: 45
-                    }
-                },
                 y: {
                     beginAtZero: true
                 }
             }
         }
     });
-};
+}

@@ -28,7 +28,7 @@ namespace ColdlineWeb.Pages
 
         protected int pageNumber = 1;
         protected int totalPages = 1;
-        protected const int defaultPageSize = 4;
+        protected const int defaultPageSize = 8;
 
         protected bool CanGoNext => pageNumber < totalPages;
         protected bool CanGoPrevious => pageNumber > 1;
@@ -79,6 +79,29 @@ namespace ColdlineWeb.Pages
                 Console.WriteLine($"[ERRO] {ex.Message}");
             }
         }
+
+        protected async Task FinalizeMachine(string machineId)
+        {
+            try
+            {
+                var success = await machineService.FinalizeMachineAsync(machineId);
+                if (success)
+                {
+                    await ApplyFilters(); // Atualiza tabela
+                }
+                else
+                {
+                    errorMessage = "Falha ao finalizar máquina.";
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = "Erro ao finalizar máquina.";
+                Console.WriteLine($"[ERRO] {ex.Message}");
+            }
+        }
+
+
 
         protected async Task ResetFilters()
         {

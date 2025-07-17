@@ -1,5 +1,6 @@
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Domain.Entities;
+using ColdlineAPI.Application.Filters;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -23,6 +24,12 @@ namespace ColdlineAPI.Presentation.Controllers
             var monitorings = await _monitoringService.GetAllMonitoringsAsync();
             return Ok(monitorings);
         }
+        [HttpPost("filter")]
+        public async Task<ActionResult<IEnumerable<Monitoring>>> GetFiltered([FromBody] MonitoringFilter filter)
+        {
+            var result = await _monitoringService.GetFilteredMonitoringsAsync(filter);
+            return Ok(result);
+        }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Monitoring>> GetById(string id)
@@ -36,6 +43,16 @@ namespace ColdlineAPI.Presentation.Controllers
         {
             var created = await _monitoringService.CreateMonitoringAsync(monitoring);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        }
+
+        [HttpPost("batch")]
+        public async Task<ActionResult<IEnumerable<Monitoring>>> CreateAll([FromBody] List<Monitoring> monitorings)
+        {
+            if (monitorings == null || monitorings.Count == 0)
+                return BadRequest("A lista de monitoramentos está vazia.");
+
+            var createdList = await _monitoringService.CreateAllMonitoringsAsync(monitorings);
+            return Ok(createdList);
         }
 
         [HttpPut("{id}")]

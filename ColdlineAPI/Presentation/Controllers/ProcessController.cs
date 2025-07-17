@@ -70,7 +70,7 @@ namespace ColdlineAPI.Presentation.Controllers
         {
             try
             {
-                var process = await _processService.StartProcessAsync(request.IdentificationNumber, request.ProcessTypeId, request.MachineId, request.PreIndustrialization, request.ReWork);
+                var process = await _processService.StartProcessAsync(request.IdentificationNumber, request.ProcessTypeId, request.MachineId, request.PreIndustrialization, request.ReWork, request.Prototype);
                 return Ok(process);
             }
             catch (ArgumentException ex)
@@ -122,5 +122,73 @@ namespace ColdlineAPI.Presentation.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        // Endpoint no ProcessController
+        [HttpPost("chart/by-date")]
+        public async Task<ActionResult<List<ProcessByDateDto>>> GetProcessChartData([FromBody] DateRangeRequest request)
+        {
+            if (request.StartDate > request.EndDate)
+                return BadRequest("Data inicial não pode ser maior que a final.");
+
+            var result = await _processService.GetProcessCountByStartDateAsync(request.StartDate, request.EndDate);
+            return Ok(result);
+        }
+
+        [HttpPost("chart/by-type-and-date")]
+        public async Task<IActionResult> GetChartByTypeAndDate([FromBody] DateRangeRequest request)
+        {
+            var result = await _processService.GetProcessCountByTypeAndDateAsync(request.StartDate, request.EndDate);
+            return Ok(result);
+        }
+
+        [HttpPost("chart/by-user-and-date")]
+        public async Task<ActionResult<List<ProcessUserChartDto>>> GetChartByUserAndDate([FromBody] DateRangeRequest request)
+        {
+            var result = await _processService.GetProcessCountByUserAsync(request.StartDate, request.EndDate);
+            return Ok(result);
+        }
+
+        [HttpPost("chart/total-time-by-user")]
+        public async Task<ActionResult<List<UserTotalProcessTimeDto>>> GetTotalProcessTimeByUser([FromBody] DateRangeRequest request)
+        {
+            if (request.StartDate > request.EndDate)
+                return BadRequest("Data inicial não pode ser maior que a final.");
+
+            var result = await _processService.GetTotalProcessTimeByUserAsync(request.StartDate, request.EndDate);
+            return Ok(result);
+        }
+
+        [HttpPost("chart/total-time-by-type")]
+        public async Task<ActionResult<List<ProcessTypeTotalTimeDto>>> GetTotalProcessTimeByType([FromBody] DateRangeRequest request)
+        {
+            if (request.StartDate > request.EndDate)
+                return BadRequest("Data inicial não pode ser maior que a final.");
+
+            var result = await _processService.GetTotalProcessTimeByProcessTypeAsync(request.StartDate, request.EndDate);
+            return Ok(result);
+        }
+        [HttpPost("chart/individual-time-by-user/{userId}")]
+        public async Task<ActionResult<List<IndividualUserProcessDto>>> GetIndividualProcessTimesByUser(string userId, [FromBody] IndividualUserProcessRequest request)
+        {
+            if (request.StartDate > request.EndDate)
+                return BadRequest("Data inicial não pode ser maior que a final.");
+
+            var result = await _processService.GetIndividualProcessTimesByUserAsync(userId, request.StartDate, request.EndDate, request.PreIndustrialization);
+            return Ok(result);
+        }
+        [HttpPost("generate-excel-report")]
+        public async Task<IActionResult> GenerateExcelReport([FromBody] DateRangeRequest request)
+        {
+            try
+            {
+                var fileBytes = await _processService.GenerateExcelReportAsync(request.StartDate, request.EndDate);
+                return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "relatorio-processos.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"Erro ao gerar Excel: {ex.Message}" });
+            }
+        }
+
+
     }
 }

@@ -8,6 +8,8 @@
 @using ColdlineWeb.Models
 @using ColdlineWeb.Models.Filter
 @using ColdlineWeb.Helpers
+@using ColdlineWeb.Models.Enum
+
 
 
 <link rel="stylesheet" href="css/MachineViewer.css" />
@@ -26,13 +28,19 @@ else if (!string.IsNullOrEmpty(errorMessage))
 else if (machine != null)
 {
     <div class="viewer-container">
+        @if (machine.Status != MachineStatus.Finished)
+        {
+            <button class="finalize-button" @onclick="() => FinalizeMachine(machine.Id)">
+                <img src="img/finalizar.png" alt="Finalizar" />
+            </button>
+        }
         <div class="machine-box">
             <h3>🔧 Detalhes da Máquina</h3>
             <div><strong>Cliente:</strong> @machine.CustomerName</div>
             <div><strong>Identificação:</strong> @machine.IdentificationNumber</div>
             <div><strong>Fase:</strong> @machine.Phase</div>
             <div><strong>Voltagem:</strong> @machine.Voltage</div>
-            <div><strong>Status:</strong> @(machine.Status?.ToPortugueseString() ?? "Desconhecido")</div>
+            <div><strong>Status:</strong> @(machine.Status?.GetDisplayName() ?? "Desconhecido")</div>
             <div><strong>Tipo de Máquina:</strong> @machine.MachineType?.Name</div>
             <div><strong>Qualidade:</strong> @(machine.Quality?.Name ?? "Não disponivel")</div>
             <div><strong>Monitoramento:</strong> @(machine.Monitoring?.Name ?? "Nenhum")</div>
@@ -107,6 +115,30 @@ else if (machine != null)
             isLoading = false;
         }
     }
+    private async Task FinalizeMachine(string id)
+    {
+        try
+        {
+            var success = await MachineService.FinalizeMachineAsync(id);
+            if (success)
+            {
+                // Recarrega os dados atualizados da máquina
+                machine = await MachineService.GetMachineByIdAsync(id);
+                StateHasChanged();
+            }
+            else
+            {
+                errorMessage = "Falha ao finalizar máquina.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Erro ao finalizar máquina.";
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    
 
     private void GoBack() => Navigation.NavigateTo("/home");
 }

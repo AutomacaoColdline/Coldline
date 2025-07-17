@@ -1,4 +1,6 @@
 @inject IJSRuntime JS
+@inject HttpClient Http
+
 <link rel="stylesheet" href="css/NumberProcessByUsers.css" />
 
 <div class="filtro-container">
@@ -31,24 +33,32 @@
     private DateTime endDate = DateTime.Today;
     private string chartType = "bar";
 
-    private async Task GerarGraficoPorUsuarios()
+    private class UsuarioChartDto
     {
-        var dados = GerarDadosFicticios(startDate, endDate);
-        await JS.InvokeVoidAsync("renderizarGraficoUsuarios", dados.Labels, dados.Values, chartType);
+        public string UserName { get; set; } = string.Empty;
+        public int Quantity { get; set; }
     }
 
-    private (List<string> Labels, List<int> Values) GerarDadosFicticios(DateTime start, DateTime end)
+    private async Task GerarGraficoPorUsuarios()
     {
-        var usuarios = new[] { "Cicero", "Douglas", "Franke", "Jhony", "Luiz", "Raphael" };
-        var labels = new List<string>();
-        var values = new List<int>();
-
-        foreach (var user in usuarios)
+        var request = new
         {
-            labels.Add(user);
-            values.Add(Random.Shared.Next(5, 50));
-        }
+            startDate = startDate.ToUniversalTime(),
+            endDate = endDate.ToUniversalTime()
+        };
 
-        return (labels, values);
+        var response = await Http.PostAsJsonAsync("api/Process/chart/by-user-and-date", request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var data = await response.Content.ReadFromJsonAsync<List<UsuarioChartDto>>();
+
+            if (data != null)
+            {
+                var labels = data.Select(d => d.UserName).ToList();
+                var values = data.Select(d => d.Quantity).ToList();
+                await JS.InvokeVoidAsync("renderizarGraficoUsuarios", labels, values, chartType);
+            }
+        }
     }
 }

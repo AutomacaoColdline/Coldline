@@ -1,13 +1,22 @@
-using ColdlineWeb.Helpers;
+using System.ComponentModel.DataAnnotations;
 
 namespace ColdlineWeb.Models.Enum
 {
     public enum MachineStatus
     {
-        WaitingProduction = 1,     
-        InProgress = 2, 
-        InOcurrence = 3,     
-        InRework = 4,    
-        Finished = 5,      
+        [Display(Name = "Aguardando Produção")]
+        WaitingProduction = 1,
+
+        [Display(Name = "Em Progresso")]
+        InProgress = 2,
+
+        [Display(Name = "Em Ocorrência")]
+        InOcurrence = 3,
+
+        [Display(Name = "Retrabalho")]
+        InRework = 4,
+
+        [Display(Name = "Finalizado")]
+        Finished = 5
     }
 }

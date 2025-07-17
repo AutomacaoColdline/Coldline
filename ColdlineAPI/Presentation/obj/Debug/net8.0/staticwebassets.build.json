@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "EiUhzM2woXf7A2L3n81tPThBMJbHKeqsGlHMY1/GnP4=",
+  "Hash": "C5HP7MujXjo1SLqIJ3QASBCF6yWCWnc3G+8KVklAa9g=",
   "Source": "Presentation",
   "BasePath": "_content/Presentation",
   "Mode": "Default",
@@ -16,6 +16,25 @@
     }
   ],
   "Assets": [
+    {
+      "Identity": "/app/Presentation/wwwroot/arquivos/teste.pdf",
+      "SourceId": "Presentation",
+      "SourceType": "Discovered",
+      "ContentRoot": "/app/Presentation/wwwroot/",
+      "BasePath": "_content/Presentation",
+      "RelativePath": "arquivos/teste.pdf",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/arquivos/teste.pdf"
+    },
     {
       "Identity": "/app/Presentation/wwwroot/uploads/Cicero Inacio Caetano de Melo.png",
       "SourceId": "Presentation",

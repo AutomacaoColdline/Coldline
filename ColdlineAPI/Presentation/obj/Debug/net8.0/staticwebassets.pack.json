@@ -1,6 +1,10 @@
 {
   "Files": [
     {
+      "Id": "/app/Presentation/wwwroot/arquivos/teste.pdf",
+      "PackagePath": "staticwebassets/arquivos/teste.pdf"
+    },
+    {
       "Id": "/app/Presentation/wwwroot/uploads/Cicero Inacio Caetano de Melo.png",
       "PackagePath": "staticwebassets/uploads/Cicero Inacio Caetano de Melo.png"
     },

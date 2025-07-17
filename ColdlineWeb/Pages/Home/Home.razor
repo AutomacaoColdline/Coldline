@@ -117,43 +117,4 @@ else
         </div>
     </div>
 
-    <!-- Lista de máquinas com swipe -->
-    <div class="machine-pagination-arrows">
-        @if (machinesCount.Count > machinePageSize)
-        {
-            <button class="btn-pagination left-arrow" @onclick="async () => { currentMachinePage--; await LoadMachines(); }" disabled="@(currentMachinePage == 1)">
-                <img src="img/seta-esquerda.png" class="pagination-icon" />
-            </button>
-        }
-
-        <div class="machine-list"
-            @onpointerdown="HandleMachinePointerDown"
-            @onpointerup="HandleMachinePointerUp">
-            @foreach (var machine in machines)
-            {
-                <div class="machine-card">
-                    <div class="machine-card-header">
-                        NS:
-                        <a href="@($"/machineViewer/{machine.Id}")" class="text-link">
-                            @machine.IdentificationNumber
-                        </a>
-                    </div>
-                    <div class="machine-card-body">
-                        <p><strong>Nome:</strong> @machine.MachineType.Name</p>
-                        <p><strong>Status:</strong> @machine.Status?.GetTranslatedStatus()</p>
-                        <p><strong>Processo:</strong> @(machine.Process?.Name ?? "Nenhum")</p>
-                    </div>
-                </div>
-            }
-        </div>
-
-        @if (machinesCount.Count > machinePageSize)
-        {
-            <button class="btn-pagination right-arrow" @onclick="async () => { currentMachinePage++; await LoadMachines(); }"
-                    disabled="@(currentMachinePage >= Math.Ceiling((double)machinesCount.Count / machinePageSize))">
-                <img src="img/seta-direita.png" class="pagination-icon" />
-            </button>
-        }
-    </div>
-
 }

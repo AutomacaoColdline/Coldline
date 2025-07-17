@@ -83,5 +83,18 @@ namespace ColdlineAPI.Presentation.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        [HttpPost("chart/by-date")]
+        public async Task<IActionResult> GetChartByDate([FromBody] DateRangeRequest range)
+        {
+            var result = await _occurrenceService.GetOccurrenceCountByDateAsync(range.StartDate, range.EndDate);
+            return Ok(result);
+        }
+
+        [HttpPost("chart/by-user")]
+        public async Task<IActionResult> GetChartByUser([FromBody] DateRangeRequest range)
+        {
+            var result = await _occurrenceService.GetOccurrenceCountByUserAsync(range.StartDate, range.EndDate);
+            return Ok(result);
+        }
     }
 }

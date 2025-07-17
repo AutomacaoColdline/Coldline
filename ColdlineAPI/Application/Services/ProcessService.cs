@@ -6,6 +6,7 @@ using ColdlineAPI.Domain.Enum;
 using ColdlineAPI.Domain.Common;
 using ColdlineAPI.Application.Factories;
 using ColdlineAPI.Application.Repositories;
+using ColdlineAPI.Infrastructure.Utilities; 
 using MongoDB.Driver;
 using MongoDB.Bson;
 using System;
@@ -35,7 +36,7 @@ namespace ColdlineAPI.Application.Services
             _occurrences = factory.CreateRepository<Occurrence>("Occurrences").GetCollection();
         }
 
-        public async Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId, string? machineId, bool preIndustrialization, bool reWork)
+        public async Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId, string? machineId, bool preIndustrialization, bool reWork,bool prototype )
         {
             var user = await _users.Find(u => u.IdentificationNumber == identificationNumber).FirstOrDefaultAsync();
             if (user == null) throw new ArgumentException("Usuário não encontrado.");
@@ -66,6 +67,7 @@ namespace ColdlineAPI.Application.Services
                 InOccurrence = false,
                 ReWork = reWork,
                 PreIndustrialization = preIndustrialization,
+                Prototype = prototype,
                 Finished = false
             };
 
@@ -131,11 +133,11 @@ namespace ColdlineAPI.Application.Services
             var process = await _processes.GetByIdAsync(p => p.Id == id);
             var user = await _users.Find(u => u.Id == process.User.Id).FirstOrDefaultAsync();
 
-            if(user.CurrentOccurrence != null){
+            if (user.CurrentOccurrence == null || string.IsNullOrEmpty(user.CurrentOccurrence.Id))
+            {
                 var duration = await CalculateProcessTime(process.StartDate, process.EndDate);
                 process.ProcessTime = duration.ToString(@"hh\:mm\:ss");
                 await _processes.UpdateAsync(p => p.Id == id, process);
-
             }
             
             return process;
@@ -155,6 +157,7 @@ namespace ColdlineAPI.Application.Services
             if (!string.IsNullOrEmpty(filter.MachineId)) filters.Add(builder.Eq(p => p.Machine.Id, filter.MachineId));
             if (filter.Finished.HasValue) filters.Add(builder.Eq(p => p.Finished, filter.Finished));
             if (filter.PreIndustrialization.HasValue) filters.Add(builder.Eq(p => p.PreIndustrialization, filter.PreIndustrialization));
+            if (filter.Prototype.HasValue) filters.Add(builder.Eq(p => p.Prototype, filter.Prototype));
 
             var finalFilter = filters.Count > 0 ? builder.And(filters) : builder.Empty;
 
@@ -173,6 +176,229 @@ namespace ColdlineAPI.Application.Services
             }
             return results;
         }
+        
+       public async Task<List<ProcessByDateDto>> GetProcessCountByStartDateAsync(DateTime start, DateTime end)
+        {
+            var filter = Builders<Process>.Filter.Gte("start date", start) &
+                        Builders<Process>.Filter.Lte("start date", end);
+
+            var result = await _processes.GetCollection()
+                .Aggregate()
+                .Match(filter)
+                .Group(new BsonDocument {
+                    { "_id", new BsonDocument("$dateToString", new BsonDocument {
+                        { "format", "%Y-%m-%d" },
+                        { "date", "$start date" }  // importante: nome real do campo no Mongo
+                    })},
+                    { "count", new BsonDocument("$sum", 1) }
+                })
+                .Sort(new BsonDocument("_id", 1))
+                .ToListAsync();
+
+            return result
+                .Where(doc => doc.Contains("_id") && doc["_id"].IsString)
+                .Select(doc => new ProcessByDateDto
+                {
+                    Date = doc["_id"].AsString,
+                    Quantity = doc["count"].AsInt32
+                }).ToList();
+        }
+
+        public async Task<List<ProcessTypeChartDto>> GetProcessCountByTypeAndDateAsync(DateTime start, DateTime end)
+        {
+            var filter = Builders<Process>.Filter.Gte("start date", start) &
+                        Builders<Process>.Filter.Lte("start date", end);
+
+            var result = await _processes.GetCollection()
+                .Find(filter)
+                .ToListAsync();
+
+            var agrupado = result
+                .Where(p => p.ProcessType != null && !string.IsNullOrEmpty(p.ProcessType.Name))
+                .GroupBy(p => p.ProcessType!.Name)
+                .Select(g => new ProcessTypeChartDto
+                {
+                    ProcessTypeName = g.Key,
+                    Quantity = g.Count()
+                })
+                .ToList();
+
+            return agrupado;
+        }
+
+        public async Task<List<ProcessUserChartDto>> GetProcessCountByUserAsync(DateTime start, DateTime end)
+        {
+            var filter = Builders<Process>.Filter.Gte("start date", start) &
+                        Builders<Process>.Filter.Lte("start date", end);
+
+            var result = await _processes.GetCollection()
+                .Find(filter)
+                .ToListAsync();
+
+            var agrupado = result
+                .Where(p => p.User != null && !string.IsNullOrEmpty(p.User.Name))
+                .GroupBy(p => p.User!.Name)
+                .Select(g => new ProcessUserChartDto
+                {
+                    UserName = g.Key,
+                    Quantity = g.Count()
+                })
+                .ToList();
+
+            return agrupado;
+        }
+
+        public async Task<List<UserTotalProcessTimeDto>> GetTotalProcessTimeByUserAsync(DateTime start, DateTime end)
+        {
+            var filter = Builders<Process>.Filter.Gte(p => p.StartDate, start) &
+                        Builders<Process>.Filter.Lte(p => p.StartDate, end);
+
+            var allProcesses = await _processes.GetCollection()
+                .Find(filter)
+                .ToListAsync();
+
+            var groupedByUser = allProcesses
+                .Where(p => p.User != null && !string.IsNullOrWhiteSpace(p.User.Id))
+                .GroupBy(p => p.User.Id)
+                .Select(g =>
+                {
+                    string userId = g.Key;
+                    string userName = g.First().User.Name ?? "Desconhecido";
+
+                    TimeSpan total = TimeSpan.Zero;
+                    int processCount = 0;
+
+                    foreach (var p in g)
+                    {
+                        if (!string.IsNullOrWhiteSpace(p.ProcessTime) &&
+                            TimeSpan.TryParseExact(p.ProcessTime, @"hh\:mm\:ss", null, out var duration))
+                        {
+                            total += duration;
+                        }
+
+                        processCount++;
+                    }
+
+                    // ✅ Corrige o formato de hora total para não resetar a cada 24h
+                    string formattedTotalTime = string.Format("{0:D2}:{1:D2}:{2:D2}",
+                        (int)total.TotalHours, total.Minutes, total.Seconds);
+
+                    return new UserTotalProcessTimeDto
+                    {
+                        UserId = userId,
+                        UserName = userName,
+                        TotalProcessTime = formattedTotalTime,
+                        ProcessCount = processCount
+                    };
+                })
+                .ToList();
+
+            return groupedByUser;
+        }
+
+        public async Task<List<ProcessTypeTotalTimeDto>> GetTotalProcessTimeByProcessTypeAsync(DateTime start, DateTime end)
+        {
+            var filter = Builders<Process>.Filter.Gte(p => p.StartDate, start) &
+                        Builders<Process>.Filter.Lte(p => p.StartDate, end);
+
+            var allProcesses = await _processes.GetCollection()
+                .Find(filter)
+                .ToListAsync();
+
+            var groupedByType = allProcesses
+                .Where(p => p.ProcessType != null && !string.IsNullOrWhiteSpace(p.ProcessType.Id))
+                .GroupBy(p => p.ProcessType.Id)
+                .Select(g =>
+                {
+                    string typeId = g.Key;
+                    string typeName = g.First().ProcessType.Name ?? "Desconhecido";
+
+                    TimeSpan total = TimeSpan.Zero;
+                    int count = 0;
+
+                    foreach (var p in g)
+                    {
+                        if (!string.IsNullOrWhiteSpace(p.ProcessTime) &&
+                            TimeSpan.TryParseExact(p.ProcessTime, @"hh\:mm\:ss", null, out var duration))
+                        {
+                            total += duration;
+                        }
+                        count++;
+                    }
+
+                    string formattedTime = string.Format("{0:D2}:{1:D2}:{2:D2}",
+                        (int)total.TotalHours, total.Minutes, total.Seconds);
+
+                    return new ProcessTypeTotalTimeDto
+                    {
+                        ProcessTypeId = typeId,
+                        ProcessTypeName = typeName,
+                        TotalProcessTime = formattedTime,
+                        ProcessCount = count
+                    };
+                })
+                .ToList();
+
+            return groupedByType;
+        }
+
+        public async Task<List<IndividualUserProcessDto>> GetIndividualProcessTimesByUserAsync(string userId, DateTime startDate, DateTime endDate, bool? preIndustrialization = null)
+        {
+            var user = await _users.Find(u => u.Id == userId).FirstOrDefaultAsync();
+            if (user == null)
+                throw new ArgumentException("Usuário não encontrado.");
+
+            var builder = Builders<Process>.Filter; 
+            var filter = Builders<Process>.Filter.Eq(p => p.User.Id, userId) &
+                        Builders<Process>.Filter.Gte(p => p.StartDate, startDate) &
+                        Builders<Process>.Filter.Lte(p => p.StartDate, endDate);
+            
+            if (preIndustrialization.HasValue)
+            {
+                filter &= builder.Eq(p => p.PreIndustrialization, preIndustrialization.Value);
+            }
+
+            var processos = await _processes.GetCollection()
+                .Find(filter)
+                .ToListAsync();
+
+            var resultado = new List<IndividualUserProcessDto>();
+
+            foreach (var processo in processos)
+            {
+                // Recalcula tempo se necessário
+                var duration = await CalculateProcessTime(processo.StartDate, processo.EndDate);
+                processo.ProcessTime = duration.ToString(@"hh\:mm\:ss");
+
+                resultado.Add(new IndividualUserProcessDto
+                {
+                    ProcessId = processo.Id!,
+                    IdentificationNumber = processo.IdentificationNumber,
+                    ProcessTypeName = processo.ProcessType?.Name ?? "Desconhecido",
+                    StartDate = processo.StartDate,
+                    EndDate = processo.EndDate,
+                    ProcessTime = processo.ProcessTime
+                });
+            }
+
+            return resultado;
+        }
+
+
+
+       private string SumProcessTimes(IEnumerable<string> times)
+        {
+            TimeSpan total = TimeSpan.Zero;
+            foreach (var t in times)
+            {
+                if (TimeSpan.TryParseExact(t, @"hh\:mm\:ss", null, out TimeSpan parsed))
+                {
+                    total += parsed;
+                }
+            }
+            return total.ToString(@"hh\:mm\:ss");
+        }
+
 
         public async Task<Process> CreateProcessAsync(Process process)
         {
@@ -182,8 +408,9 @@ namespace ColdlineAPI.Application.Services
             var duration = await CalculateProcessTime(process.StartDate, process.EndDate);
             process.ProcessTime = duration.ToString(@"hh\:mm\:ss");
             process.IdentificationNumber = GenerateNumericCode();
-            
-            if(process.ProcessType.Id == SpecialProcessTypeId){
+
+            if (process.ProcessType.Id == SpecialProcessTypeId)
+            {
                 var machine = await _machinesRepo.GetByIdAsync(p => p.Id == process.Machine.Id);
                 var processFilter = new ProcessFilter { MachineId = process.Machine.Id };
                 var processList = await SearchProcessAsync(processFilter);
@@ -195,7 +422,7 @@ namespace ColdlineAPI.Application.Services
                     Builders<Machine>.Update
                         .Set(m => m.Status, MachineStatus.Finished)
                         .Set(m => m.Process, null)
-                        .Set(m => m.Time, timeMachine.ToString(@"hh\:mm\:ss")));  
+                        .Set(m => m.Time, timeMachine.ToString(@"hh\:mm\:ss")));
             }
 
             await _processes.CreateAsync(process);
@@ -269,6 +496,7 @@ namespace ColdlineAPI.Application.Services
             dto.TypeProcessName = process.ProcessType.Name;
 
             var stats = await GetProcessStatisticsAsync(process.Id, process.ProcessType.Id);
+            dto.TypeProcessName = stats.ProcessTypeName;
             dto.ProcessTime = stats.ProcessTime;
             dto.AverageProcessTime = stats.AverageProcessTime;
             dto.StandardDeviation = stats.StandardDeviation;
@@ -281,7 +509,6 @@ namespace ColdlineAPI.Application.Services
         {
             var process = await _processes.GetByIdAsync(p => p.Id == processId);
             var user = await _users.Find(u => u.Id == process.User.Id).FirstOrDefaultAsync();
-
 
             var filtered = await _processes.GetCollection()
                 .Find(p => p.Finished && p.ProcessType.Id == processTypeId && !string.IsNullOrEmpty(p.ProcessTime))
@@ -297,27 +524,38 @@ namespace ColdlineAPI.Application.Services
                 ProcessTime = process?.ProcessTime ?? "00:00:00"
             };
 
-            if (!durations.Any()) return dto;
-            
-            if(user.CurrentOccurrence != null){
+            if (user.CurrentOccurrence != null)
+            {
                 var ocurrence = await _occurrences.Find(u => u.Id == user.CurrentOccurrence.Id).FirstOrDefaultAsync();
-                dto.OcorrenceTypeName = ocurrence.PauseType.Name;
+                dto.OcorrenceTypeName = ocurrence?.PauseType?.Name ?? "Nenhuma";
             }
-            else{
+            else
+            {
                 dto.OcorrenceTypeName = "Nenhuma";
             }
 
-            var average = TimeSpan.FromTicks((long)durations.Average(d => d.Ticks));
-            var stdDev = TimeSpan.FromTicks((long)Math.Sqrt(durations.Average(d => Math.Pow(d.Ticks - durations.Average(x => x.Ticks), 2))));
-            var upperLimit = average + (stdDev * 2);
+            if (durations.Count == 0)
+            {
+                // Sem dados suficientes para estatísticas
+                dto.AverageProcessTime = "00:00:00";
+                dto.StandardDeviation = "00:00:00";
+                dto.UpperLimit = "00:00:00";
+                dto.ProcessTypeName = process?.ProcessType?.Name ?? "Não identificado";
+                return dto;
+            }
 
-            dto.ProcessTypeName = process.ProcessType.Name;
-            dto.AverageProcessTime = average.ToString(@"hh\:mm\:ss");
-            dto.StandardDeviation = stdDev.ToString(@"hh\:mm\:ss");
-            dto.UpperLimit = upperLimit.ToString(@"hh\:mm\:ss");
+            var averageTicks = durations.Average(d => d.Ticks);
+            var stdDevTicks = Math.Sqrt(durations.Average(d => Math.Pow(d.Ticks - averageTicks, 2)));
+            var upperLimitTicks = averageTicks + stdDevTicks * 2;
+
+            dto.AverageProcessTime = TimeSpan.FromTicks((long)averageTicks).ToString(@"hh\:mm\:ss");
+            dto.StandardDeviation = TimeSpan.FromTicks((long)stdDevTicks).ToString(@"hh\:mm\:ss");
+            dto.UpperLimit = TimeSpan.FromTicks((long)upperLimitTicks).ToString(@"hh\:mm\:ss");
+            dto.ProcessTypeName = process?.ProcessType?.Name ?? "Não identificado";
 
             return dto;
         }
+
 
         private async Task<DateTime> CalculateMachineTime(List<Process> processes)
         {
@@ -371,6 +609,37 @@ namespace ColdlineAPI.Application.Services
 
             return total;
         }
+
+        public async Task<byte[]> GenerateExcelReportAsync(DateTime startDate, DateTime endDate)
+        {
+            var filter = Builders<Process>.Filter.Gte(p => p.StartDate, startDate) &
+                        Builders<Process>.Filter.Lte(p => p.StartDate, endDate);
+
+            var processos = await _processes.GetCollection()
+                .Find(filter)
+                .ToListAsync();
+
+            var linhas = new List<List<string>>
+            {
+                new() { "Usuário", "Tipo de Processo", "Tempo de Processo" }
+            };
+
+            foreach (var processo in processos)
+            {
+                var duration = await CalculateProcessTime(processo.StartDate, processo.EndDate);
+                var tempoFormatado = duration.ToString(@"hh\:mm\:ss");
+
+                linhas.Add(new List<string>
+                {
+                    processo.User?.Name ?? "Desconhecido",
+                    processo.ProcessType?.Name ?? "Desconhecido",
+                    tempoFormatado
+                });
+            }
+
+            return FileUtils.GenerateExcel(linhas); // Aqui usa a utility já existente
+        }
+
 
         private DateTime GetCurrentCampoGrandeTime()
         {

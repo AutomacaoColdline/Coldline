@@ -21,6 +21,10 @@
       "PackagePath": "staticwebassets/css/CostsByTypeProcess.css"
     },
     {
+      "Id": "/app/wwwroot/css/Dashboard.css",
+      "PackagePath": "staticwebassets/css/Dashboard.css"
+    },
+    {
       "Id": "/app/wwwroot/css/Home.css",
       "PackagePath": "staticwebassets/css/Home.css"
     },
@@ -129,6 +133,10 @@
       "PackagePath": "staticwebassets/css/TimeOcurrenceByTypeProcess.css"
     },
     {
+      "Id": "/app/wwwroot/css/TimeProcessByMachine.css",
+      "PackagePath": "staticwebassets/css/TimeProcessByMachine.css"
+    },
+    {
       "Id": "/app/wwwroot/css/TimeProcessByTypeProcess.css",
       "PackagePath": "staticwebassets/css/TimeProcessByTypeProcess.css"
     },
@@ -179,6 +187,10 @@
     {
       "Id": "/app/wwwroot/img/editar.png",
       "PackagePath": "staticwebassets/img/editar.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/finalizar.png",
+      "PackagePath": "staticwebassets/img/finalizar.png"
     },
     {
       "Id": "/app/wwwroot/img/icon.png",
@@ -257,6 +269,10 @@
       "PackagePath": "staticwebassets/index.html"
     },
     {
+      "Id": "/app/wwwroot/js/Dashboard.js",
+      "PackagePath": "staticwebassets/js/Dashboard.js"
+    },
+    {
       "Id": "/app/wwwroot/js/costsByTypeMachine.js",
       "PackagePath": "staticwebassets/js/costsByTypeMachine.js"
     },
@@ -319,6 +335,10 @@
     {
       "Id": "/app/wwwroot/js/timeOcurrenceByTypeProcess.js",
       "PackagePath": "staticwebassets/js/timeOcurrenceByTypeProcess.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/timeProcessByMachine.js",
+      "PackagePath": "staticwebassets/js/timeProcessByMachine.js"
     },
     {
       "Id": "/app/wwwroot/js/timeProcessByTypeProcess.js",

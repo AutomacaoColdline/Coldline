@@ -1,4 +1,7 @@
+@page "/reports/time-machine-by-type"
 @inject IJSRuntime JS
+@inject HttpClient Http
+
 <link rel="stylesheet" href="css/TimeMachineByTypeMachine.css" />
 
 <div class="filtro-container">
@@ -31,24 +34,33 @@
     private DateTime endDate = DateTime.Today;
     private string chartType = "bar";
 
-    private async Task GerarGraficoTempoPorTipoDeMaquina()
+    public class MachineTypeTimeDto
     {
-        var dados = GerarDadosFicticios(startDate, endDate);
-        await JS.InvokeVoidAsync("renderizarGraficoTempoPorTipoDeMaquina", dados.Labels, dados.Values, chartType);
+        public string MachineTypeId { get; set; } = string.Empty;
+        public string MachineTypeName { get; set; } = string.Empty;
+        public string AverageProcessTime { get; set; } = "00:00:00";
+        public int MachineCount { get; set; }
     }
 
-    private (List<string> Labels, List<int> Values) GerarDadosFicticios(DateTime start, DateTime end)
+    private async Task GerarGraficoTempoPorTipoDeMaquina()
     {
-        var tiposDeMaquina = new[] { "Cold 5", "Cold 10", "Cold 15", "Cold 10s" };
-        var labels = new List<string>();
-        var values = new List<int>();
-
-        foreach (var tipo in tiposDeMaquina)
+        var requestData = new
         {
-            labels.Add(tipo);
-            values.Add(Random.Shared.Next(10, 240)); // minutos entre 10 e 240
-        }
+            startDate = startDate.ToUniversalTime(),
+            endDate = endDate.ToUniversalTime()
+        };
 
-        return (labels, values);
+        var response = await Http.PostAsJsonAsync("api/Machine/average-process-time-by-type", requestData);
+        if (!response.IsSuccessStatusCode)
+            return;
+
+        var result = await response.Content.ReadFromJsonAsync<List<MachineTypeTimeDto>>();
+        if (result == null)
+            return;
+
+        var labels = result.Select(x => x.MachineTypeName).ToList();
+        var valoresOriginais = result.Select(x => x.AverageProcessTime).ToList();
+
+        await JS.InvokeVoidAsync("renderizarGraficoTempoPorTipoDeMaquina", labels, valoresOriginais, chartType);
     }
 }

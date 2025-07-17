@@ -5,6 +5,7 @@ using ColdlineAPI.Domain.Enum;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ColdlineAPI.Application.DTOs;
 
 namespace ColdlineAPI.Presentation.Controllers
 {
@@ -95,5 +96,61 @@ namespace ColdlineAPI.Presentation.Controllers
 
             return Ok(response);
         }
+        [HttpPost("count-by-day")]
+        public async Task<ActionResult<List<MachineByDateDto>>> GetCountByDay([FromBody] DateRangeRequest request)
+        {
+            if (request.StartDate > request.EndDate)
+                return BadRequest("A data inicial não pode ser maior que a final.");
+
+            var result = await _machineService.GetMachineCountPerDayAsync(request.StartDate, request.EndDate);
+            return Ok(result);
+        }
+
+        [HttpPost("count-by-type")]
+        public async Task<ActionResult<List<MachineByTypeDto>>> GetCountByType([FromBody] DateRangeRequest request)
+        {
+            if (request.StartDate > request.EndDate)
+                return BadRequest("A data inicial não pode ser maior que a final.");
+
+            var result = await _machineService.GetMachineCountByTypeAsync(request.StartDate, request.EndDate);
+            return Ok(result);
+        }
+        [HttpPost("total-process-time")]
+        public async Task<ActionResult<List<MachineTotalProcessTimeDto>>> GetTotalProcessTimeByMachine([FromBody] DateRangeRequest request)
+        {
+            var result = await _machineService.GetTotalProcessTimeByMachineAsync(request.StartDate, request.EndDate);
+            return Ok(result);
+        }
+        [HttpPost("average-process-time-by-type")]
+        public async Task<ActionResult<List<MachineTypeAverageTimeDto>>> GetAverageProcessTimeByMachineType([FromBody] DateRangeRequest request)
+        {
+            var result = await _machineService.GetAverageProcessTimeByMachineTypeAsync(request.StartDate, request.EndDate);
+            return Ok(result);
+        }
+
+        [HttpPut("update-created-at")]
+        public async Task<IActionResult> UpdateMachinesCreatedAtAsync()
+        {
+            try
+            {
+                var quantidadeAtualizada = await _machineService.UpdateMachinesCreatedAtAsync();
+                return Ok(new { message = $"{quantidadeAtualizada} máquinas atualizadas com sucesso." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        [HttpGet("dashboard")]
+        public async Task<IActionResult> GetDashboard()
+        {
+            var endDate = DateTime.UtcNow;
+            var startDate = endDate.AddDays(-30);
+
+            var result = await _machineService.GetMachineDashboardAsync(startDate, endDate);
+            return Ok(result);
+        }
+
     }
 }

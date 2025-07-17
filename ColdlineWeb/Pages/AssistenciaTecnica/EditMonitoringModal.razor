@@ -1,0 +1,97 @@
+@inherits ComponentBase
+@inject HttpClient Http
+@using ColdlineWeb.Models
+
+@if (Show && Current != null)
+{
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal d-block" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Acesso</h5>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="OnClose"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Identificador</label>
+                            <input class="form-control" @bind="Current.Identificador" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Unidade</label>
+                            <input class="form-control" @bind="Current.Unidade" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estado</label>
+                            <input class="form-control" @bind="Current.Estado" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Cidade</label>
+                            <input class="form-control" @bind="Current.Cidade" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">IHM</label>
+                            <input class="form-control" @bind="Current.Ihm" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">MASC</label>
+                            <input class="form-control" @bind="Current.Masc" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">GATEWAY</label>
+                            <input class="form-control" @bind="Current.Gateway" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">ANYDESK</label>
+                            <input class="form-control" @bind="Current.IdAnydesk" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">RUSTDESK</label>
+                            <input class="form-control" @bind="Current.IdRustdesk" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">TEAMVIEWER</label>
+                            <input class="form-control" @bind="Current.IdTeamViewer" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo de Monitoramento</label>
+                            <input class="form-control" @bind="Current.MonitoringType.Name" disabled />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">CLPs (separados por vírgula)</label>
+                            <input class="form-control" @bind="Clps" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">MACs (separados por vírgula)</label>
+                            <input class="form-control" @bind="Macs" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="OnClose">Cancelar</button>
+                    <button class="btn btn-primary" @onclick="async () => await OnSave.InvokeAsync()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Show { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public MonitoringModel? Current { get; set; }
+
+    private string Clps
+    {
+        get => string.Join(", ", Current?.Clp ?? new());
+        set => Current!.Clp = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+    }
+
+    private string Macs
+    {
+        get => string.Join(", ", Current?.Macs ?? new());
+        set => Current!.Macs = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+    }
+}

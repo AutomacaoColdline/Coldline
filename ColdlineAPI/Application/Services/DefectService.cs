@@ -2,6 +2,7 @@ using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Domain.Entities;
 using ColdlineAPI.Application.Repositories;
 using ColdlineAPI.Application.Factories;
+using System.Text.RegularExpressions;
 using MongoDB.Driver;
 using MongoDB.Bson;
 

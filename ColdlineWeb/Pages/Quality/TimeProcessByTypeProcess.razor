@@ -1,5 +1,7 @@
 @page "/reports/time-process-by-type"
 @inject IJSRuntime JS
+@inject HttpClient Http
+
 <link rel="stylesheet" href="css/TimeProcessByTypeProcess.css" />
 
 <div class="filtro-container">
@@ -21,7 +23,7 @@
 </div>
 
 <div class="grafico-container">
-    <canvas id="typeProcessChart"></canvas>
+    <canvas id="processTypeChart"></canvas>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -32,24 +34,49 @@
     private DateTime endDate = DateTime.Today;
     private string chartType = "bar";
 
-    private async Task GerarGraficoTempoPorTipoDeProcesso()
+    public class ProcessTypeTimeDto
     {
-        var dados = GerarDadosFicticios(startDate, endDate);
-        await JS.InvokeVoidAsync("renderizarGraficoTempoPorTipoDeProcesso", dados.Labels, dados.Values, chartType);
+        public string ProcessTypeId { get; set; } = string.Empty;
+        public string ProcessTypeName { get; set; } = string.Empty;
+        public string TotalProcessTime { get; set; } = "00:00:00";
+        public int ProcessCount { get; set; }
     }
 
-    private (List<string> Labels, List<int> Values) GerarDadosFicticios(DateTime start, DateTime end)
+    private async Task GerarGraficoTempoPorTipoDeProcesso()
     {
-        var tipos = new[] { "Solda", "Elétrica", "Montagem", "Higienização", "Teste" };
-        var labels = new List<string>();
-        var values = new List<int>();
-
-        foreach (var tipo in tipos)
+        var requestData = new
         {
-            labels.Add(tipo);
-            values.Add(Random.Shared.Next(10, 240)); // minutos entre 10 e 240
-        }
+            startDate = startDate.ToUniversalTime(),
+            endDate = endDate.ToUniversalTime()
+        };
 
-        return (labels, values);
+        var response = await Http.PostAsJsonAsync("api/Process/chart/total-time-by-type", requestData);
+        if (!response.IsSuccessStatusCode)
+            return;
+
+        var result = await response.Content.ReadFromJsonAsync<List<ProcessTypeTimeDto>>();
+        if (result == null)
+            return;
+
+        var labels = result.Select(x => x.ProcessTypeName).ToList();
+
+        var values = result.Select(x =>
+        {
+            try
+            {
+                var parts = x.TotalProcessTime.Split(':');
+                if (parts.Length == 3)
+                {
+                    int h = int.Parse(parts[0]);
+                    int m = int.Parse(parts[1]);
+                    int s = int.Parse(parts[2]);
+                    return Math.Round((h * 60.0) + m + (s / 60.0), 2);
+                }
+            }
+            catch { }
+            return 0.0;
+        }).ToList();
+
+        await JS.InvokeVoidAsync("renderizarGraficoTipoProcesso", labels, values, chartType);
     }
 }

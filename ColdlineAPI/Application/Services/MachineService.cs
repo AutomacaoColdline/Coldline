@@ -4,6 +4,7 @@ using ColdlineAPI.Domain.Entities;
 using ColdlineAPI.Domain.Enum;
 using ColdlineAPI.Application.Factories;
 using ColdlineAPI.Application.Repositories;
+using ColdlineAPI.Application.DTOs;
 using System.Text.RegularExpressions;
 
 
@@ -16,11 +17,17 @@ namespace ColdlineAPI.Application.Services
 {
     public class MachineService : IMachineService
     {
+        private readonly IMongoCollection<Process> _processes;
+        private readonly IProcessService _processService;
+        private readonly IOccurrenceService _occurrenceService;
         private readonly MongoRepository<Machine> _machines;
 
-        public MachineService(RepositoryFactory factory)
+        public MachineService(IProcessService processService, IOccurrenceService occurrenceService, RepositoryFactory factory)
         {
             _machines = factory.CreateRepository<Machine>("Machines");
+            _processes = factory.CreateRepository<Process>("Processes").GetCollection();
+            _processService = processService;
+            _occurrenceService = occurrenceService;
         }
 
         public async Task<List<Machine>> GetAllMachinesAsync()
@@ -32,6 +39,320 @@ namespace ColdlineAPI.Application.Services
         {
             return await _machines.GetByIdAsync(m => m.Id == id);
         }
+       public async Task<List<MachineByDateDto>> GetMachineCountPerDayAsync(DateTime startDate, DateTime endDate)
+        {
+            var collection = _machines.GetCollection();
+
+            var filter = Builders<Machine>.Filter.And(
+                Builders<Machine>.Filter.Gte(m => m.CreatedAt, startDate),
+                Builders<Machine>.Filter.Lte(m => m.CreatedAt, endDate)
+            );
+
+            var pipeline = new[]
+            {
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "createdAt", new BsonDocument {
+                        { "$gte", startDate },
+                        { "$lte", endDate }
+                    }}
+                }),
+                new BsonDocument("$group", new BsonDocument
+                {
+                    { "_id", new BsonDocument {
+                        { "$dateToString", new BsonDocument {
+                            { "format", "%Y-%m-%d" },
+                            { "date", "$createdAt" }
+                        }}
+                    }},
+                    { "count", new BsonDocument { { "$sum", 1 } } }
+                }),
+                new BsonDocument("$sort", new BsonDocument { { "_id", 1 } })
+            };
+
+            var rawResult = await collection.Aggregate<BsonDocument>(pipeline).ToListAsync();
+
+            return rawResult.Select(doc => new MachineByDateDto
+            {
+                Date = doc["_id"].AsString,
+                Count = doc["count"].AsInt32
+            }).ToList();
+        }
+        public async Task<List<MachineByTypeDto>> GetMachineCountByTypeAsync(DateTime startDate, DateTime endDate)
+        {
+            var collection = _machines.GetCollection();
+
+            var pipeline = new[]
+            {
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "createdAt", new BsonDocument {
+                        { "$gte", startDate },
+                        { "$lte", endDate }
+                    }}
+                }),
+                new BsonDocument("$group", new BsonDocument
+                {
+                    { "_id", "$machineType.Name" }, // ⚠️ CORREÇÃO AQUI
+                    { "count", new BsonDocument { { "$sum", 1 } } }
+                }),
+                new BsonDocument("$sort", new BsonDocument { { "count", -1 } })
+            };
+
+            var rawResult = await collection.Aggregate<BsonDocument>(pipeline).ToListAsync();
+
+            return rawResult.Select(doc => new MachineByTypeDto
+            {
+                Type = doc["_id"].IsBsonNull ? "Desconhecido" : doc["_id"].AsString,
+                Count = doc["count"].AsInt32
+            }).ToList();
+        }
+
+
+        public async Task<List<MachineTotalProcessTimeDto>> GetTotalProcessTimeByMachineAsync(DateTime start, DateTime end)
+        {
+            var machineCollection = _machines.GetCollection();
+
+            var filter = Builders<Process>.Filter.Gte(p => p.StartDate, start) &
+                        Builders<Process>.Filter.Lte(p => p.StartDate, end);
+
+            var allProcesses = await _processes.Find(filter).ToListAsync();
+            var machines = await machineCollection.Find(Builders<Machine>.Filter.Empty).ToListAsync();
+
+            var groupedByMachine = allProcesses
+                .Where(p => p.Machine != null && !string.IsNullOrWhiteSpace(p.Machine.Id))
+                .GroupBy(p => p.Machine.Id)
+                .Select(g =>
+                {
+                    string machineId = g.Key;
+                    string machineName = g.First().Machine.Name ?? "Desconhecida";
+
+                    TimeSpan total = TimeSpan.Zero;
+                    int processCount = 0;
+
+                    foreach (var p in g)
+                    {
+                        if (!string.IsNullOrWhiteSpace(p.ProcessTime) &&
+                            TimeSpan.TryParseExact(p.ProcessTime, @"hh\:mm\:ss", null, out var duration))
+                        {
+                            total += duration;
+                        }
+                        processCount++;
+                    }
+
+                    var machineData = machines.FirstOrDefault(m => m.Id == machineId);
+
+                    return new MachineTotalProcessTimeDto
+                    {
+                        MachineId = machineId,
+                        IdentificationNumber = machineName,
+                        CustomerName = machineData?.CustomerName ?? "Desconhecido",
+                        TotalProcessTime = string.Format("{0:D2}:{1:D2}:{2:D2}", (int)total.TotalHours, total.Minutes, total.Seconds),
+                        ProcessCount = processCount,
+                        MachineTypeName = machineData?.MachineType?.Name ?? "Desconhecido"
+                    };
+                })
+                .ToList();
+
+            return groupedByMachine;
+        }
+        public async Task<MachineDashboardDto> GetMachineDashboardAsync(DateTime startDate, DateTime endDate)
+        {
+            var machineCollection = _machines.GetCollection();
+
+            // 1. Buscar máquinas criadas no intervalo
+            var machineFilter = Builders<Machine>.Filter.Gte(m => m.CreatedAt, startDate) &
+                                Builders<Machine>.Filter.Lte(m => m.CreatedAt, endDate);
+            var machines = await machineCollection.Find(machineFilter).ToListAsync();
+            var machineIds = machines.Select(m => m.Id).ToHashSet();
+
+            // ➕ NOVO: contar máquinas finalizadas (status == 5)
+            var finishedCount = machines.Count(m => m.Status == MachineStatus.Finished); // MachineStatus.Finished == 5
+
+            // 2. Buscar todos os processos do período
+            var totalProcessFilter = Builders<Process>.Filter.Gte(p => p.StartDate, startDate) &
+                                    Builders<Process>.Filter.Lte(p => p.StartDate, endDate);
+            var allProcesses = await _processes.Find(totalProcessFilter).ToListAsync();
+
+            // 3. Filtrar processos ligados às máquinas encontradas
+            var relatedProcesses = allProcesses
+                .Where(p => p.Machine != null && machineIds.Contains(p.Machine.Id))
+                .ToList();
+
+            // 4. Tempo e contagem por máquina
+            var machineTimes = relatedProcesses
+                .Where(p => p.Machine != null && !string.IsNullOrWhiteSpace(p.Machine.Id))
+                .GroupBy(p => p.Machine.Id)
+                .Select(g =>
+                {
+                    var machine = machines.FirstOrDefault(m => m.Id == g.Key);
+                    var total = TimeSpan.Zero;
+                    int processCount = 0;
+
+                    foreach (var p in g)
+                    {
+                        if (!string.IsNullOrWhiteSpace(p.ProcessTime) &&
+                            TimeSpan.TryParseExact(p.ProcessTime, @"hh\:mm\:ss", null, out var duration))
+                        {
+                            total += duration;
+                            processCount++;
+                        }
+                    }
+
+                    return new MachineTotalProcessTimeDto
+                    {
+                        MachineId = g.Key,
+                        IdentificationNumber = machine?.IdentificationNumber ?? "Desconhecida",
+                        CustomerName = machine?.CustomerName ?? "Desconhecido",
+                        TotalProcessTime = string.Format("{0:D2}:{1:D2}:{2:D2}", (int)total.TotalHours, total.Minutes, total.Seconds),
+                        ProcessCount = processCount,
+                        MachineTypeName = machine?.MachineType?.Name ?? "Desconhecido"
+                    };
+                })
+                .ToList();
+
+            // 5. Agrupamento por tipo
+            var machineTypeCounts = machines
+                .GroupBy(m => m.MachineType?.Name ?? "Desconhecido")
+                .Select(g => new MachineByTypeDto
+                {
+                    Type = g.Key,
+                    Count = g.Count()
+                })
+                .ToList();
+
+            // 6. Processos por usuário e tipo
+            var userProcessCounts = await _processService.GetTotalProcessTimeByUserAsync(startDate, endDate);
+            var processCountByType = await _processService.GetProcessCountByTypeAndDateAsync(startDate, endDate);
+
+            // 7. Tempo médio por tipo de máquina
+            var machineTypeAverages = await GetAverageProcessTimeByMachineTypeAsync(startDate, endDate);
+
+            // ➕ NOVO: buscar quantidade de ocorrências no período
+            var occurrences = await _occurrenceService.GetAllOccurrencesAsync();
+            var totalOccurrences = occurrences.Count(o =>
+                o.StartDate >= startDate &&
+                o.StartDate <= endDate
+            );
+
+            // ✅ retorno
+            return new MachineDashboardDto
+            {
+                TotalMachines = machines.Count,
+                TotalProcesses = allProcesses.Count,
+                FinishedMachines = finishedCount,           // NOVO
+                TotalOccurrences = totalOccurrences,        // NOVO
+                Machines = machineTimes,
+                MachineTypeCounts = machineTypeCounts,
+                ProcessCountByUser = userProcessCounts,
+                ProcessCountByType = processCountByType,
+                MachineTypeAverageTimes = machineTypeAverages
+            };
+        }
+
+        public async Task<int> UpdateMachinesCreatedAtAsync()
+        {
+            var machineCollection = _machines.GetCollection();
+            var processCollection = _processes;
+
+            var todasMaquinas = await machineCollection.Find(Builders<Machine>.Filter.Empty).ToListAsync();
+            int atualizadas = 0;
+
+            foreach (var maquina in todasMaquinas)
+            {
+                if (string.IsNullOrWhiteSpace(maquina.Id))
+                    continue;
+
+                var filtro = Builders<Process>.Filter.Eq(p => p.Machine.Id, maquina.Id);
+                var processos = await processCollection.Find(filtro)
+                    .SortBy(p => p.StartDate)
+                    .Limit(1)
+                    .ToListAsync();
+
+                if (processos.Count == 0)
+                    continue;
+
+                var menorData = processos[0].StartDate;
+
+                if (maquina.CreatedAt != menorData)
+                {
+                    var update = Builders<Machine>.Update.Set(m => m.CreatedAt, menorData);
+                    await machineCollection.UpdateOneAsync(m => m.Id == maquina.Id, update);
+                    atualizadas++;
+                }
+            }
+
+            return atualizadas;
+        }
+
+
+        public async Task<List<MachineTypeAverageTimeDto>> GetAverageProcessTimeByMachineTypeAsync(DateTime start, DateTime end)
+        {
+            var machineCollection = _machines.GetCollection();
+
+            // 1. Buscar todos os processos no intervalo desejado
+            var processFilter = Builders<Process>.Filter.Gte(p => p.StartDate, start) &
+                                Builders<Process>.Filter.Lte(p => p.StartDate, end);
+
+            var allProcesses = await _processes.Find(processFilter).ToListAsync();
+
+            // 2. Buscar todas as máquinas citadas nesses processos
+            var machineIds = allProcesses
+                .Where(p => p.Machine != null && !string.IsNullOrWhiteSpace(p.Machine.Id))
+                .Select(p => p.Machine.Id)
+                .Distinct()
+                .ToList();
+
+            var machines = await machineCollection.Find(m => machineIds.Contains(m.Id)).ToListAsync();
+
+            // 3. Somar tempos por máquina
+            var machineTimes = allProcesses
+                .Where(p => p.Machine != null && !string.IsNullOrWhiteSpace(p.Machine.Id))
+                .GroupBy(p => p.Machine.Id)
+                .Select(g => new
+                {
+                    MachineId = g.Key,
+                    TotalTime = g.Sum(p =>
+                    {
+                        return TimeSpan.TryParseExact(p.ProcessTime, @"hh\:mm\:ss", null, out var ts) ? ts.TotalSeconds : 0;
+
+                    })
+                })
+                .ToDictionary(x => x.MachineId, x => TimeSpan.FromSeconds(x.TotalTime));
+
+            // 4. Agrupar por tipo de máquina e calcular médias
+            var groupedByType = machines
+                .Where(m => m.MachineType != null && !string.IsNullOrWhiteSpace(m.MachineType.Id))
+                .GroupBy(m => m.MachineType.Id)
+                .Select(g =>
+                {
+                    var totalTime = TimeSpan.Zero;
+                    int count = 0;
+
+                    foreach (var machine in g)
+                    {
+                        if (machineTimes.TryGetValue(machine.Id, out var time))
+                        {
+                            totalTime += time;
+                            count++;
+                        }
+                    }
+
+                    var avgTicks = count > 0 ? totalTime.Ticks / count : 0;
+                    var average = TimeSpan.FromTicks(avgTicks);
+
+                    return new MachineTypeAverageTimeDto
+                    {
+                        MachineTypeId = g.Key,
+                        MachineTypeName = g.First().MachineType.Name ?? "Desconhecido",
+                        AverageProcessTime = string.Format("{0:D2}:{1:D2}:{2:D2}", (int)average.TotalHours, average.Minutes, average.Seconds),
+                        MachineCount = count
+                    };
+                })
+                .ToList();
+
+            return groupedByType;
+        }
 
         public async Task<Machine> CreateMachineAsync(Machine machine)
         {
@@ -40,6 +361,7 @@ namespace ColdlineAPI.Application.Services
             if (string.IsNullOrEmpty(machine.Id))
                 machine.Id = ObjectId.GenerateNewId().ToString();
 
+            machine.CreatedAt = DateTime.UtcNow;
             await _machines.CreateAsync(machine);
             return machine;
         }
@@ -85,6 +407,8 @@ namespace ColdlineAPI.Application.Services
                 var pattern = Regex.Escape(filter.IdentificationNumber.Trim()); 
                 filters.Add(builder.Regex(m => m.IdentificationNumber, new BsonRegularExpression(pattern, "i")));
             }
+            if (filter.Status.HasValue)
+                filters.Add(builder.Eq(m => m.Status, filter.Status.Value));
 
 
             if (!string.IsNullOrWhiteSpace(filter.MachineTypeId))
@@ -108,7 +432,8 @@ namespace ColdlineAPI.Application.Services
                 .Include(m => m.Voltage)
                 .Include(m => m.Phase)
                 .Include(m => m.Quality)
-                .Include(m => m.Monitoring);
+                .Include(m => m.Monitoring)
+                .Include(m => m.CreatedAt);
 
             var findOptions = new FindOptions<Machine>
             {

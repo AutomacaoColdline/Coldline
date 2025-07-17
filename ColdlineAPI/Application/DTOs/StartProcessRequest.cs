@@ -7,5 +7,6 @@ namespace ColdlineAPI.Application.DTOs
         public string? MachineId { get; set; } 
         public bool  PreIndustrialization { get; set; }
         public bool ReWork { get; set; }
+        public bool  Prototype { get; set; }
     }
 }

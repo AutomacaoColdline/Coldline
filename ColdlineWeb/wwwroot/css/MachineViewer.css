@@ -1,4 +1,5 @@
 .viewer-container {
+    position: relative; 
     max-width: 900px;
     margin: 30px auto;
     padding: 20px;
@@ -78,6 +79,33 @@ h3 {
     color: #1c3c93;
     font-weight: 500;
 }
+.finalize-button {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    width: 150px;
+    height: 150px;
+    background-color: #cdcdcd;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+    z-index: 100;
+}
+
+.finalize-button img {
+    width: 100px;
+    height: 100px;
+}
+
+.finalize-button:hover {
+    background-color: #acacac;
+}
+
 
 @keyframes spin {
     0% { transform: rotate(0deg); }

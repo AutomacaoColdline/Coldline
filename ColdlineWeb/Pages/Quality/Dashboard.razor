@@ -1,0 +1,187 @@
+@inject IJSRuntime JS
+@inject HttpClient Http
+
+<link rel="stylesheet" href="css/Dashboard.css" />
+
+<div class="dashboard-container">
+
+    <div class="summary-cards">
+        <div class="card resumo-card produto-a">
+            <span class="card-label">Qtd. de Processos</span>
+            <span class="card-value">@totalProcesses</span>
+        </div>
+        <div class="card resumo-card produto-b">
+            <span class="card-label">Qtd. de Máquinas</span>
+            <span class="card-value">@totalMachines</span>
+        </div>
+        <div class="card resumo-card produto-c">
+            <span class="card-label">Qtd. de Ocorrências</span>
+            <span class="card-value">@totalOccurrences</span>
+        </div>
+        <div class="card resumo-card total">
+            <span class="card-label">Máquinas Fabricadas</span>
+            <span class="card-value">@finishedMachines</span>
+        </div>
+    </div>
+
+    <div class="graph-area">
+        <div class="card full">
+            <h4>Máquinas Individuais por Data</h4>
+            <canvas id="graficoLinhaMaquinasIndividuais"></canvas>
+        </div>
+    </div>
+
+    <div class="graph-grid">
+        <div class="card">
+            <h4>Tempo de Processo por Usuário</h4>
+            <canvas id="graficoA"></canvas>
+        </div>
+        <div class="card">
+            <h4>Qtd. de Processos por Tipo</h4>
+            <canvas id="graficoB"></canvas>
+        </div>
+        <div class="card">
+            <h4>Desenv. por Tipo de Máquina</h4>
+            <canvas id="graficoC"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+@code {
+    private int totalMachines = 0;
+    private int totalProcesses = 0;
+    private int totalOccurrences = 0;
+    private int finishedMachines = 0;
+
+    private List<string> labels = new();
+    private List<double> values = new();
+
+    private List<string> userLabels = new();
+    private List<double> userValues = new();
+
+    private List<string> procTypeLabels = new();
+    private List<int> procTypeValues = new();
+
+    private List<string> avgLabels = new();
+    private List<double> avgValues = new();
+
+    private bool dataLoaded = false;
+    private bool hasRendered = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await Http.GetFromJsonAsync<DashboardDto>("/api/Machine/dashboard");
+            if (response == null)
+                return;
+
+            totalMachines = response.TotalMachines;
+            totalProcesses = response.TotalProcesses;
+            totalOccurrences = response.TotalOccurrences;
+            finishedMachines = response.FinishedMachines;
+
+            labels = response.Machines.Select(x => x.IdentificationNumber).ToList();
+            values = response.Machines.Select(x => ToTotalHours(x.TotalProcessTime)).ToList(); // tempo total por máquina em horas decimais
+
+            userLabels = response.ProcessCountByUser.Select(u => u.UserName).ToList();
+            userValues = response.ProcessCountByUser.Select(u => u.TotalProcessTime).ToList(); // horas decimais
+
+            procTypeLabels = response.ProcessCountByType.Select(p => p.ProcessTypeName).ToList();
+            procTypeValues = response.ProcessCountByType.Select(p => p.Quantity).ToList();
+
+            avgLabels = response.MachineTypeAverageTimes.Select(m => m.MachineTypeName).ToList();
+            avgValues = response.MachineTypeAverageTimes.Select(m => m.AverageProcessTime).ToList(); // horas decimais
+
+            dataLoaded = true;
+
+            if (hasRendered)
+                await RenderChartsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Erro ao carregar dashboard: " + ex.Message);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            hasRendered = true;
+
+            if (dataLoaded)
+                await RenderChartsAsync();
+        }
+    }
+
+    private async Task RenderChartsAsync()
+    {
+        await JS.InvokeVoidAsync("dashboardCharts.renderGraficoLinha", labels, values);
+        await JS.InvokeVoidAsync("dashboardCharts.renderGraficoBarra", "graficoA", userLabels, userValues, "Tempo Total (h)");
+        await JS.InvokeVoidAsync("dashboardCharts.renderGraficoBarra", "graficoB", procTypeLabels, procTypeValues, "Qtd. por Tipo");
+        await JS.InvokeVoidAsync("dashboardCharts.renderGraficoBarra", "graficoC", avgLabels, avgValues, "Tempo Médio (h)");
+    }
+
+    private double ToTotalHours(string time)
+    {
+        try
+        {
+            var parts = time.Split(':');
+            if (parts.Length == 3)
+            {
+                int h = int.Parse(parts[0]);
+                int m = int.Parse(parts[1]);
+                int s = int.Parse(parts[2]);
+                return Math.Round(h + m / 60.0 + s / 3600.0, 2);
+            }
+        }
+        catch { }
+        return 0.0;
+    }
+
+    public class DashboardDto
+    {
+        public int TotalMachines { get; set; }
+        public int TotalProcesses { get; set; }
+        public int TotalOccurrences { get; set; }
+        public int FinishedMachines { get; set; }
+        public List<MachineDto> Machines { get; set; } = new();
+        public List<TypeCountDto> MachineTypeCounts { get; set; } = new();
+        public List<UserDto> ProcessCountByUser { get; set; } = new();
+        public List<ProcessTypeDto> ProcessCountByType { get; set; } = new();
+        public List<MachineAverageDto> MachineTypeAverageTimes { get; set; } = new();
+    }
+
+    public class MachineDto
+    {
+        public string IdentificationNumber { get; set; } = string.Empty;
+        public string TotalProcessTime { get; set; } = "00:00:00";
+    }
+
+    public class TypeCountDto
+    {
+        public string Type { get; set; } = string.Empty;
+        public int Count { get; set; }
+    }
+
+    public class UserDto
+    {
+        public string UserName { get; set; } = string.Empty;
+        public string TotalProcessTime { get; set; } = "00:00:00";
+    }
+
+    public class ProcessTypeDto
+    {
+        public string ProcessTypeName { get; set; } = string.Empty;
+        public int Quantity { get; set; }
+    }
+
+    public class MachineAverageDto
+    {
+        public string MachineTypeName { get; set; } = string.Empty;
+        public string AverageProcessTime { get; set; } = "00:00:00";
+    }
+}

@@ -1,145 +1,108 @@
 @page "/reports"
+@inject HttpClient Http
+@inherits ReportsPage
+
 <link rel="stylesheet" href="css/Quality.css" />
 
 <div class="tab-bar">
-    <button class="tab-button @(selectedChart == null ? "active" : "")" @onclick="@(() => ExibirChart(null))">Nada</button>
+    <button class="tab-button @(selectedChart == null ? "active" : "")" @onclick="@(() => ExibirChart(null))">
+        Dashboard
+    </button>
+
+    <!-- Quantidade -->
     <div class="tab-button dropdown">
-        <button class="tab-button @(selectedChart == "numberProcessDate" ||
-                                selectedChart == "numberMachineDate" ||
-                                selectedChart == "numberOcurrenceDate" ||
-                                selectedChart == "numberProcessByUsers" ||
-                                selectedChart == "numberOcurrencesByUsers" ||
-                                selectedChart == "numberProcessByTypeProcess" ||
-                                selectedChart == "numberMachineByTypeMachine" ||
-                                selectedChart == "numberBrokenPartDate" ||
-                                selectedChart == "numberBrokenPartByUsers" ||
-                                selectedChart == "numberBrokenPartByTypeProcess" ? "active" : "")">
-            Quantidade
+        <button class="tab-button @(selectedChart?.StartsWith("numberProcess") == true || selectedChart == "numberOcurrenceDate" ? "active" : "")">
+            Processos (Quantidade)
         </button>
         <div class="dropdown-content">
-            <button @onclick="@(() => ExibirChart("numberProcessDate"))">Processos por data</button>
-            <button @onclick="@(() => ExibirChart("numberMachineDate"))">Máquinas por data</button>
-            <button @onclick="@(() => ExibirChart("numberOcurrenceDate"))">Ocorrências por data</button>
-            <button @onclick="@(() => ExibirChart("numberProcessByUsers"))">Processos por usuário</button>
-            <button @onclick="@(() => ExibirChart("numberOcurrencesByUsers"))">Ocorrências por usuário</button>
-            <button @onclick="@(() => ExibirChart("numberProcessByTypeProcess"))">Processos por tipo de processo</button>
-            <button @onclick="@(() => ExibirChart("numberMachineByTypeMachine"))">Máquinas por tipo de máquina</button>
-            <button @onclick="@(() => ExibirChart("numberBrokenPartDate"))">Peças quebradas por data</button>
-            <button @onclick="@(() => ExibirChart("numberBrokenPartByUsers"))">Peças quebradas por usuário</button>
-            <button @onclick="@(() => ExibirChart("numberBrokenPartByTypeProcess"))">Peças quebradas por tipo de processo</button>
+            <button @onclick="@(() => ExibirChart("numberProcessDate"))">Por data</button>
+            <button @onclick="@(() => ExibirChart("numberProcessByUsers"))">Por usuário</button>
+            <button @onclick="@(() => ExibirChart("numberProcessByTypeProcess"))">Por tipo de processo</button>
         </div>
     </div>
+
     <div class="tab-button dropdown">
-        <button class="tab-button @(selectedChart == "timeProcessByUsers" ||
-                                selectedChart == "timeProcessByUsersIndividual" ||
-                                selectedChart == "idleTimeByUsers" ||
-                                selectedChart == "timeOcurrenceByTypeProcess" ||
-                                selectedChart == "timeOcurrenceByUsers" ||
-                                selectedChart == "timeMachineByTypeMachine" ||
-                                selectedChart == "timeProcessByTypeProcess" ? "active" : "")">
-            Tempo
+        <button class="tab-button @(selectedChart == "numberMachineDate" || selectedChart == "numberMachineByTypeMachine" ? "active" : "")">
+            Máquinas (Quantidade)
         </button>
         <div class="dropdown-content">
-            <button @onclick="@(() => ExibirChart("timeProcessByUsers"))">Tempo de processo por usuários</button>
-            <button @onclick="@(() => ExibirChart("timeProcessByUsersIndividual"))">Tempo de processo por usuário individual</button>
-            <button @onclick="@(() => ExibirChart("idleTimeByUsers"))">Tempo ocioso dos usuários</button>
-            <button @onclick="@(() => ExibirChart("timeOcurrenceByTypeProcess"))">Tempo de ocorrência por tipo de processo</button>
-            <button @onclick="@(() => ExibirChart("timeOcurrenceByUsers"))">Tempo de ocorrência por usuário</button>
-            <button @onclick="@(() => ExibirChart("timeMachineByTypeMachine"))">Tempo de desenvolvimento por tipo de máquina</button>
-            <button @onclick="@(() => ExibirChart("timeProcessByTypeProcess"))">Tempo de processo por tipo de processo</button>
+            <button @onclick="@(() => ExibirChart("numberMachineDate"))">Por data</button>
+            <button @onclick="@(() => ExibirChart("numberMachineByTypeMachine"))">Por tipo</button>
         </div>
     </div>
+
+    <!-- Tempo -->
     <div class="tab-button dropdown">
-        <button class="tab-button @(selectedChart == "costsByTypeProcess" || selectedChart == "costsByTypeMachine" ? "active" : "")">Custo</button>
+        <button class="tab-button @(selectedChart?.StartsWith("timeProcessByUsers") == true ? "active" : "")">
+            Processos (Tempo)
+        </button>
         <div class="dropdown-content">
-            <button @onclick="@(() => ExibirChart("costsByTypeProcess"))">Custo por tipo de processo</button>
-            <button @onclick="@(() => ExibirChart("costsByTypeMachine"))">Custo por tipo de maquina</button>
+            <button @onclick="@(() => ExibirChart("timeProcessByUsers"))">Por usuários</button>
+            <button @onclick="@(() => ExibirChart("timeProcessByUsersIndividual"))">Por usuário individual</button>
+            <button @onclick="@(() => ExibirChart("timeProcessByTypeProcess"))">Por tipo de processo</button>
+        </div>
+    </div>
+
+    <div class="tab-button dropdown">
+        <button class="tab-button @(selectedChart == "timeMachineByTypeMachine" || selectedChart == "timeMachineByMachine" ? "active" : "")">
+            Máquinas (Tempo)
+        </button>
+        <div class="dropdown-content">
+            <button @onclick="@(() => ExibirChart("timeMachineByTypeMachine"))">Por tipo</button>
+            <button @onclick="@(() => ExibirChart("timeMachineByMachine"))">Por máquina</button>
         </div>
     </div>
 </div>
 
-@if (selectedChart == "numberProcessDate")
+<!-- Renderização do conteúdo -->
+@switch (selectedChart)
 {
-    <NumberProcessDate />
-}
-else if (selectedChart == "numberMachineDate")
-{
-    <NumberMachineDate />
-}
-else if (selectedChart == "numberOcurrenceDate")
-{
-    <NumberOcurrenceDate />
-}
-
-else if (selectedChart == "numberProcessByUsers")
-{
-    <NumberProcessByUsers />
-}
-else if (selectedChart == "numberOcurrencesByUsers")
-{
-    <NumberOcurrencesByUsers />
-}
-else if (selectedChart == "numberProcessByTypeProcess")
-{
-    <NumberProcessByTypeProcess />
-}
-else if (selectedChart == "numberMachineByTypeMachine")
-{
-    <NumberMachineByTypeMachine />
-}
-else if (selectedChart == "timeProcessByUsers")
-{
-    <TimeProcessByUsers/>
-}
-else if (selectedChart == "timeProcessByTypeProcess")
-{
-    <TimeProcessByTypeProcess/>
-}
-else if (selectedChart == "timeProcessByUsersIndividual")
-{
-    <TimeProcessByUsersIndividual/>
-}
-else if (selectedChart == "timeMachineByTypeMachine")
-{
-    <TimeMachineByTypeMachine/>
-}
-else if (selectedChart == "idleTimeByUsers")
-{
-    <IdleTimeByUsers/>
-}
-else if (selectedChart == "timeOcurrenceByTypeProcess")
-{
-    <TimeOcurrenceByTypeProcess/>
-}
-else if (selectedChart == "timeOcurrenceByUsers")
-{
-    <TimeOcurrenceByUsers/>
-}
-else if (selectedChart == "numberBrokenPartDate")
-{
-    <NumberBrokenPartDate/>
-}
-else if (selectedChart == "numberBrokenPartByUsers")
-{
-    <NumberBrokenPartByUsers/>
-}
-else if (selectedChart == "numberBrokenPartByTypeProcess")
-{
-    <NumberBrokenPartByTypeProcess/>
-}
-else if (selectedChart == "costsByTypeProcess")
-{
-    <CostsByTypeProcess/>
-}
-else if (selectedChart == "costsByTypeMachine")
-{
-    <CostsByTypeMachine/>
-}
-@code {
-    private string? selectedChart;
-
-    private void ExibirChart(string? chart)
-    {
-        selectedChart = chart;
-    }
+    case null:
+        <Dashboard />;
+        break;
+    case "numberProcessDate":
+        <NumberProcessDate />;
+        break;
+    case "numberMachineDate":
+        <NumberMachineDate />;
+        break;
+    case "numberProcessByUsers":
+        <NumberProcessByUsers />;
+        break;
+    case "numberProcessByTypeProcess":
+        <NumberProcessByTypeProcess />;
+        break;
+    case "numberMachineByTypeMachine":
+        <NumberMachineByTypeMachine />;
+        break;
+    case "timeProcessByUsers":
+        <TimeProcessByUsers />;
+        break;
+    case "timeProcessByUsersIndividual":
+        <TimeProcessByUsersIndividual />;
+        break;
+    case "timeMachineByTypeMachine":
+        <TimeMachineByTypeMachine />;
+        break;
+    case "timeMachineByMachine":
+        <TimeProcessByMachine />;
+        break;
+    case "timeProcessByTypeProcess":
+        <TimeProcessByTypeProcess />;
+        break;
+    case "numberBrokenPartDate":
+        <NumberBrokenPartDate />;
+        break;
+    case "numberBrokenPartByUsers":
+        <NumberBrokenPartByUsers />;
+        break;
+    case "numberBrokenPartByTypeProcess":
+        <NumberBrokenPartByTypeProcess />;
+        break;
+    case "costsByTypeProcess":
+        <CostsByTypeProcess />;
+        break;
+    case "costsByTypeMachine":
+        <CostsByTypeMachine />;
+        break;
 }

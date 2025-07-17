@@ -33,7 +33,7 @@ namespace ColdlineWeb.Pages
 
         // Usuários
         protected int currentPage = 0;
-        protected const int pageSize = 4;
+        protected const int pageSize = 6;
         protected List<UserModel> PaginatedUsers => users.Skip(currentPage * pageSize).Take(pageSize).ToList();
         protected bool isFirstPage => currentPage == 0;
         protected bool isLastPage => (currentPage + 1) * pageSize >= users.Count;

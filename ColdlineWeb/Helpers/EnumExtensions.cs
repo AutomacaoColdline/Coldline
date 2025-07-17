@@ -1,20 +1,19 @@
-using ColdlineWeb.Models.Enum;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Reflection;
 
 namespace ColdlineWeb.Helpers
 {
     public static class EnumExtensions
     {
-        public static string ToPortugueseString(this MachineStatus status)
+        public static string GetDisplayName(this Enum value)
         {
-            return status switch
-            {
-                MachineStatus.WaitingProduction => "Aguardando Produção",
-                MachineStatus.InProgress => "Em Progresso",
-                MachineStatus.InOcurrence => "Em Ocorrência",
-                MachineStatus.InRework => "Retrabalho",
-                MachineStatus.Finished => "Finalizado",
-                _ => "Desconhecido"
-            };
+            return value.GetType()
+                .GetMember(value.ToString())
+                .FirstOrDefault()?
+                .GetCustomAttribute<DisplayAttribute>()?
+                .GetName() ?? value.ToString();
         }
     }
 }

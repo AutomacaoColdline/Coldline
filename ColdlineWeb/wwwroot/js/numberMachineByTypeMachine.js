@@ -5,6 +5,9 @@ window.renderizarGraficoTipoMaquina = (labels, data, type) => {
         window.machineTypeChart.destroy();
     }
 
+    const maxValue = Math.max(...data);
+    const stepSize = Math.ceil(maxValue / 5) || 1;
+
     window.machineTypeChart = new Chart(ctx, {
         type: type,
         data: {
@@ -36,7 +39,15 @@ window.renderizarGraficoTipoMaquina = (labels, data, type) => {
                     }
                 },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    suggestedMax: maxValue + stepSize,
+                    ticks: {
+                        stepSize: stepSize
+                    },
+                    title: {
+                        display: true,
+                        text: 'Quantidade'
+                    }
                 }
             }
         }

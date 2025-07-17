@@ -1,8 +1,16 @@
-window.renderizarGraficoTempoUsuarios = (labels, data, type) => {
+window.renderizarGraficoTempoUsuarios = (labels, data, type, rawTimes) => {
     const ctx = document.getElementById('timeChart').getContext('2d');
 
     if (window.timeChart instanceof Chart) {
         window.timeChart.destroy();
+    }
+
+    function formatMinutesToHMS(minutes) {
+        const totalSeconds = Math.round(minutes * 60);
+        const h = Math.floor(totalSeconds / 3600);
+        const m = Math.floor((totalSeconds % 3600) / 60);
+        const s = totalSeconds % 60;
+        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     }
 
     window.timeChart = new Chart(ctx, {
@@ -10,7 +18,7 @@ window.renderizarGraficoTempoUsuarios = (labels, data, type) => {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Tempo de Processo por Usuário (minutos)',
+                label: 'Tempo de Processo por Usuário',
                 data: data,
                 backgroundColor: 'rgba(255, 99, 132, 0.5)',
                 borderColor: 'rgba(255, 99, 132, 1)',
@@ -24,8 +32,12 @@ window.renderizarGraficoTempoUsuarios = (labels, data, type) => {
             plugins: {
                 legend: { display: true },
                 tooltip: {
-                    mode: 'index',
-                    intersect: false
+                    callbacks: {
+                        label: function (context) {
+                            const i = context.dataIndex;
+                            return `${labels[i]}: ${rawTimes[i]}`;
+                        }
+                    }
                 }
             },
             scales: {
@@ -39,7 +51,12 @@ window.renderizarGraficoTempoUsuarios = (labels, data, type) => {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Minutos'
+                        text: 'Tempo (hh:mm:ss)'
+                    },
+                    ticks: {
+                        callback: function (value) {
+                            return formatMinutesToHMS(value);
+                        }
                     }
                 }
             }

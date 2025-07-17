@@ -1,4 +1,6 @@
 @page "/machines"
+@using ColdlineWeb.Models.Enum
+@using ColdlineWeb.Helpers
 @inherits MachinesPage
 <link rel="stylesheet" href="css/Machine.css" />
 
@@ -28,6 +30,16 @@ else
                 }
             </select>
 
+            <select class="form-control filter-medium" @bind="filter.Status">
+                <option value="">Todos os Status</option>
+                @foreach (var status in Enum.GetValues<MachineStatus>())
+                {
+                    <option value="@((int)status)">
+                        @status.GetDisplayName()
+                    </option>
+                }
+            </select>
+
             <button class="btn btn-filter" @onclick="ApplyFilters">
                 <img src="img/lupa.png" alt="Buscar" class="btn-icon" />
             </button>
@@ -52,13 +64,8 @@ else
             <thead>
                 <tr>
                     <th>Tipo de Máquina</th>
-                    <th>Nome do Cliente</th>
                     <th>Número de Identificação</th>
-                    <th>Fase</th>
-                    <th>Voltagem</th>
                     <th>Processo</th>
-                    <th>Qualidade</th>
-                    <th>Monitoramento</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -67,17 +74,12 @@ else
                 {
                     <tr>
                         <td>@(machine.MachineType?.Name ?? "Sem Tipo")</td>
-                        <td>@machine.CustomerName</td>
                         <td>
                             <a class="text-link" href="@($"/machineViewer/{machine.Id}")">
                                 @machine.IdentificationNumber
                             </a>
                         </td>
-                        <td>@machine.Phase</td>
-                        <td>@machine.Voltage</td>
                         <td>@(machine.Process?.Name ?? "Não iniciado")</td>
-                        <td>@(machine.Quality?.Name ?? "Não disponivel")</td>
-                        <td>@(machine.Monitoring?.Name ?? "Sem Monitoramento")</td>
                         <td>
                             <button class="btn btn-warning btn-sm" @onclick="() => OpenEditMachineModal(machine)">
                                 <img src="img/editar.png" alt="Editar" style="width: 20px;" />

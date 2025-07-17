@@ -1,0 +1,86 @@
+@page "/reports/time-machine-individual"
+@inject IJSRuntime JS
+@inject HttpClient Http
+
+<link rel="stylesheet" href="css/TimeProcessByMachine.css" />
+
+<div class="filtro-container">
+    <label>De:
+        <input @bind="startDate" type="date" />
+    </label>
+    <label>Até:
+        <input @bind="endDate" type="date" />
+    </label>
+    <label>Tipo de Gráfico:
+        <select @bind="chartType">
+            <option value="bar">Barra</option>
+            <option value="line">Linha</option>
+        </select>
+    </label>
+    <button @onclick="GerarGraficoTempoPorMaquina">
+        <img src="img/lupa.png" alt="Buscar" class="btn-icon" />
+    </button>
+</div>
+
+<div class="grafico-container">
+    <canvas id="machineProcessChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/timeProcessByMachine.js"></script>
+
+@code {
+    private DateTime startDate = DateTime.Today.AddDays(-7);
+    private DateTime endDate = DateTime.Today;
+    private string chartType = "bar";
+
+    public class MachineProcessTimeDto
+    {
+        public string MachineId { get; set; } = string.Empty;
+        public string IdentificationNumber { get; set; } = string.Empty;
+        public string CustomerName { get; set; } = string.Empty;
+        public string TotalProcessTime { get; set; } = "00:00:00";
+        public int ProcessCount { get; set; }
+        public string MachineTypeName { get; set; } = string.Empty;
+    }
+
+    private async Task GerarGraficoTempoPorMaquina()
+    {
+        var requestData = new
+        {
+            startDate = startDate.ToUniversalTime(),
+            endDate = endDate.ToUniversalTime()
+        };
+
+        var response = await Http.PostAsJsonAsync("api/Machine/total-process-time", requestData);
+        if (!response.IsSuccessStatusCode)
+            return;
+
+        var result = await response.Content.ReadFromJsonAsync<List<MachineProcessTimeDto>>();
+        if (result == null)
+            return;
+
+        var labels = result.Select(x => $"{x.IdentificationNumber} ({x.MachineTypeName})").ToList();
+
+        var values = result
+            .Select(x =>
+            {
+                try
+                {
+                    var parts = x.TotalProcessTime.Split(':');
+                    if (parts.Length == 3)
+                    {
+                        int h = int.Parse(parts[0]);
+                        int m = int.Parse(parts[1]);
+                        int s = int.Parse(parts[2]);
+                        return Math.Round(h * 60.0 + m + s / 60.0, 2);
+                    }
+                }
+                catch { }
+                return 0.0;
+            })
+            .ToList();
+
+        await JS.InvokeVoidAsync("renderizarGraficoTempoMaquina", labels, values, chartType);
+    }
+}

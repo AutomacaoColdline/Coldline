@@ -9,7 +9,7 @@ namespace ColdlineAPI.Domain.Entities
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string? Id { get; set; } 
+        public string? Id { get; set; }
 
         [BsonElement("customer name")]
         public string CustomerName { get; set; } = string.Empty;
@@ -31,5 +31,10 @@ namespace ColdlineAPI.Domain.Entities
         public ReferenceEntity? MachineType { get; set; } = new ReferenceEntity();
         [BsonElement("time")]
         public string Time { get; set; } = "00:00:00";
+        [BsonElement("createdAt")]
+        [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+        public DateTime CreatedAt { get; set; }  // ✅ Agora presente
+        
+        
     }
 }

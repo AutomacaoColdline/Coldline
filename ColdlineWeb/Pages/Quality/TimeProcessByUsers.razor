@@ -1,4 +1,6 @@
 @inject IJSRuntime JS
+@inject HttpClient Http
+
 <link rel="stylesheet" href="css/TimeProcessByUsers.css" />
 
 <div class="filtro-container">
@@ -31,24 +33,46 @@
     private DateTime endDate = DateTime.Today;
     private string chartType = "bar";
 
-    private async Task GerarGraficoTempoPorUsuarios()
+    public class UserProcessTimeDto
     {
-        var dados = GerarDadosFicticios(startDate, endDate);
-        await JS.InvokeVoidAsync("renderizarGraficoTempoUsuarios", dados.Labels, dados.Values, chartType);
+        public string UserId { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
+        public string TotalProcessTime { get; set; } = "00:00:00";
+        public int ProcessCount { get; set; }
     }
 
-    private (List<string> Labels, List<int> Values) GerarDadosFicticios(DateTime start, DateTime end)
+    private async Task GerarGraficoTempoPorUsuarios()
     {
-        var usuarios = new[] { "Cicero", "Douglas", "Franke", "Jhony", "Luiz", "Raphael" };
-        var labels = new List<string>();
-        var values = new List<int>();
-
-        foreach (var user in usuarios)
+        var requestData = new
         {
-            labels.Add(user);
-            values.Add(Random.Shared.Next(10, 240)); // minutos entre 10 e 240
-        }
+            startDate = startDate.ToUniversalTime(),
+            endDate = endDate.ToUniversalTime()
+        };
 
-        return (labels, values);
+        var response = await Http.PostAsJsonAsync("api/Process/chart/total-time-by-user", requestData);
+        if (!response.IsSuccessStatusCode)
+            return;
+
+        var result = await response.Content.ReadFromJsonAsync<List<UserProcessTimeDto>>();
+        if (result == null)
+            return;
+
+        var labels = result.Select(x => x.UserName).ToList();
+        var rawTimes = result.Select(x => x.TotalProcessTime).ToList();
+
+        var numericValues = rawTimes.Select(hms =>
+        {
+            var parts = hms.Split(':');
+            if (parts.Length == 3 &&
+                int.TryParse(parts[0], out int h) &&
+                int.TryParse(parts[1], out int m) &&
+                int.TryParse(parts[2], out int s))
+            {
+                return h * 60 + m + s / 60.0;
+            }
+            return 0.0;
+        }).ToList();
+
+        await JS.InvokeVoidAsync("renderizarGraficoTempoUsuarios", labels, numericValues, chartType, rawTimes);
     }
 }

@@ -42,6 +42,55 @@ namespace ColdlineAPI.Application.Services
             return occurrence;
         }
 
+        public async Task<List<OccurrenceDateChartDto>> GetOccurrenceCountByDateAsync(DateTime start, DateTime end)
+        {
+            var filter = Builders<Occurrence>.Filter.Gte("start date", start) &
+                        Builders<Occurrence>.Filter.Lte("start date", end);
+
+            var result = await _occurrences.GetCollection()
+                .Aggregate()
+                .Match(filter)
+                .Group(new BsonDocument
+                {
+                    {"_id", new BsonDocument("$dateToString", new BsonDocument
+                        {
+                            {"format", "%Y-%m-%d"},
+                            {"date", "$start date"}
+                        })},
+                    {"count", new BsonDocument("$sum", 1)}
+                })
+                .Sort(new BsonDocument("_id", 1))
+                .ToListAsync();
+
+            return result.Select(doc => new OccurrenceDateChartDto
+            {
+                Date = doc["_id"].AsString,
+                Quantity = doc["count"].AsInt32
+            }).ToList();
+        }
+
+        public async Task<List<OccurrenceUserChartDto>> GetOccurrenceCountByUserAsync(DateTime start, DateTime end)
+        {
+            var filter = Builders<Occurrence>.Filter.Gte("start date", start) &
+                        Builders<Occurrence>.Filter.Lte("start date", end);
+
+            var result = await _occurrences.GetCollection()
+                .Find(filter)
+                .ToListAsync();
+
+            var agrupado = result
+                .Where(o => o.User != null && !string.IsNullOrEmpty(o.User.Name))
+                .GroupBy(o => o.User!.Name)
+                .Select(g => new OccurrenceUserChartDto
+                {
+                    UserName = g.Key,
+                    Quantity = g.Count()
+                })
+                .ToList();
+
+            return agrupado;
+        }
+
         public async Task<Occurrence> CreateOccurrenceAsync(Occurrence occurrence)
         {
             occurrence.Id ??= ObjectId.GenerateNewId().ToString();

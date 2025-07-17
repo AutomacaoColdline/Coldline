@@ -1,0 +1,83 @@
+@inherits ComponentBase
+@inject HttpClient Http
+@using ColdlineWeb.Models
+
+@if (Show && Current != null)
+{
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal d-block" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Visualizar Acesso</h5>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="OnClose"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Identificador</label>
+                            <input class="form-control" value="@Current.Identificador" disabled />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Unidade</label>
+                            <input class="form-control" value="@Current.Unidade" disabled />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estado</label>
+                            <input class="form-control" value="@Current.Estado" disabled />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Cidade</label>
+                            <input class="form-control" value="@Current.Cidade" disabled />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">IHM</label>
+                            <input class="form-control" value="@Current.Ihm" disabled />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">MASC</label>
+                            <input class="form-control" value="@Current.Masc" disabled />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">GATEWAY</label>
+                            <input class="form-control" value="@Current.Gateway" disabled />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">ANYDESK</label>
+                            <input class="form-control" value="@Current.IdAnydesk" disabled />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">RUSTDESK</label>
+                            <input class="form-control" value="@Current.IdRustdesk" disabled />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">TEAMVIEWER</label>
+                            <input class="form-control" value="@Current.IdTeamViewer" disabled />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo de Monitoramento</label>
+                            <input class="form-control" value="@Current.MonitoringType?.Name" disabled />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">CLPs</label>
+                            <input class="form-control" value="@string.Join(", ", Current?.Clp ?? new())" disabled />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">MACs</label>
+                            <input class="form-control" value="@string.Join(", ", Current?.Macs ?? new())" disabled />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="OnClose">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Show { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public MonitoringModel? Current { get; set; }
+}

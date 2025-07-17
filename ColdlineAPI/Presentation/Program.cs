@@ -18,7 +18,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll",
         policy =>
         {
-            policy.WithOrigins("http://10.0.0.44:5173", "http://coldline.industria.com")
+            policy.WithOrigins("http://10.0.0.44:5173", "http://coldline.industria.com", "http://coldline.coldnex.com","http://coldnex.com")
                   .AllowAnyMethod()
                   .AllowAnyHeader()
                   .AllowCredentials();
@@ -62,6 +62,8 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(uploadsPath),
     RequestPath = "/uploads"
 });
+
+
 
 
 

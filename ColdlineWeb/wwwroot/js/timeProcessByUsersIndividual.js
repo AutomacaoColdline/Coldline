@@ -5,12 +5,15 @@ window.renderizarGraficoUsuarioIndividual = (labels, data, usuario, type) => {
         window.userIndividualChart.destroy();
     }
 
+    const maxValue = Math.max(...data);
+    const stepSize = Math.ceil(maxValue / 5) || 1;
+
     window.userIndividualChart = new Chart(ctx, {
         type: type,
         data: {
             labels: labels,
             datasets: [{
-                label: `Tempo de Processo de ${usuario} por Tipo (min)`,
+                label: `Tempo de Processo de ${usuario} por Tipo (min)`, // continua em minutos
                 data: data,
                 backgroundColor: 'rgba(54, 162, 235, 0.5)',
                 borderColor: 'rgba(54, 162, 235, 1)',
@@ -25,7 +28,15 @@ window.renderizarGraficoUsuarioIndividual = (labels, data, usuario, type) => {
                 legend: { display: true },
                 tooltip: {
                     mode: 'index',
-                    intersect: false
+                    intersect: false,
+                    callbacks: {
+                        label: function (context) {
+                            const minutes = context.parsed.y;
+                            const hrs = Math.floor(minutes / 60);
+                            const min = Math.round(minutes % 60);
+                            return `${hrs}h ${min}min`; // permanece assim
+                        }
+                    }
                 }
             },
             scales: {
@@ -43,7 +54,15 @@ window.renderizarGraficoUsuarioIndividual = (labels, data, usuario, type) => {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Minutos'
+                        text: 'Horas' // ✅ muda aqui apenas
+                    },
+                    suggestedMax: maxValue + stepSize,
+                    ticks: {
+                        stepSize: stepSize,
+                        callback: function (value) {
+                            const h = Math.floor(value / 60);
+                            return `${h}h`; // ✅ mostra apenas hora inteira
+                        }
                     }
                 }
             }

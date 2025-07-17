@@ -1,0 +1,62 @@
+@page "/setup"
+@layout EmptyLayout
+@inject NavigationManager Navigation
+
+<PageTitle>Setup</PageTitle>
+
+<div class="setup-container">
+    <div class="card-box" @onclick="@(() => Navigation.NavigateTo("/homeAssistencia"))">
+        <h3>Assistência Técnica</h3>
+        <p>Acesso ao sistema de suporte técnico e monitoramento de clientes.</p>
+    </div>
+
+    <div class="card-box" @onclick="@(() => Navigation.NavigateTo("/home"))">
+        <h3>Indústria</h3>
+        <p>Acesso ao painel industrial e controle operacional.</p>
+    </div>
+</div>
+
+<style>
+    .setup-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 40px;
+        flex-wrap: wrap;
+        height: 100vh;
+        background-color: #f8f9fa;
+        padding: 20px;
+    }
+
+    .card-box {
+        width: 280px;
+        height: 200px;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        background-color: #e9f5ff;
+    }
+
+    .card-box h3 {
+        margin-bottom: 10px;
+        color: #007bff;
+    }
+
+    .card-box p {
+        color: #555;
+        font-size: 14px;
+    }
+</style>

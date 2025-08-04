@@ -33,6 +33,10 @@
       "PackagePath": "staticwebassets/css/HomeAssitencia.css"
     },
     {
+      "Id": "/app/wwwroot/css/HomeIndustria.css",
+      "PackagePath": "staticwebassets/css/HomeIndustria.css"
+    },
+    {
       "Id": "/app/wwwroot/css/IdleTimeByUsers.css",
       "PackagePath": "staticwebassets/css/IdleTimeByUsers.css"
     },

@@ -96,6 +96,18 @@
       <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"ct5wqi5g9j"},{"Name":"integrity","Value":"sha256-cBfV9f4V6hYupbHNS5ETpzRhnPz4cR2aszF1Q9Mk5zc="},{"Name":"label","Value":"css/HomeAssitencia.css"}]]]></EndpointProperties>
       <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"1899"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022cBfV9f4V6hYupbHNS5ETpzRhnPz4cR2aszF1Q9Mk5zc=\u0022"},{"Name":"Last-Modified","Value":"Fri, 20 Jun 2025 13:49:41 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="css/HomeIndustria.165p79mpa8.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\HomeIndustria.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"165p79mpa8"},{"Name":"integrity","Value":"sha256-abH\u002Bu6PwQWxem7yJdRfIHZEC\u002BsGGgMIDiS\u002BUg7xd8l4="},{"Name":"label","Value":"css/HomeIndustria.css"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"2325"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022abH\u002Bu6PwQWxem7yJdRfIHZEC\u002BsGGgMIDiS\u002BUg7xd8l4=\u0022"},{"Name":"Last-Modified","Value":"Fri, 01 Aug 2025 13:08:36 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="css/HomeIndustria.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\HomeIndustria.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-abH\u002Bu6PwQWxem7yJdRfIHZEC\u002BsGGgMIDiS\u002BUg7xd8l4="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"2325"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022abH\u002Bu6PwQWxem7yJdRfIHZEC\u002BsGGgMIDiS\u002BUg7xd8l4=\u0022"},{"Name":"Last-Modified","Value":"Fri, 01 Aug 2025 13:08:36 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="css/IdleTimeByUsers.0omb0nu7n1.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\IdleTimeByUsers.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>

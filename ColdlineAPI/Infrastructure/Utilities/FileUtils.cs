@@ -6,7 +6,7 @@ using System.IO;
 
 namespace ColdlineAPI.Infrastructure.Utilities
 {
-    public static class FileUtils
+    public static class Utils
     {
         public static byte[] GenerateExcel(List<List<string>> matrix)
         {
@@ -72,6 +72,17 @@ namespace ColdlineAPI.Infrastructure.Utilities
             using var stream = new MemoryStream();
             document.GeneratePdf(stream);
             return stream.ToArray();
+        }
+        private static string GenerateNumericCode()
+        {
+            return new Random().Next(100000, 999999).ToString();
+        }
+        private static DateTime GetCurrentCampoGrandeTime()
+        {
+            return TimeZoneInfo.ConvertTime(
+                DateTime.UtcNow,
+                TimeZoneInfo.FindSystemTimeZoneById("America/Campo_Grande")
+            );
         }
     }
 }

@@ -87,14 +87,16 @@
             values = response.Machines.Select(x => ToTotalHours(x.TotalProcessTime)).ToList(); // tempo total por máquina em horas decimais
 
             userLabels = response.ProcessCountByUser.Select(u => u.UserName).ToList();
-            userValues = response.ProcessCountByUser.Select(u => u.TotalProcessTime).ToList(); // horas decimais
-
+            userValues = response.ProcessCountByUser
+                .Select(u => ToTotalHours(u.TotalProcessTime))
+                .ToList();
             procTypeLabels = response.ProcessCountByType.Select(p => p.ProcessTypeName).ToList();
             procTypeValues = response.ProcessCountByType.Select(p => p.Quantity).ToList();
 
             avgLabels = response.MachineTypeAverageTimes.Select(m => m.MachineTypeName).ToList();
-            avgValues = response.MachineTypeAverageTimes.Select(m => m.AverageProcessTime).ToList(); // horas decimais
-
+            avgValues = response.MachineTypeAverageTimes
+                .Select(m => ToTotalHours(m.AverageProcessTime))
+                .ToList();
             dataLoaded = true;
 
             if (hasRendered)

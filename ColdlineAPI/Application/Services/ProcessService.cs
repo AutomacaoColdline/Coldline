@@ -637,7 +637,7 @@ namespace ColdlineAPI.Application.Services
                 });
             }
 
-            return FileUtils.GenerateExcel(linhas); // Aqui usa a utility já existente
+            return Utils.GenerateExcel(linhas); // Aqui usa a utility já existente
         }
 
 

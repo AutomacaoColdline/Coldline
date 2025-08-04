@@ -8,12 +8,12 @@ namespace ColdlineAPI.Application.Services
     {
         public byte[] CreateExcel(List<List<string>> matrix)
         {
-            return FileUtils.GenerateExcel(matrix);
+            return Utils.GenerateExcel(matrix);
         }
 
         public byte[] CreatePdf(List<List<string>> matrix)
         {
-            return FileUtils.GeneratePdf(matrix);
+            return Utils.GeneratePdf(matrix);
         }
     }
 }

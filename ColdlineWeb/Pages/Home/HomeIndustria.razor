@@ -1,0 +1,69 @@
+@page "/homeindustria"
+@using ColdlineWeb.Models
+@using ColdlineWeb.Services
+@layout EmptyLayout
+@inherits HomeIndustriaBase
+
+<link rel="stylesheet" href="css/HomeIndustria.css">
+
+@if (isLoading)
+{
+    <div class="loader-wrapper">
+        <div class="custom-loader"></div>
+        <span class="loading-text">Carregando...</span>
+    </div>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <div class="user-table-fullscreen">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>Nome</th>
+                    <th>Processo Atual</th>
+                    <th>Tempo de Processo</th>
+                    <th>Indicador</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in users)
+                {
+                    <tr class="@(UsuarioSemAtividade(user) ? "row-alert" : "")">
+                        <td>
+                            <img class="user-photo" src="@($"http://10.0.0.44:5000/uploads/{user.UrlPhoto}?t={CacheBuster}")"
+                                 alt="Foto de @user.Name" />
+                        </td>
+                        <td>@user.Name</td>
+                        @if (ProcessStatsByUserId.TryGetValue(user.Id, out var stat))
+                        {
+                            <td>
+                                @if (user.CurrentProcess != null)
+                                {
+                                    <a href="@($"/processViewer/{user.CurrentProcess.Id}")" class="text-link">
+                                        @stat.ProcessTypeName
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span>Nenhum</span>
+                                }
+                            </td>
+                            <td>@stat.ProcessTime</td>
+                        }
+                        else
+                        {
+                            <td>Nenhum</td>
+                            <td>00:00:00</td>
+                        }
+                        <td>@(RenderIndicator(user))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

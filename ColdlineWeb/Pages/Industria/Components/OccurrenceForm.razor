@@ -1,107 +1,202 @@
 @using ColdlineWeb.Models
 @using ColdlineWeb.Services
-
-@inject IndustriaService IndustriaService
+@inject OccurrenceTypeService OccurrenceTypeService
+@inject PartService PartService
 
 @code {
-    [Parameter] public EventCallback<StartOccurrenceModel> OnStartOccurrence { get; set; }
-    [Parameter] public EventCallback OnClose { get; set; } 
-    [Parameter] public string ProcessId { get; set; } = string.Empty;
-    [Parameter] public ProcessModel? ProcessDetails { get; set; }
+    [Parameter] public ReferenceEntity? ProcessRef { get; set; }
+    [Parameter] public ReferenceEntity? UserRef { get; set; }
+    [Parameter] public EventCallback<StartOccurrenceModel> OnSaveDraft { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
 
-    private string selectedPauseTypeId = "";
-    private string selectedDefectId = "";
-    private List<ReferenceEntity> pauseTypes = new();
-    private List<ReferenceEntity> defects = new();
-    private bool isLoading = true; 
+    private StartOccurrenceModel Model = new();
+
+    private List<OccurrenceTypeModel> occurrenceTypes = new();
+    private string? selectedOccurrenceTypeId;
+
+    // Peças
+    private List<PartModel> parts = new();
+    private string? selectedPartId;
+
+    private bool loading = true;
+    private string? loadError;
+    private string? formError;
+
+    // Conjunto dos tipos que exigem peça (por ID e por Nome)
+    private static readonly HashSet<string> RequiredTypeIds = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "689cd4645327afa586ab9dff", // Falta Peça
+        "689cd47a5327afa586ab9e00"  // Peça quebrada
+    };
+
+    private static readonly HashSet<string> RequiredTypeNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Falta Peça",
+        "Peça quebrada"
+    };
+
+    private bool RequiresPart =>
+        !string.IsNullOrWhiteSpace(Model.OccurrenceType?.Id) && RequiredTypeIds.Contains(Model.OccurrenceType.Id)
+        || (!string.IsNullOrWhiteSpace(Model.OccurrenceType?.Name) && RequiredTypeNames.Contains(Model.OccurrenceType.Name));
 
     protected override async Task OnInitializedAsync()
     {
-        pauseTypes = await IndustriaService.GetPauseTypesAsync();
-        defects = await IndustriaService.GetDefectsAsync();
-
-        if (ProcessDetails == null || string.IsNullOrWhiteSpace(ProcessDetails.Id))
+        try
         {
-            ProcessDetails = await IndustriaService.GetProcessById(ProcessId);
+            occurrenceTypes = await OccurrenceTypeService.GetAllAsync() ?? new();
+
+            // Carrega todas as peças uma vez (pode trocar para lazy se preferir)
+            parts = await PartService.GetAllAsync();
+
+            // refs vindas do pai
+            Model.Process = ProcessRef;
+            Model.User = UserRef ?? new ReferenceEntity();
+
+            // manter nulos conforme solicitado
+            Model.CodeOccurrence = null;
+            Model.MachineStopped = false;
+
+            // Sem peça selecionada inicialmente
+            Model.Part = null;
+            selectedPartId = null;
+        }
+        catch
+        {
+            loadError = "Falha ao carregar dados (tipos de ocorrência/peças).";
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private void OnOccurrenceTypeChanged(ChangeEventArgs e)
+    {
+        selectedOccurrenceTypeId = e.Value?.ToString();
+        var selected = occurrenceTypes.Find(x => x.Id == selectedOccurrenceTypeId);
+
+        Model.OccurrenceType = selected is null
+            ? new OccurrenceTypeModel()
+            : new OccurrenceTypeModel
+            {
+                Id = selected.Id,
+                Name = selected.Name,
+                Description = selected.Description,
+                PendingEvent = selected.PendingEvent
+            };
+
+        // Se passou para um tipo que exige peça e já existe seleção, mantém.
+        // Se não exige peça, zera a parte.
+        if (!RequiresPart)
+        {
+            selectedPartId = null;
+            Model.Part = null;
+        }
+    }
+
+    private void OnPartChanged(ChangeEventArgs e)
+    {
+        selectedPartId = e.Value?.ToString();
+
+        if (string.IsNullOrWhiteSpace(selectedPartId))
+        {
+            Model.Part = null;
+            return;
         }
 
-        isLoading = false; 
-        StateHasChanged();
+        var p = parts.FirstOrDefault(x => x.Id == selectedPartId);
+        Model.Part = p is null ? null : new ReferenceEntity { Id = p.Id, Name = p.Name };
     }
 
-    private bool CanStartOccurrence =>
-        !string.IsNullOrWhiteSpace(selectedPauseTypeId) &&
-        ProcessDetails?.User != null && 
-        !string.IsNullOrWhiteSpace(ProcessDetails.User.Id);
-
-    private async Task HandleStartOccurrence()
+    private async Task SubmitAsync()
     {
-        if (!CanStartOccurrence) return;
+        formError = null;
 
-        var pauseType = pauseTypes.FirstOrDefault(pt => pt.Id == selectedPauseTypeId);
-        var defect = defects.FirstOrDefault(d => d.Id == selectedDefectId);
-
-        var occurrenceModel = new StartOccurrenceModel
+        // validação: precisa escolher um tipo
+        if (string.IsNullOrWhiteSpace(Model.OccurrenceType?.Id))
         {
-            CodeOccurrence = "",
-            Process = new ReferenceEntity { Id = ProcessId.Trim() },
-            PauseType = pauseType ?? new ReferenceEntity(),
-            Defect = defect ?? new ReferenceEntity(),
-            User = new ReferenceEntity
-            { 
-                Id = ProcessDetails?.User?.Id ?? "",
-                Name = ProcessDetails?.User?.Name ?? "Usuário Desconhecido"
+            formError = "Selecione o Tipo de Ocorrência.";
+            return;
+        }
+
+        // se esse tipo exige peça, a peça é obrigatória
+        if (RequiresPart)
+        {
+            if (string.IsNullOrWhiteSpace(selectedPartId) || Model.Part?.Id is null or "")
+            {
+                formError = "Selecione a peça para este tipo de ocorrência.";
+                return;
             }
-        };
+        }
+        else
+        {
+            // se não exige, garante que vai nulo
+            Model.Part = null;
+        }
 
-        await OnStartOccurrence.InvokeAsync(occurrenceModel);
+        // garantir que vão nulos/conforme pedido
+        Model.CodeOccurrence = null;
+        Model.MachineStopped = false;
+
+        await OnSaveDraft.InvokeAsync(Model);
     }
 
-    private async Task CloseModal()
-    {
-        await OnClose.InvokeAsync();
-    }
+    private async Task CancelAsync() => await OnCancel.InvokeAsync();
 }
 
-@if (isLoading)
+@if (loading)
 {
-    <p>Carregando...</p>
+    <p>Carregando dados...</p>
+}
+else if (!string.IsNullOrEmpty(loadError))
+{
+    <p class="text-danger">@loadError</p>
 }
 else
 {
-    <div class="modal">
-        <div class="modal-content">
-            <button class="btn-close" @onclick="CloseModal">
-                ✖
-            </button>
+    <div class="card mt-3 p-3">
+        <div class="mb-3">
+            <label class="form-label">Tipo de Ocorrência *</label>
+            <select class="form-select"
+                    @onchange="OnOccurrenceTypeChanged"
+                    value="@selectedOccurrenceTypeId">
+                <option value="">-- selecione --</option>
+                @foreach (var t in occurrenceTypes)
+                {
+                    <option value="@t.Id">@t.Name</option>
+                }
+            </select>
+        </div>
 
-            <h5>Registrar Nova Ocorrência</h5>
-
-            <div class="form-group">
-                <label>Tipo de Pausa</label>
-                <select @bind="selectedPauseTypeId" class="form-control">
-                    <option value="">Selecione um tipo</option>
-                    @foreach (var type in pauseTypes)
+        @if (RequiresPart)
+        {
+            <div class="mb-3">
+                <label class="form-label">Peça *</label>
+                <select class="form-select"
+                        @onchange="OnPartChanged"
+                        value="@selectedPartId">
+                    <option value="">-- selecione --</option>
+                    @foreach (var p in parts)
                     {
-                        <option value="@type.Id">@type.Name</option>
+                        <option value="@p.Id">@p.Name</option>
                     }
                 </select>
             </div>
+        }
 
-            <div class="form-group">
-                <label>Defeito (Opcional)</label>
-                <select @bind="selectedDefectId" class="form-control">
-                    <option value="">Nenhum</option>
-                    @foreach (var defect in defects)
-                    {
-                        <option value="@defect.Id">@defect.Name</option>
-                    }
-                </select>
-            </div>
+        <div class="mb-3">
+            <label class="form-label">Descrição (opcional)</label>
+            <InputTextArea class="form-control" rows="4" @bind-Value="Model.Description" />
+        </div>
 
-            <button class="btn btn-primary mt-2" @onclick="HandleStartOccurrence" disabled="@(!CanStartOccurrence)">
-                Registrar Ocorrência
-            </button>
+        @if (!string.IsNullOrEmpty(formError))
+        {
+            <p class="text-danger">@formError</p>
+        }
+
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-primary" @onclick="SubmitAsync">Enviar</button>
+            <button type="button" class="btn btn-outline-secondary" @onclick="CancelAsync">Cancelar</button>
         </div>
     </div>
 }

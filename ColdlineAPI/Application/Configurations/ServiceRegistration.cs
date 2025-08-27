@@ -27,6 +27,7 @@ namespace ColdlineAPI.Application.Configurations
             services.AddScoped<IProcessTypeService, ProcessTypeService>();
             services.AddScoped<IMachineService, MachineService>();
             services.AddScoped<IMachineTypeService, MachineTypeService>();
+            services.AddScoped<IOccurrenceTypeService, OccurrenceTypeService>();
             services.AddScoped<RepositoryFactory>();
 
 

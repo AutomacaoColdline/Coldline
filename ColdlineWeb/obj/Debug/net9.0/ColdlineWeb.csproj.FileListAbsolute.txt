@@ -814,7 +814,6 @@
 /app/obj/Debug/net9.0/blazor.boot.json
 /app/obj/Debug/net9.0/compressed/dv4exvi334-uem7b4045p.gz
 /app/obj/Debug/net9.0/compressed/51stt5klbh-73sq15tx24.gz
-/app/obj/Debug/net9.0/compressed/eqigagcmfk-narzvhvu4d.gz
 /app/obj/Debug/net9.0/compressed/44421v302u-bqjiyaj88i.gz
 /app/obj/Debug/net9.0/compressed/zh579iauum-c2jlpeoesf.gz
 /app/obj/Debug/net9.0/compressed/wqou47hmup-erw9l3u2r3.gz
@@ -1143,10 +1142,12 @@
 /app/obj/Debug/net9.0/compressed/tcwr797tdn-wlbgbqj0pe.gz
 /app/obj/Debug/net9.0/compressed/yfrl2b14wm-upaslym0oj.gz
 /app/obj/Debug/net9.0/compressed/jflahodnwh-165p79mpa8.gz
-/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.g1x9vj4aq2.pdb
-/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.rgg61jwm0r.wasm
-/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.rgg61jwm0r.wasm.gz
-/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.g1x9vj4aq2.pdb.gz
-/app/obj/Debug/net9.0/compressed/hscczrya4x-rgg61jwm0r.gz
-/app/obj/Debug/net9.0/compressed/q644bqhs6y-g1x9vj4aq2.gz
-/app/obj/Debug/net9.0/compressed/cbhgt0xw5z-27oecezr0i.gz
+/app/obj/Debug/net9.0/compressed/eqigagcmfk-etcyreg46t.gz
+/app/obj/Debug/net9.0/compressed/cooay5qc7w-dpf0fme6bv.gz
+/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.r99hok5ihj.pdb
+/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.vdmpuo0yxq.wasm
+/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.vdmpuo0yxq.wasm.gz
+/app/bin/Debug/net9.0/wwwroot/_framework/ColdlineWeb.r99hok5ihj.pdb.gz
+/app/obj/Debug/net9.0/compressed/hscczrya4x-vdmpuo0yxq.gz
+/app/obj/Debug/net9.0/compressed/q644bqhs6y-r99hok5ihj.gz
+/app/obj/Debug/net9.0/compressed/cbhgt0xw5z-k7t0uxf19p.gz

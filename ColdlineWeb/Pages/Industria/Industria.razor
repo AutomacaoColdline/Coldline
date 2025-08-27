@@ -10,7 +10,11 @@
 <link rel="stylesheet" href="css/Industria.css">
 
 <div class="container-industria">
-    <Sidebar User="user" OnLogout="Logout" />
+    <Sidebar
+    User="user"
+    StoppedMachines="stoppedMachines"
+    OnLogout="Logout"
+    OnResumeMachine="HandleResumeMachine" />
 
     <div class="main-content">
         <img src="img/logofundo.png" class="background-image" alt="Logo Fundo">

@@ -4,14 +4,11 @@
 <link rel="stylesheet" href="css/Configuration.css" />
 
 <div class="tab-bar">
-    <button class="tab-button @(SelectedTab == "Defects" ? "active" : "")" @onclick='() => SelectTab("Defects")'>Defeitos</button>
     <button class="tab-button @(SelectedTab == "Parts" ? "active" : "")" @onclick='() => SelectTab("Parts")'>Peças</button>
-    <button class="tab-button @(SelectedTab == "PauseTypes" ? "active" : "")" @onclick='() => SelectTab("PauseTypes")'>Tipos de Pausa</button>
     <button class="tab-button @(SelectedTab == "ProcessTypes" ? "active" : "")" @onclick='() => SelectTab("ProcessTypes")'>Tipos de Processo</button>
     <button class="tab-button @(SelectedTab == "UserTypes" ? "active" : "")" @onclick='() => SelectTab("UserTypes")'>Tipos de Usuário</button>
     <button class="tab-button @(SelectedTab == "MachineTypes" ? "active" : "")" @onclick='() => SelectTab("MachineTypes")'>Tipos de Máquina</button>
-    <button class="tab-button @(SelectedTab == "Departments" ? "active" : "")" @onclick='() => SelectTab("Departments")'>Departamentos</button>
-    <button class="tab-button @(SelectedTab == "TypeDefects" ? "active" : "")" @onclick='() => SelectTab("TypeDefects")'>Tipos de Defeito</button>
+    <button class="tab-button @(SelectedTab == "OccurrenceTypes" ? "active" : "")" @onclick='() => SelectTab("OccurrenceTypes")'>Tipos de Ocorrência</button>
 </div>
 
 <div class="config-content">
@@ -22,35 +19,6 @@
             <span class="loading-text">Carregando dados da aba...</span>
         </div>
     }
-    else if (SelectedTab == "Defects")
-    {
-        <button class="btn btn-primary mb-3" @onclick="OpenAddDefectModal">Adicionar Defeito</button>
-
-        @foreach (var item in PagedDefects)
-        {
-            <div class="config-item">
-                <span><strong>@item.Name</strong> - @item.Description</span>
-                <div class="action-buttons">
-                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditDefectModal(item)"><img src="img/editar.png" alt="Editar" style="width: 20px;" /></button>
-                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteDefect(item.Id)"><img src="img/lixeira.png" alt="Excluir" style="width: 20px;" /></button>
-                </div>
-            </div>
-        }
-        @if (PagedDefects.Count > 0)
-        {
-            <div class="pagination-wrapper">
-                <button class="btn btn-pagination" @onclick="GoToPreviousDefectPage" disabled="@(DefectPageNumber == 1)">
-                    <img src="img/seta-esquerda.png" class="pagination-icon" />
-                </button>
-
-                <span class="page-indicator">@DefectPageNumber de @TotalDefectPages</span>
-
-                <button class="btn btn-pagination" @onclick="GoToNextDefectPage" disabled="@(DefectPageNumber == TotalDefectPages)">
-                    <img src="img/seta-direita.png" class="pagination-icon" />
-                </button>
-            </div>
-        }
-    }
     else if (SelectedTab == "Parts")
     {
         <button class="btn btn-primary mb-3" @onclick="OpenAddPartModal">Adicionar Peça</button>
@@ -60,11 +28,16 @@
             <div class="config-item">
                 <span><strong>@item.Name</strong> - R$ @item.Value.ToString("F2")</span>
                 <div class="action-buttons">
-                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditPartModal(item)"><img src="img/editar.png" alt="Editar" style="width: 20px;" /></button>
-                    <button class="btn btn-sm btn-danger" @onclick="() => DeletePart(item.Id)"><img src="img/lixeira.png" alt="Excluir" style="width: 20px;" /></button>
+                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditPartModal(item)">
+                        <img src="img/editar.png" alt="Editar" style="width: 20px;" />
+                    </button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeletePart(item.Id)">
+                        <img src="img/lixeira.png" alt="Excluir" style="width: 20px;" />
+                    </button>
                 </div>
             </div>
         }
+
         @if (PagedParts.Count > 0)
         {
             <div class="pagination-wrapper">
@@ -80,35 +53,6 @@
             </div>
         }
     }
-    else if (SelectedTab == "PauseTypes")
-    {
-        <button class="btn btn-primary mb-3" @onclick="OpenAddPauseTypeModal">Adicionar Tipo de Pausa</button>
-
-        @foreach (var item in PagedPauseTypes)
-        {
-            <div class="config-item">
-                <span><strong>@item.Name</strong> - @item.Description</span>
-                <div class="action-buttons">
-                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditPauseTypeModal(item)"><img src="img/editar.png" alt="Editar" style="width: 20px;" /></button>
-                    <button class="btn btn-sm btn-danger" @onclick="() => DeletePauseType(item.Id)"><img src="img/lixeira.png" alt="Excluir" style="width: 20px;" /></button>
-                </div>
-            </div>
-        }
-        @if (PagedPauseTypes.Count > 0)
-        {
-            <div class="pagination-wrapper">
-                <button class="btn btn-pagination" @onclick="GoToPreviousPauseTypePage" disabled="@(PauseTypePageNumber == 1)">
-                    <img src="img/seta-esquerda.png" class="pagination-icon" />
-                </button>
-
-                <span class="page-indicator">@PauseTypePageNumber de @TotalPauseTypePages</span>
-
-                <button class="btn btn-pagination" @onclick="GoToNextPauseTypePage" disabled="@(PauseTypePageNumber == TotalPauseTypePages)">
-                    <img src="img/seta-direita.png" class="pagination-icon" />
-                </button>
-            </div>
-        }
-    }
     else if (SelectedTab == "ProcessTypes")
     {
         <button class="btn btn-primary mb-3" @onclick="OpenAddProcessTypeModal">Adicionar Tipo de Processo</button>
@@ -118,11 +62,16 @@
             <div class="config-item">
                 <span><strong>@item.Name</strong> - @item.Description</span>
                 <div class="action-buttons">
-                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditProcessTypeModal(item)"><img src="img/editar.png" alt="Editar" style="width: 20px;" /></button>
-                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteProcessType(item.Id)"><img src="img/lixeira.png" alt="Excluir" style="width: 20px;" /></button>
+                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditProcessTypeModal(item)">
+                        <img src="img/editar.png" alt="Editar" style="width: 20px;" />
+                    </button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteProcessType(item.Id)">
+                        <img src="img/lixeira.png" alt="Excluir" style="width: 20px;" />
+                    </button>
                 </div>
             </div>
         }
+
         @if (PagedProcessTypes.Count > 0)
         {
             <div class="pagination-wrapper">
@@ -147,11 +96,16 @@
             <div class="config-item">
                 <span><strong>@item.Name</strong> - @item.Description</span>
                 <div class="action-buttons">
-                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditUserTypeModal(item)"><img src="img/editar.png" alt="Editar" style="width: 20px;" /></button>
-                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteUserType(item.Id)"><img src="img/lixeira.png" alt="Excluir" style="width: 20px;" /></button>
+                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditUserTypeModal(item)">
+                        <img src="img/editar.png" alt="Editar" style="width: 20px;" />
+                    </button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteUserType(item.Id)">
+                        <img src="img/lixeira.png" alt="Excluir" style="width: 20px;" />
+                    </button>
                 </div>
             </div>
         }
+
         @if (PagedUserTypes.Count > 0)
         {
             <div class="pagination-wrapper">
@@ -176,11 +130,16 @@
             <div class="config-item">
                 <span><strong>@item.Name</strong></span>
                 <div class="action-buttons">
-                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditMachineTypeModal(item)"><img src="img/editar.png" alt="Editar" style="width: 20px;" /></button>
-                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteMachineType(item.Id)"><img src="img/lixeira.png" alt="Excluir" style="width: 20px;" /></button>
+                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditMachineTypeModal(item)">
+                        <img src="img/editar.png" alt="Editar" style="width: 20px;" />
+                    </button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteMachineType(item.Id)">
+                        <img src="img/lixeira.png" alt="Excluir" style="width: 20px;" />
+                    </button>
                 </div>
             </div>
         }
+
         @if (PagedMachineTypes.Count > 0)
         {
             <div class="pagination-wrapper">
@@ -196,59 +155,46 @@
             </div>
         }
     }
-    else if (SelectedTab == "Departments")
+    else if (SelectedTab == "OccurrenceTypes")
     {
-        <button class="btn btn-primary mb-3" @onclick="OpenAddDepartmentModal">Adicionar Departamento</button>
+        <button class="btn btn-primary mb-3" @onclick="OpenAddOccurrenceTypeModal">Adicionar Tipo de Ocorrência</button>
 
-        @foreach (var item in PagedDepartments)
+        @foreach (var item in PagedOccurrenceTypes)
         {
             <div class="config-item">
-                <span><strong>@item.Name</strong> - @item.Description</span>
+                <span>
+                    <strong>@item.Name</strong>
+                    @if (!string.IsNullOrWhiteSpace(item.Description))
+                    {
+                        <text> - @item.Description</text>
+                    }
+                    @if (item.PendingEvent)
+                    {
+                        <span class="badge bg-warning text-dark ms-2">Evento pendente</span>
+                    }
+                </span>
+
                 <div class="action-buttons">
-                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditDepartmentModal(item)"><img src="img/editar.png" alt="Editar" style="width: 20px;" /></button>
-                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteDepartment(item.Id)"><img src="img/lixeira.png" alt="Excluir" style="width: 20px;" /></button>
+                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditOccurrenceTypeModal(item)">
+                        <img src="img/editar.png" alt="Editar" style="width: 20px;" />
+                    </button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteOccurrenceType(item.Id)">
+                        <img src="img/lixeira.png" alt="Excluir" style="width: 20px;" />
+                    </button>
                 </div>
             </div>
         }
-        @if (PagedDepartments.Count > 0)
+
+        @if (PagedOccurrenceTypes.Count > 0)
         {
             <div class="pagination-wrapper">
-                <button class="btn btn-pagination" @onclick="GoToPreviousDepartmentPage" disabled="@(DepartmentPageNumber == 1)">
+                <button class="btn btn-pagination" @onclick="GoToPreviousOccurrenceTypePage" disabled="@(OccurrenceTypePageNumber == 1)">
                     <img src="img/seta-esquerda.png" class="pagination-icon" />
                 </button>
 
-                <span class="page-indicator">@DepartmentPageNumber de @TotalDepartmentPages</span>
+                <span class="page-indicator">@OccurrenceTypePageNumber de @TotalOccurrenceTypePages</span>
 
-                <button class="btn btn-pagination" @onclick="GoToNextDepartmentPage" disabled="@(DepartmentPageNumber == TotalDepartmentPages)">
-                    <img src="img/seta-direita.png" class="pagination-icon" />
-                </button>
-            </div>
-        }
-    }
-    else if (SelectedTab == "TypeDefects")
-    {
-        <button class="btn btn-primary mb-3" @onclick="OpenAddTypeDefectModal">Adicionar Tipo de Defeito</button>
-
-        @foreach (var item in PagedTypeDefects)
-        {
-            <div class="config-item">
-                <span><strong>@item.Name</strong> - @item.Description</span>
-                <div class="action-buttons">
-                    <button class="btn btn-sm btn-warning" @onclick="() => OpenEditTypeDefectModal(item)"><img src="img/editar.png" alt="Editar" style="width: 20px;" /></button>
-                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteTypeDefect(item.Id)"><img src="img/lixeira.png" alt="Excluir" style="width: 20px;" /></button>
-                </div>
-            </div>
-        }
-        @if (PagedTypeDefects.Count > 0)
-        {
-            <div class="pagination-wrapper">
-                <button class="btn btn-pagination" @onclick="GoToPreviousTypeDefectPage" disabled="@(TypeDefectPageNumber == 1)">
-                    <img src="img/seta-esquerda.png" class="pagination-icon" />
-                </button>
-
-                <span class="page-indicator">@TypeDefectPageNumber de @TotalTypeDefectPages</span>
-
-                <button class="btn btn-pagination" @onclick="GoToNextTypeDefectPage" disabled="@(TypeDefectPageNumber == TotalTypeDefectPages)">
+                <button class="btn btn-pagination" @onclick="GoToNextOccurrenceTypePage" disabled="@(OccurrenceTypePageNumber == TotalOccurrenceTypePages)">
                     <img src="img/seta-direita.png" class="pagination-icon" />
                 </button>
             </div>
@@ -256,25 +202,11 @@
     }
 </div>
 
-<DefectModalComponent 
-    Visible="@showDefectModal"
-    VisibleChanged="v => showDefectModal = v"
-    Defect="currentDefect"
-    IsEdit="isEditingDefect"
-    OnSaved="LoadAll" />
-
 <PartModalComponent 
     Visible="@showPartModal"
     VisibleChanged="v => showPartModal = v"
     Part="currentPart"
     IsEdit="isEditingPart"
-    OnSaved="LoadAll" />
-
-<PauseTypeModalComponent 
-    Visible="@showPauseTypeModal"
-    VisibleChanged="v => showPauseTypeModal = v"
-    PauseType="currentPauseType"
-    IsEdit="isEditingPauseType"
     OnSaved="LoadAll" />
 
 <ProcessTypeModalComponent 
@@ -298,17 +230,9 @@
     IsEdit="isEditingMachineType"
     OnSaved="LoadAll" />
 
-<DepartmentModalComponent 
-    Visible="@showDepartmentModal"
-    VisibleChanged="v => showDepartmentModal = v"
-    Department="currentDepartment"
-    IsEdit="isEditingDepartment"
+<OccurrenceTypeModalComponent
+    Visible="@showOccurrenceTypeModal"
+    VisibleChanged="v => showOccurrenceTypeModal = v"
+    OccurrenceType="currentOccurrenceType"
+    IsEdit="isEditingOccurrenceType"
     OnSaved="LoadAll" />
-
-<TypeDefectModalComponent 
-    Visible="@showTypeDefectModal"
-    VisibleChanged="v => showTypeDefectModal = v"
-    TypeDefect="currentTypeDefect"
-    IsEdit="isEditingTypeDefect"
-    OnSaved="LoadAll" />
-

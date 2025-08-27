@@ -97,6 +97,10 @@
       "PackagePath": "staticwebassets/css/NumberProcessDate.css"
     },
     {
+      "Id": "/app/wwwroot/css/Occurrence.css",
+      "PackagePath": "staticwebassets/css/Occurrence.css"
+    },
+    {
       "Id": "/app/wwwroot/css/OccurrenceForm.css",
       "PackagePath": "staticwebassets/css/OccurrenceForm.css"
     },
@@ -185,6 +189,10 @@
       "PackagePath": "staticwebassets/img/adicionar-maquina.png"
     },
     {
+      "Id": "/app/wwwroot/img/ativarMaquina.png",
+      "PackagePath": "staticwebassets/img/ativarMaquina.png"
+    },
+    {
       "Id": "/app/wwwroot/img/configuration.png",
       "PackagePath": "staticwebassets/img/configuration.png"
     },
@@ -229,6 +237,10 @@
       "PackagePath": "staticwebassets/img/novo-usuario.png"
     },
     {
+      "Id": "/app/wwwroot/img/ocorrencia.png",
+      "PackagePath": "staticwebassets/img/ocorrencia.png"
+    },
+    {
       "Id": "/app/wwwroot/img/painel.png",
       "PackagePath": "staticwebassets/img/painel.png"
     },
@@ -263,6 +275,10 @@
     {
       "Id": "/app/wwwroot/img/seta-esquerda.png",
       "PackagePath": "staticwebassets/img/seta-esquerda.png"
+    },
+    {
+      "Id": "/app/wwwroot/img/stop.png",
+      "PackagePath": "staticwebassets/img/stop.png"
     },
     {
       "Id": "/app/wwwroot/img/usuario.png",

@@ -65,9 +65,21 @@ namespace ColdlineWeb.Services
                 : null;
         }
 
-        public async Task<bool> EndProcessAsync(string processId)
+        public async Task<bool> EndProcessAsync(string processId, bool finished, StartOccurrenceModel? occurrence = null)
         {
-            var response = await _http.PostAsync($"api/Process/end-process/{processId}", null);
+            var url = $"api/Process/end-process/{processId}?finished={finished.ToString().ToLower()}";
+
+            HttpResponseMessage response;
+            if (finished)
+            {
+                response = await _http.PostAsync(url, null);
+            }
+            else
+            {
+                if (occurrence == null) return false;
+                response = await _http.PostAsJsonAsync(url, occurrence);
+            }
+
             return response.IsSuccessStatusCode;
         }
     }

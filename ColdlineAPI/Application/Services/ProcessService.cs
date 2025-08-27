@@ -24,6 +24,7 @@ namespace ColdlineAPI.Application.Services
         private readonly IMongoCollection<ProcessType> _processTypes;
         private readonly IMongoCollection<Machine> _machines;
         private readonly MongoRepository<Machine> _machinesRepo;
+
         private const string SpecialProcessTypeId = "67f6b00f101359f06e303492";
 
         public ProcessService(RepositoryFactory factory)
@@ -89,20 +90,51 @@ namespace ColdlineAPI.Application.Services
             return newProcess;
         }
 
-        public async Task<bool> EndProcessAsync(string processId)
+        public async Task<bool> EndProcessAsync(string processId, bool Finished, StartOccurrenceRequest requestOccurrence)
         {
             var process = await _processes.GetByIdAsync(p => p.Id == processId);
+
             if (process == null) throw new ArgumentException("Processo não encontrado.");
 
             var user = await _users.Find(u => u.Id == process.User.Id).FirstOrDefaultAsync();
-            if (user == null) throw new ArgumentException("Usuário do processo não encontrado.");
-            if (user.CurrentOccurrence != null)
-                throw new InvalidOperationException("Não é possível finalizar o processo enquanto houver uma ocorrência aberta.");
 
+            if (user == null) throw new ArgumentException("Usuário do processo não encontrado.");
+            
             var now = GetCurrentCampoGrandeTime();
 
+            if (!Finished)
+            {
+                DateTime? enddateOcurrence = now;
+                var FinishedOccurrence = true;
+                if (requestOccurrence.OccurrenceType.PendingEvent)
+                {
+                    enddateOcurrence = null;
+                    FinishedOccurrence = false;
+                    
+                    await _machines.UpdateOneAsync(
+                        m => m.Id == process.Machine.Id,
+                        Builders<Machine>.Update.Set(m => m.Status, MachineStatus.Stop));
+                }
+                var newOccurrence = new Occurrence
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    CodeOccurrence = GenerateNumericCode(),
+                    ProcessTime = "00:00:00",
+                    StartDate = now,
+                    EndDate = enddateOcurrence,
+                    Process = new ReferenceEntity(process.Id, process.IdentificationNumber),
+                    OccurrenceType = requestOccurrence.OccurrenceType,
+                    Finished = FinishedOccurrence,
+                    User = new ReferenceEntity(user.Id, user.Name),
+                    Description = requestOccurrence.Description,
+                    Part = requestOccurrence.Part,
+                    Machine = new ReferenceEntity(process.Machine.Id, process.Machine.Name)
+                };
+                await _occurrences.InsertOneAsync(newOccurrence);
+            }
+
             var updateProcess = Builders<Process>.Update
-                .Set(p => p.Finished, true)
+                .Set(p => p.Finished, Finished)
                 .Set(p => p.EndDate, now);
 
 
@@ -511,7 +543,9 @@ namespace ColdlineAPI.Application.Services
             var user = await _users.Find(u => u.Id == process.User.Id).FirstOrDefaultAsync();
 
             var filtered = await _processes.GetCollection()
-                .Find(p => p.Finished && p.ProcessType.Id == processTypeId && !string.IsNullOrEmpty(p.ProcessTime))
+                .Find(p => p.Finished == true
+                    && p.ProcessType.Id == processTypeId
+                    && !string.IsNullOrEmpty(p.ProcessTime))
                 .ToListAsync();
 
             var durations = filtered
@@ -527,7 +561,6 @@ namespace ColdlineAPI.Application.Services
             if (user.CurrentOccurrence != null)
             {
                 var ocurrence = await _occurrences.Find(u => u.Id == user.CurrentOccurrence.Id).FirstOrDefaultAsync();
-                dto.OcorrenceTypeName = ocurrence?.PauseType?.Name ?? "Nenhuma";
             }
             else
             {

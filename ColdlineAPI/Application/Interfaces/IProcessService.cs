@@ -17,7 +17,7 @@ namespace ColdlineAPI.Application.Interfaces
         Task<List<Process>> SearchProcessAsync(ProcessFilter filter);
         Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId, string? machineId, bool preIndustrialization, bool reWork, bool prototype);
         Task<bool> UpdateProcessTimeInDatabase(string processId, string processTime);
-        Task<bool> EndProcessAsync(string processId);
+        Task<bool> EndProcessAsync(string processId, bool Finished, StartOccurrenceRequest requestOccurrence);
         Task<ProcessStatisticsDto> GetProcessStatisticsAsync(string processId, string processTypeId);
         Task<UserProcessDetailsDto> GetUserProcessDataAsync(string userId);
         Task<List<ProcessByDateDto>> GetProcessCountByStartDateAsync(DateTime start, DateTime end);

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "C5HP7MujXjo1SLqIJ3QASBCF6yWCWnc3G+8KVklAa9g=",
+  "Hash": "FP3ebBaFsu9RnXXHj1KXFLi6ErD6C6alUvYZ5q00Ys4=",
   "Source": "Presentation",
   "BasePath": "_content/Presentation",
   "Mode": "Default",
@@ -148,6 +148,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/uploads/Raphael Nantes Lima.png"
+    },
+    {
+      "Identity": "/app/Presentation/wwwroot/uploads/teste.png",
+      "SourceId": "Presentation",
+      "SourceType": "Discovered",
+      "ContentRoot": "/app/Presentation/wwwroot/",
+      "BasePath": "_content/Presentation",
+      "RelativePath": "uploads/teste.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/uploads/teste.png"
     }
   ]
 }

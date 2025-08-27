@@ -34,6 +34,8 @@ namespace ColdlineAPI.Domain.Entities
         [BsonElement("createdAt")]
         [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
         public DateTime CreatedAt { get; set; }  // ✅ Agora presente
+        [BsonElement("users")]
+        public List<ReferenceEntity> Users { get; set; } = new();
         
         
     }

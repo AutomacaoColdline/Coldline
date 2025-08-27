@@ -6,9 +6,12 @@ namespace ColdlineWeb.Models
     public class StartOccurrenceModel
     {
         public string CodeOccurrence { get; set; } = string.Empty; // Obrigatório
-        public ReferenceEntity PauseType { get; set; } = new ReferenceEntity(); // Obrigatório
-        public ReferenceEntity Process { get; set; } = new ReferenceEntity(); // Obrigatório (diferente da API)
-        public ReferenceEntity? Defect { get; set; } = null;
+        public OccurrenceTypeModel OccurrenceType { get; set; } = new OccurrenceTypeModel();
+        public ReferenceEntity? Process { get; set; } = null;
         public ReferenceEntity User { get; set; } = new ReferenceEntity();
+        public ReferenceEntity? Department { get; set; } = new();
+        public bool MachineStopped { get; set; }
+        public string Description { get; set; } = string.Empty;
+        public ReferenceEntity? Part { get; set; } = new ReferenceEntity();
     }
 }

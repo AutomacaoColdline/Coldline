@@ -64,8 +64,6 @@ else
                 {
                     <div class="occurrence-card">
                         <div><strong>Código:</strong> @occ.CodeOccurrence</div>
-                        <div><strong>Tipo de Pausa:</strong> @occ.PauseType.Name</div>
-                        <div><strong>Defeito:</strong> @(occ.Defect?.Name ?? "Nenhum")</div>
                         <div><strong>Usuário:</strong> @occ.User.Name</div>
                         <div><strong>Tempo:</strong> @occ.ProcessTime</div>
                         <div><strong>Início:</strong> @occ.StartDate.ToString("dd/MM/yyyy HH:mm")</div>

@@ -70,10 +70,9 @@ namespace ColdlineAPI.Application.Services
                 filters.Add(builder.Regex("name", new BsonRegularExpression(name, "i")));
             if (!string.IsNullOrEmpty(email))
                 filters.Add(builder.Regex("email", new BsonRegularExpression(email, "i")));
-            if (!string.IsNullOrEmpty(departmentId))
-                filters.Add(builder.Eq("department.id", departmentId));
-            if (!string.IsNullOrEmpty(userTypeId))
-                filters.Add(builder.Eq("userType.id", userTypeId));
+            if (!string.IsNullOrEmpty(departmentId)) filters.Add(builder.Eq(p => p.Department.Id, departmentId));
+            
+            if (!string.IsNullOrEmpty(userTypeId)) filters.Add(builder.Eq(p => p.UserType.Id, userTypeId));
 
             var finalFilter = filters.Count > 0 ? builder.And(filters) : builder.Empty;
 

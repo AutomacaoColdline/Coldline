@@ -26,6 +26,7 @@ builder.Services.AddScoped<ProcessTypeService>();
 builder.Services.AddScoped<QualityService>();
 builder.Services.AddScoped<TypeDefectService>();
 builder.Services.AddScoped<OccurrenceService>();
+builder.Services.AddScoped<OccurrenceTypeService>();
 
 
 await builder.Build().RunAsync();

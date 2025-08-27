@@ -37,6 +37,7 @@
     {
         if (IsEdit)
             await UserTypeService.UpdateAsync(UserType.Id, UserType);
+            
         else
             await UserTypeService.CreateAsync(UserType);
 

@@ -17,6 +17,8 @@ namespace ColdlineWeb.Models.Enum
         InRework = 4,
 
         [Display(Name = "Finalizado")]
-        Finished = 5
+        Finished = 5,
+        [Display(Name = "Pausada")]
+        Stop = 6
     }
 }

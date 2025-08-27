@@ -1,0 +1,207 @@
+@page "/Occurrences"
+@using ColdlineWeb.Models
+@using ColdlineWeb.Models.Filter
+@using Microsoft.AspNetCore.Components.Forms
+@inherits OccurrencePageBase
+
+<link rel="stylesheet" href="css/Occurrence.css" />
+
+@if (isLoading)
+{
+    <div class="loader-wrapper">
+        <div class="custom-loader"></div>
+        <span class="loading-text">Carregando...</span>
+    </div>
+}
+else if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <!-- 🔎 BARRA DE BUSCA -->
+    <div class="filter-card">
+        <div class="search-filters">
+            <!-- Usuário -->
+            <select class="form-control filter-medium" @bind="filter.UserId">
+                <option value="">Todos os Usuários</option>
+                @foreach (var u in users)
+                {
+                    <option value="@u.Id">@u.Name</option>
+                }
+            </select>
+
+            <!-- Tipo de Ocorrência -->
+            <select class="form-control filter-medium" @bind="filter.OccurrenceTypeId">
+                <option value="">Todos os Tipos</option>
+                @foreach (var t in occurrenceTypes)
+                {
+                    <option value="@t.Id">@t.Name</option>
+                }
+            </select>
+
+            <!-- Data Início -->
+            <InputDate @bind-Value="startDate" class="form-control filter-medium" />
+
+            <!-- Data Fim -->
+            <InputDate @bind-Value="endDate" class="form-control filter-medium" />
+
+            <!-- Finalizada? -->
+            <select class="form-control filter-small" @bind="finishedStr">
+                <option value="">Finalizada?</option>
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
+            </select>
+
+            <!-- Ações -->
+            <button class="btn btn-filter" title="Buscar" @onclick="ApplyFilters">
+                <img src="img/lupa.png" alt="Buscar" class="btn-icon" />
+            </button>
+
+            <button class="btn btn-filter" title="Limpar" @onclick="ResetFilters">
+                <img src="img/limpar-limpo.png" alt="Limpar" class="btn-icon" />
+            </button>
+
+            <button class="btn btn-filter" title="Nova Ocorrência" @onclick="OpenAddModal">
+                <img src="img/adicionar-ficheiro.png" alt="Nova" class="btn-icon" />
+            </button>
+        </div>
+    </div>
+
+    @if (PagedItems.Count == 0)
+    {
+        <p class="text-muted text-center mt-2">Nenhuma ocorrência encontrada.</p>
+    }
+    else
+    {
+        <div class="table-card">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Tipo</th>
+                        <th>Processo</th>
+                        <th>Usuário</th>
+                        <th>Início</th>
+                        <th>Fim</th>
+                        <th>Finalizada</th>
+                        <th style="width: 140px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var o in PagedItems)
+                    {
+                        <tr>
+                            <td>@(o.CodeOccurrence ?? "-")</td>
+                            <td>@(o.OccurrenceType?.Name ?? "-")</td>
+                            <td>@(o.Process?.Name ?? "-")</td>
+                            <td>@(o.User?.Name ?? "-")</td>
+                            <td>@o.StartDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@(o.EndDate?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
+                            <td>@(o.Finished ? "Sim" : "Não")</td>
+                            <td class="d-flex gap-2">
+                                <button class="btn btn-sm btn-warning" @onclick="() => OpenEditModal(o)">
+                                    <img src="img/editar.png" alt="Editar" style="width: 20px;" />
+                                </button>
+                                <button class="btn btn-sm btn-danger" @onclick="() => Delete(o.Id)">
+                                    <img src="img/lixeira.png" alt="Excluir" style="width: 20px;" />
+                                </button>
+                                <button class="btn btn-sm btn-outline-success" title="Finalizar"
+                                    disabled="@o.Finished" @onclick="() => End(o.Id)">
+                                    ✔
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-wrapper">
+            <button class="btn btn-pagination"
+                    @onclick="GoPrev"
+                    disabled="@(pageNumber == 1)">
+                <img src="img/seta-esquerda.png" class="pagination-icon" />
+            </button>
+
+            <span class="page-indicator">@pageNumber de @totalPages</span>
+
+            <button class="btn btn-pagination"
+                    @onclick="GoNext"
+                    disabled="@(pageNumber == totalPages)">
+                <img src="img/seta-direita.png" class="pagination-icon" />
+            </button>
+        </div>
+    }
+}
+
+@if (showModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @(isEditing ? "Editar Ocorrência" : "Nova Ocorrência")
+                    </h5>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row g-2">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo de Ocorrência</label>
+                            <select class="form-select"
+                                    @bind="selectedOccurrenceTypeId"
+                                    @bind:after="OnTypeChanged">
+                                <option value="">-- selecione --</option>
+                                @foreach (var t in occurrenceTypes)
+                                {
+                                    <option value="@t.Id">@t.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Peça -->
+                    <div class="row g-2 mt-2">
+                        <div class="col-md-12">
+                            <label class="form-label">Peça</label>
+                            <select class="form-select"
+                                    @bind="selectedPartId"
+                                    @bind:after="OnPartChanged">
+                                <option value="">-- selecione --</option>
+                                @foreach (var p in parts)
+                                {
+                                    <option value="@p.Id">@p.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mt-2">
+                        <label class="form-label">Descrição</label>
+                        <textarea class="form-control" rows="3" @bind="current.Description"></textarea>
+                    </div>
+
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" id="chkFinished" type="checkbox" @bind="current.Finished" />
+                        <label class="form-check-label" for="chkFinished">Finalizada</label>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(formError))
+                    {
+                        <p class="text-danger mt-2">@formError</p>
+                    }
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
+                    <button class="btn btn-success" @onclick="Save">Salvar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}

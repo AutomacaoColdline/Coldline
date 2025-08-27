@@ -413,6 +413,9 @@ namespace ColdlineAPI.Application.Services
 
             if (!string.IsNullOrWhiteSpace(filter.MachineTypeId))
                 filters.Add(builder.Eq(m => m.MachineType.Id, filter.MachineTypeId.Trim()));
+
+            if (!string.IsNullOrWhiteSpace(filter.UserId))
+                filters.Add(builder.ElemMatch(m => m.Users, u => u.Id == filter.UserId.Trim()));
                 
 
             var finalFilter = filters.Count > 0 ? builder.And(filters) : builder.Empty;
@@ -433,7 +436,8 @@ namespace ColdlineAPI.Application.Services
                 .Include(m => m.Phase)
                 .Include(m => m.Quality)
                 .Include(m => m.Monitoring)
-                .Include(m => m.CreatedAt);
+                .Include(m => m.CreatedAt)
+                .Include(m => m.Users);
 
             var findOptions = new FindOptions<Machine>
             {

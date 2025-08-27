@@ -8,9 +8,12 @@ namespace ColdlineWeb.Models
         public DateTime StartDate { get; set; } = DateTime.UtcNow;
         public DateTime? EndDate { get; set; }
         public ReferenceEntity Process { get; set; } = new();
-        public ReferenceEntity PauseType { get; set; } = new();
-        public ReferenceEntity? Defect { get; set; }
         public ReferenceEntity User { get; set; } = new();
+        public ReferenceEntity? Department { get; set; } = new();
         public bool Finished { get; set; }
+        public string Description { get; set; } = string.Empty;
+        public OccurrenceTypeModel? OccurrenceType { get; set; } = new OccurrenceTypeModel();
+        public ReferenceEntity? Part { get; set; } = new ReferenceEntity();
+        public ReferenceEntity? Machine { get; set; } = new ReferenceEntity();
     }
 }

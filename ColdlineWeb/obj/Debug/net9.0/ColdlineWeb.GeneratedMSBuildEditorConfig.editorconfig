@@ -76,10 +76,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvTW9uaXRvcmluZ1R5cGUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Bases/Occurrence.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvT2NjdXJyZW5jZS5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
 [/app/Pages/Bases/Parts.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvUGFydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -104,10 +100,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ29uZmlndXJhdGlvbi9Db25maWd1cmF0aW9uLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Configuration/DefectModalComponent.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ29uZmlndXJhdGlvbi9EZWZlY3RNb2RhbENvbXBvbmVudC5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
 [/app/Pages/Configuration/DepartmentModalComponent.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ29uZmlndXJhdGlvbi9EZXBhcnRtZW50TW9kYWxDb21wb25lbnQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -116,20 +108,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ29uZmlndXJhdGlvbi9NYWNoaW5lVHlwZU1vZGFsQ29tcG9uZW50LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/app/Pages/Configuration/OccurrenceTypeModalComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ29uZmlndXJhdGlvbi9PY2N1cnJlbmNlVHlwZU1vZGFsQ29tcG9uZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [/app/Pages/Configuration/PartModalComponent.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ29uZmlndXJhdGlvbi9QYXJ0TW9kYWxDb21wb25lbnQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Configuration/PauseTypeModalComponent.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ29uZmlndXJhdGlvbi9QYXVzZVR5cGVNb2RhbENvbXBvbmVudC5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
 [/app/Pages/Configuration/ProcessTypeModalComponent.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ29uZmlndXJhdGlvbi9Qcm9jZXNzVHlwZU1vZGFsQ29tcG9uZW50LnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Configuration/TypeDefectModalComponent.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ29uZmlndXJhdGlvbi9UeXBlRGVmZWN0TW9kYWxDb21wb25lbnQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/Configuration/UserTypeModalComponent.razor]
@@ -188,8 +176,8 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZS9NYWNoaW5lVmlld2VyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Ocurrence/OccurrenceViewer.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT2N1cnJlbmNlL09jY3VycmVuY2VWaWV3ZXIucmF6b3I=
+[/app/Pages/Ocurrence/OccurrencePage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT2N1cnJlbmNlL09jY3VycmVuY2VQYWdlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/Process/ProcessModal.razor]

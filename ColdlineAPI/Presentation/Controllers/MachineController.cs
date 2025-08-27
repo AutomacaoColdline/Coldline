@@ -65,8 +65,10 @@ namespace ColdlineAPI.Presentation.Controllers
             [FromQuery] string? monitoringId,
             [FromQuery] string? machineTypeId,
             [FromQuery] int? status,
+            [FromQuery] string? userId,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10
+            )
         {
             var filter = new MachineFilter
             {
@@ -80,7 +82,8 @@ namespace ColdlineAPI.Presentation.Controllers
                 MachineTypeId = machineTypeId,
                 Status = status.HasValue ? (MachineStatus?)status.Value : null,
                 Page = page,
-                PageSize = pageSize
+                PageSize = pageSize,
+                UserId = userId
             };
 
             var items = await _machineService.SearchMachinesAsync(filter);

@@ -28,16 +28,6 @@ else
             <input class="form-control" placeholder="Nome" @bind="filterName" />
             <input class="form-control" placeholder="Email" @bind="filterEmail" />
 
-            <select class="form-control" @bind="filterDepartmentId">
-                <option value="">Todos Departamentos</option>
-                @foreach (var dept in departments)
-                {
-                    <option value="@dept.Id">@dept.Name</option>
-                }
-            </select>
-            <button class="btn btn-success mb-3"  @onclick="OpenDepartmentModal" >
-                <img src="img/adicionar-ficheiro.png" alt="Departamento" style="width: 16px; height: 16px;" />
-            </button>
             <select class="form-control" @bind="filterUserTypeId">
                 <option value="">Todos Tipos</option>
                 @foreach (var ut in userTypes)

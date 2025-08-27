@@ -78,13 +78,26 @@ namespace ColdlineAPI.Presentation.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        
         [HttpPost("end-process/{id}")]
-        public async Task<IActionResult> EndProcess(string id)
+        public async Task<IActionResult> EndProcess(string id, [FromQuery] bool finished, [FromBody] StartOccurrenceRequest? request)
         {
+            if (!finished && request == null)
+                return BadRequest(new { message = "RequestOccurrence é obrigatório quando finished=false." });
+
             try
             {
-                var result = await _processService.EndProcessAsync(id);
-                return result ? Ok(new { message = "Processo finalizado com sucesso." }) : BadRequest(new { message = "Falha ao finalizar o processo." });
+                var ok = await _processService.EndProcessAsync(id, finished, request!);
+
+                if (!ok)
+                    return BadRequest(new { message = "Falha ao processar a solicitação." });
+
+                return Ok(new
+                {
+                    message = finished
+                        ? "Processo finalizado com sucesso."
+                        : "Ocorrência registrada com sucesso."
+                });
             }
             catch (ArgumentException ex)
             {

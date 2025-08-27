@@ -19,6 +19,8 @@ namespace ColdlineWeb.Pages
         [Inject] protected DepartmentService DepartmentService { get; set; } = default!;
         [Inject] protected ProcessTypeService ProcessTypeService { get; set; } = default!;
         [Inject] protected TypeDefectService TypeDefectService { get; set; } = default!;
+        [Inject] protected OccurrenceTypeService OccurrenceTypeService { get; set; } = default!;
+
 
         [Inject] protected HttpClient Http { get; set; } = default!;
         [Inject] protected IJSRuntime JS { get; set; } = default!;
@@ -34,6 +36,7 @@ namespace ColdlineWeb.Pages
         protected List<PauseTypeModel> PauseTypes = new();
         protected List<DefectModel> Defects = new();
         protected List<DepartmentModel> Departments = new();
+        protected List<OccurrenceTypeModel> OccurrenceTypes = new();
         protected bool isLoadingTab = true;
 
         protected override async Task OnInitializedAsync()
@@ -54,6 +57,7 @@ namespace ColdlineWeb.Pages
             PauseTypes = await PauseTypeService.GetAllAsync();
             Defects = await DefectService.GetAllAsync();
             Departments = await DepartmentService.GetAllAsync();
+            OccurrenceTypes = await OccurrenceTypeService.GetAllAsync();
             isLoadingTab = false;
         }
 

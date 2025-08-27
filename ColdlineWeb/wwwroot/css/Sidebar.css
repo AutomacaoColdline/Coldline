@@ -45,42 +45,120 @@
     border: none;
     transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
 }
-/* 📌 Ícone dentro do botão de voltar */
 .btn-circle::before {
-    content: '\2B05'; /* Código Unicode para seta grossa */
+    content: '\2B05';
     font-size: 26px;
     color: #1B2845;
     font-weight: bold;
 }
-
-/* 📌 Efeito de hover no botão */
 .btn-circle:hover {
     background-color: #f8f9fa;
     transform: translateX(-50%) scale(1.1);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
-
-/* 📌 Efeito de hover no botão */
-.btn-circle:hover {
-    background-color: #f8f9fa;
-}
-
-/* 📌 Ícone dentro do botão */
 .btn-circle i {
     color: #1B2845;
     font-size: 18px;
 }
 
-/* 📌 Imagem da Logo abaixo do botão de voltar */
+/* 📌 Logo no rodapé */
 .sidebar-logo {
     position: absolute;
-    bottom: 10px; /* Define a posição abaixo do botão */
+    bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
 }
-
 .sidebar-logo img {
-    width: 120px; /* Aumentei o tamanho da imagem */
-    height: auto; /* Mantém a proporção original */
-    opacity: 0.8; /* Deixa um pouco transparente */
+    width: 120px;
+    height: auto;
+    opacity: 0.8;
+}
+
+/* 🔹 Lista de máquinas paradas */
+.stopped-machines h6 {
+    color: #fff;
+    margin: 12px 0 6px;
+    font-weight: 700;
+}
+
+.stopped-list {
+    margin: 0;
+    padding-left: 0;      /* sem indent */
+    list-style: none;     /* sem bolinha */
+}
+
+.stopped-item {
+    color: #fff;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+/* 🔹 Tudo em uma linha */
+.stopped-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* 🔹 Tipografia MAIOR + elipse quando faltar espaço */
+.stopped-type {
+    font-weight: 800;
+    font-size: 16px;          /* ↑ antes 14 */
+    line-height: 1.1;
+    flex: 1 1 auto;           /* ocupa o que puder */
+    min-width: 0;             /* necessário p/ ellipsis funcionar */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stopped-id {
+    font-size: 16px;          /* ↑ antes 14 */
+    line-height: 1.1;
+    flex-shrink: 0;           /* não “amassar” o número */
+}
+
+/* 🔹 Ícone de parada (maior) */
+.stopped-icon {
+    height: 24px;             /* ↑ antes 18 */
+    width: 24px;              /* ↑ antes 18 */
+    object-fit: contain;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+/* 🔹 Botão-imagem “ativar” (maior) */
+.activate-btn {
+    margin: 0;
+    padding: 0 2px;
+    border: 1px solid rgba(0, 255, 133, 0.55);
+    background: rgba(0,0,0,0.15);
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 82px;             /* ↑ antes 24 */
+    width: 82px;              /* ↑ antes 28 */
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+    flex-shrink: 0;
+}
+.activate-btn img {
+    height: 80px;             /* ↑ antes 18 */
+    width: 80px;              /* ↑ antes 18 */
+    object-fit: contain;
+    pointer-events: none;
+}
+.activate-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0,0,0,.25);
+    border-color: rgba(0, 255, 133, 0.85);
+    background: rgba(0,0,0,0.2);
+}
+.activate-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
 }

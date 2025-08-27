@@ -1,44 +1,54 @@
 @using ColdlineWeb.Models
+
 @code {
     [Parameter] public UserModel? User { get; set; }
+    [Parameter] public List<MachineModel> StoppedMachines { get; set; } = new(); 
     [Parameter] public EventCallback OnLogout { get; set; }
+
+    // 🔹 NOVO: callback para o pai (Industria)
+    [Parameter] public EventCallback<string> OnResumeMachine { get; set; }
 }
 
 <div class="sidebar">
     @if (User != null)
     {
         <div class="user-avatar">
-            <div class="user-avatar">
-        <img src="@($"http://10.0.0.44:5000/uploads/{User.UrlPhoto}?t={DateTime.UtcNow.Ticks}")" 
-             alt="Foto do Usuário" 
-             width="80" 
-             onerror="this.onerror=null; this.src='https://via.placeholder.com/80';">
-    </div>
+            <img src="@($"http://10.0.0.44:5000/uploads/{User.UrlPhoto}?t={DateTime.UtcNow.Ticks}")"
+                 alt="Foto do Usuário" width="80"
+                 onerror="this.onerror=null; this.src='https://via.placeholder.com/80';">
         </div>
 
         <div class="user-info">
             <h5>@User.Name</h5>
             <p>@User.Department?.Name</p>
-            
-            @if (User.CurrentProcess != null)
-            {
-                <p>@User.CurrentProcess.Name</p>
-            }
-            else
-            {
-                <p>Não há progresso existente</p>
-            }
-
-            @if (User.CurrentOccurrence != null)
-            {
-                <p>@User.CurrentOccurrence.Name</p>
-            }
-            else
-            {
-                <p>Não há ocorrência</p>
-            }
+            <p>@(User.CurrentProcess != null ? User.CurrentProcess.Name : "Não há progresso existente")</p>
+            <p>@(User.CurrentOccurrence != null ? User.CurrentOccurrence.Name : "Não há ocorrência")</p>
         </div>
+
+        @if (StoppedMachines?.Count > 0)
+        {
+            <div class="stopped-machines mt-3">
+                <h6>Máquinas paradas por você</h6>
+                <ul class="stopped-list">
+                    @foreach (var m in StoppedMachines)
+                    {
+                        <li class="stopped-item">
+                            <div class="stopped-line">
+                                <span class="stopped-type">@(m.MachineType?.Name ?? "Máquina")</span>
+                                <span class="stopped-id">@m.IdentificationNumber</span>
+                                <img src="img/stop.png" alt="Parada" class="stopped-icon" />
+                                <button class="activate-btn" title="Voltar máquina"
+                                        @onclick="() => OnResumeMachine.InvokeAsync(m.Id)">
+                                    <img src="img/ocorrencia.png" alt="Ativar máquina">
+                                </button>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
     }
+
     <div class="sidebar-logo">
         <img src="img/logo.png" alt="Logo Coldline">
     </div>

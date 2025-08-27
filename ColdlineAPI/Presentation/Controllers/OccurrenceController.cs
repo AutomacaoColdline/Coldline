@@ -1,4 +1,5 @@
 using ColdlineAPI.Application.Interfaces;
+using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Domain.Entities;
 using ColdlineAPI.Domain.Common;
 using ColdlineAPI.Application.DTOs;
@@ -25,6 +26,21 @@ namespace ColdlineAPI.Presentation.Controllers
             var occurrences = await _occurrenceService.GetAllOccurrencesAsync();
             return Ok(occurrences);
         }
+        
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] OccurrenceSearchFilter filter)
+        {
+            var result = await _occurrenceService.SearchOccurrencesAsync(filter);
+            return Ok(result);
+        }
+
+        [HttpPost("finalize/{id}")]
+        public async Task<IActionResult> Finalize(string id)
+        {
+            var ok = await _occurrenceService.FinalizeOccurrenceAsync(id);
+            return ok ? NoContent() : NotFound();
+        }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Occurrence>> GetOccurrenceById(string id)
@@ -53,36 +69,7 @@ namespace ColdlineAPI.Presentation.Controllers
             var deleted = await _occurrenceService.DeleteOccurrenceAsync(id);
             return deleted ? NoContent() : NotFound();
         }
-
-        [HttpPost("start-occurrence")]
-        public async Task<ActionResult<Occurrence>> StartOccurrence([FromBody] StartOccurrenceRequest request)
-        {
-            try
-            {
-                var occurrence = await _occurrenceService.StartOccurrenceAsync(request);
-                return CreatedAtAction(nameof(GetOccurrenceById), new { id = occurrence.Id }, occurrence);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        [HttpPost("end-occurrence/{id}")]
-        public async Task<IActionResult> EndOccurrence(string id)
-        {
-            try
-            {
-                var result = await _occurrenceService.EndOccurrenceAsync(id);
-                return result
-                    ? Ok(new { message = "Ocorrência finalizada com sucesso." })
-                    : BadRequest(new { message = "Falha ao finalizar a ocorrência." });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
+        
         [HttpPost("chart/by-date")]
         public async Task<IActionResult> GetChartByDate([FromBody] DateRangeRequest range)
         {

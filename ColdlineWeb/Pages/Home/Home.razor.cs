@@ -48,6 +48,7 @@ namespace ColdlineWeb.Pages
         private bool isDragging;
         private double machineStartX;
         protected string CacheBuster { get; set; } = DateTime.UtcNow.Ticks.ToString();
+        private const string FixedUserTypeId = "67f41bf13a50bfa4e95bfe69";
 
         private Dictionary<string, TimeSpan> runningTimers = new();
         private System.Timers.Timer? timer;
@@ -64,7 +65,16 @@ namespace ColdlineWeb.Pages
         {
             try
             {
-                users = await UserService.GetUsersAsync();
+                var page = await UserService.SearchUsersAsync(
+                    name: null,
+                    email: null,
+                    departmentId: null,
+                    userTypeId: FixedUserTypeId, 
+                    pageNumber: 1,
+                    pageSize: 10                
+                );
+
+                users = page.Items ?? new List<UserModel>();
             }
             catch
             {

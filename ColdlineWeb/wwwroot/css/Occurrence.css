@@ -1,0 +1,290 @@
+/* =========================
+   Página / Base
+   ========================= */
+body, .page {
+  background-color: #ecf0f1;
+}
+
+h4 {
+  margin: 0;
+  color: #142c59;
+}
+
+/* =========================
+   Barra de busca (filtros)
+   ========================= */
+.filter-card {
+  margin: 2rem auto 1rem;
+  width: 95%;
+  max-width: 1300px;
+  background-color: #FAFCFF;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  padding: 1rem;
+  border: 1px solid #DCEAFB;
+}
+
+.search-filters {
+  display: flex;
+  flex-wrap: wrap;            /* quebra em telas menores */
+  justify-content: center;    /* centraliza os itens */
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.search-filters .form-control,
+.search-filters .form-select,
+.search-filters input[type="date"] {
+  height: 40px;
+  font-size: 0.95rem;
+}
+
+/* Larguras utilitárias iguais às de Machines */
+.filter-large  { width: 220px; }
+.filter-medium { width: 180px; }
+.filter-small  { width: 140px; }
+.filter-xs     { width: 100px; }
+
+/* Botões de ação da barra */
+.btn-filter {
+  background-color: #cce4f6 !important;
+  border-color: #99c9ed !important;
+  color: #000 !important;
+  height: 40px;
+  width: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.btn-filter:hover {
+  background-color: #b4d8f2 !important;
+}
+
+.btn-icon {
+  width: 22px;
+  height: 22px;
+}
+
+/* Ajuste visual do <InputDate> (type=date) */
+input[type="date"].form-control,
+input[type="date"].form-select {
+  padding: 0 .5rem;
+  line-height: 40px;   /* alinha verticalmente o texto */
+}
+
+/* =========================
+   Cartão da Tabela
+   ========================= */
+.table-card {
+  margin: 1rem auto;
+  width: 95%;
+  max-width: 1300px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  padding: 1rem;
+  border: 1px solid #DCEAFB;
+}
+
+.table-card table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Cabeçalho */
+.table thead {
+  background-color: #142c59;
+  color: #ffffff;
+}
+.table thead th {
+  font-weight: bold;
+  text-align: center;
+  padding: 0.75rem;
+  white-space: nowrap;
+}
+
+/* Corpo */
+.table tbody td {
+  vertical-align: middle;
+  padding: 0.75rem;
+  border: 1px solid #dee2e6;
+  text-align: center;
+  background-color: #ffffff;
+}
+
+/* Larguras/ajustes (opcional) */
+.table thead th:nth-child(1),
+.table tbody td:nth-child(1) { width: 110px; }          /* Código */
+.table thead th:nth-child(2),
+.table thead th:nth-child(3) { min-width: 160px; }     /* Tipo / Processo */
+.table thead th:nth-child(4) { min-width: 140px; }     /* Usuário */
+.table thead th:nth-child(5),
+.table thead th:nth-child(6) { width: 170px; }         /* Início / Fim */
+.table thead th:nth-child(7) { width: 110px; }         /* Finalizada */
+.table thead th:nth-child(8) { width: 160px; }         /* Ações */
+
+/* Ações da tabela */
+.table-card .btn-warning {
+  background-color: #fff9c4 !important;
+  border-color: #fff59d !important;
+  color: #000 !important;
+}
+.table-card .btn-danger {
+  background-color: #ffcdd2 !important;
+  border-color: #ef9a9a !important;
+  color: #000 !important;
+}
+.table-card .btn-outline-success {
+  border-color: #99c9ed !important;
+  color: #142c59 !important;
+}
+.table-card .btn-outline-success:disabled {
+  opacity: .6;
+}
+
+/* =========================
+   Modal
+   ========================= */
+.modal {
+  background-color: rgba(0,0,0,0.5);
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+}
+.modal-dialog {
+  margin: 6% auto;
+  max-width: 700px;
+}
+.modal-content {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+.modal-header {
+  background-color: #142c59;
+  color: white;
+  padding: 1rem;
+}
+.modal-body label {
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+.modal-body input,
+.modal-body select,
+.modal-body textarea {
+  margin-bottom: 0.75rem;
+}
+.modal-footer {
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  border-top: 1px solid #dee2e6;
+}
+.modal-footer .btn-success {
+  background-color: #cce4f6 !important;
+  border-color: #99c9ed !important;
+  color: #000 !important;
+}
+
+/* =========================
+   Paginação
+   ========================= */
+.pagination-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+}
+.btn-pagination {
+  background-color: #cce4f6 !important;
+  border-color: #99c9ed !important;
+  color: #000 !important;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+.btn-pagination:hover { background-color: #b4d8f2 !important; }
+.btn-pagination:disabled {
+  background-color: #e0e0e0 !important;
+  border-color: #cfcfcf !important;
+  color: #666 !important;
+  cursor: not-allowed;
+}
+.pagination-icon {
+  width: 18px;
+  height: 18px;
+}
+.page-indicator {
+  font-weight: bold;
+  font-size: 1rem;
+  color: #142c59;
+}
+
+/* =========================
+   Loader
+   ========================= */
+.loader-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 0;
+}
+.custom-loader {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #1c63e7;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+.loading-text {
+  font-size: 15px;
+  color: #142c59;
+  font-weight: 500;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* =========================
+   Links
+   ========================= */
+.text-link {
+  color: #0c5bd2;
+  text-decoration: none;
+  font-weight: 500;
+}
+.text-link:hover { text-decoration: underline; }
+
+/* =========================
+   Responsividade
+   ========================= */
+@media (max-width: 768px) {
+  .filter-large,
+  .filter-medium,
+  .filter-small,
+  .filter-xs {
+    width: 100%;
+  }
+  .search-filters {
+    justify-content: stretch;
+  }
+  .btn-filter {
+    width: 100%;
+    height: 42px;
+  }
+}

@@ -1,5 +1,6 @@
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Domain.Entities;
+using ColdlineAPI.Application.Filters;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -51,6 +52,13 @@ namespace ColdlineAPI.Presentation.Controllers
         {
             var deleted = await _occurrenceTypeService.DeleteOccurrenceTypeAsync(id);
             return deleted ? NoContent() : NotFound();
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<List<OccurrenceType>>> Search([FromQuery] OccurrenceTypeFilter filter)
+        {
+            var result = await _occurrenceTypeService.SearchOccurrenceTypesAsync(filter);
+            return Ok(result);
         }
     }
 }

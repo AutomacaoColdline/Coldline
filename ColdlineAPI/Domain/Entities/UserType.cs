@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using ColdlineAPI.Domain.Common;
 
 namespace ColdlineAPI.Domain.Entities
 {
@@ -14,5 +15,7 @@ namespace ColdlineAPI.Domain.Entities
 
         [BsonElement("description")]
         public string Description { get; set; } = string.Empty;
+        [BsonElement("department")]
+        public ReferenceEntity? Department { get; set; } = new ReferenceEntity(); 
     }
 }

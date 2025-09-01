@@ -1,0 +1,50 @@
+@page "/automation"
+@page "/automation/{Section?}"
+@layout EmptyLayout
+@using ColdlineWeb.Models
+@using ColdlineWeb.Pages.PagesAutomation.Components
+@using ColdlineWeb.Pages.PagesAutomation.Users
+@inherits AutomationHomePage
+
+<link rel="stylesheet" href="css/Automation/Automation.css" />
+
+<div class="container-automation">
+    <Sidebar User="user"
+             OnLogout="Logout"
+             OnNavigate="HandleNavigate" />
+
+    <div class="main-content">
+        <img src="img/logofundo.png" class="background-image" alt="Logo Fundo">
+
+        @if (isLoading)
+        {
+            <div class="loader-overlay"><div class="loader"></div></div>
+        }
+        else if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger mt-3">@errorMessage</div>
+            <button class="btn btn-secondary mt-2" @onclick="Logout">
+                Voltar ao Login
+            </button>
+        }
+        else
+        {
+            @switch (Section?.ToLowerInvariant())
+            {
+                case "users":
+                    <Users />
+                    break;
+
+                // Outros módulos no futuro:
+                // case "monitoramento": <Monitoramento />; break;
+
+                default:
+                    <div class="p-4 text-muted">
+                        <h5>Bem-vindo à Automação</h5>
+                        <p>Selecione uma seção no menu à esquerda.</p>
+                    </div>
+                    break;
+            }
+        }
+    </div>
+</div>

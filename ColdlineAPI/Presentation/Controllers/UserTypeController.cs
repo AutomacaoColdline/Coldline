@@ -1,4 +1,5 @@
 using ColdlineAPI.Application.Interfaces;
+using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -57,6 +58,13 @@ namespace ColdlineAPI.Presentation.Controllers
             {
                 return BadRequest(new { Message = ex.Message });
             }
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<List<UserType>>> Search([FromQuery] UserTypeFilter filter)
+        {
+            var result = await _userTypeService.SearchUserTypesAsync(filter);
+            return Ok(result);
         }
     }
 }

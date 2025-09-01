@@ -1,0 +1,41 @@
+@page "/industria"
+@layout EmptyLayout
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+@using ColdlineWeb.Models
+@using ColdlineWeb.Pages.PagesIndustria.Industria.Components
+@using ColdlineWeb.Services
+
+<link rel="stylesheet" href="css/Industria.css">
+
+<div class="container-industria">
+    <Sidebar
+    User="user"
+    StoppedMachines="stoppedMachines"
+    OnLogout="Logout"
+    OnResumeMachine="HandleResumeMachine" />
+
+    <div class="main-content">
+        <img src="img/logofundo.png" class="background-image" alt="Logo Fundo">
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <p class="error-message">@errorMessage</p>
+        }
+        else if (user?.CurrentProcess == null || processDetails == null)
+        {
+            <!-- Exibir o card para iniciar um novo processo -->
+            <ProcessCard 
+                ProcessTypes="processTypes" 
+                Machines="machines" 
+                OnStartProcess="@StartProcess" /> 
+        }
+        else
+        {
+            <!-- Exibir os detalhes do processo -->
+            <UserInfo ProcessDetails="processDetails" />
+        }
+        
+    </div>
+</div>

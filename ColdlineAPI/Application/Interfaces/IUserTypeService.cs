@@ -1,4 +1,5 @@
 using ColdlineAPI.Domain.Entities;
+using ColdlineAPI.Application.Filters;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,5 +12,7 @@ namespace ColdlineAPI.Application.Interfaces
         Task<UserType> CreateUserTypeAsync(UserType userType);
         Task<bool> UpdateUserTypeAsync(string id, UserType userType);
         Task<bool> DeleteUserTypeAsync(string id);
+        Task<List<UserType>> SearchUserTypesAsync(UserTypeFilter filter);
+        
     }
 }

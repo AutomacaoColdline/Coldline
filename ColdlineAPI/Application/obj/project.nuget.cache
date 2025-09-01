@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "0yZE1vg08BE=",
+  "dgSpecHash": "sQTK0QI8L5Y=",
   "success": true,
   "projectFilePath": "/app/Application/Application.csproj",
   "expectedPackageFiles": [
@@ -59,7 +59,9 @@
     "/root/.nuget/packages/system.security.principal.windows/5.0.0/system.security.principal.windows.5.0.0.nupkg.sha512",
     "/root/.nuget/packages/system.text.encodings.web/8.0.0/system.text.encodings.web.8.0.0.nupkg.sha512",
     "/root/.nuget/packages/system.text.json/8.0.0/system.text.json.8.0.0.nupkg.sha512",
-    "/root/.nuget/packages/zstdsharp.port/0.6.2/zstdsharp.port.0.6.2.nupkg.sha512"
+    "/root/.nuget/packages/zstdsharp.port/0.6.2/zstdsharp.port.0.6.2.nupkg.sha512",
+    "/root/.nuget/packages/microsoft.netcore.app.ref/8.0.12/microsoft.netcore.app.ref.8.0.12.nupkg.sha512",
+    "/root/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.12/microsoft.aspnetcore.app.ref.8.0.12.nupkg.sha512"
   ],
   "logs": []
 }

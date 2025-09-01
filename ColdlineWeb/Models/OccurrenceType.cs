@@ -6,5 +6,6 @@ namespace ColdlineWeb.Models
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public bool PendingEvent { get; set; }
+        public ReferenceEntity? Department { get; set; } = new();
     }
 }

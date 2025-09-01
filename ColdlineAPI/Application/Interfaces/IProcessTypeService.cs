@@ -1,4 +1,5 @@
 using ColdlineAPI.Domain.Entities;
+using ColdlineAPI.Application.Filters;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,5 +12,6 @@ namespace ColdlineAPI.Application.Interfaces
         Task<ProcessType> CreateProcessTypeAsync(ProcessType processType);
         Task<bool> UpdateProcessTypeAsync(string id, ProcessType processType);
         Task<bool> DeleteProcessTypeAsync(string id);
+        Task<List<ProcessType>> SearchProcessTypesAsync(ProcessTypeFilter filter);
     }
 }

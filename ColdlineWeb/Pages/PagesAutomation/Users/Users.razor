@@ -1,0 +1,119 @@
+@* Componente filho renderizado dentro do AutomationHome *@
+@using ColdlineWeb.Models
+@inherits UsersPage
+
+<link rel="stylesheet" href="css/Automation/userAutomation.css" />
+
+
+@if (isLoading)
+{
+    <div class="loader-wrapper">
+        <div class="custom-loader"></div>
+        <span class="loading-text">Carregando...</span>
+    </div>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <!-- Card de Filtros -->
+    <div class="filter-card">
+        <div class="search-filters">
+            <button class="btn btn-success mb-3" @onclick="OpenAddUserModal">
+                <img src="img/novo-usuario.png" alt="Novo Usuário" style="width: 16px; height: 16px;" />
+            </button>
+            <input class="form-control" placeholder="Nome" @bind="filterName" />
+            <input class="form-control" placeholder="Email" @bind="filterEmail" />
+
+            <button class="btn btn-success mb-3"  @onclick="OpenUserTypeModal" >
+                <img src="img/adicionar-ficheiro.png" alt="Novo tipo de usuario" style="width: 16px; height: 16px;" />
+            </button>
+
+            <button class="btn btn-primary" @onclick="ApplyFilters" aria-label="Buscar">
+                <img src="img/lupa.png" alt="Buscar" style="width: 16px; height: 16px;" />
+            </button>  
+        </div>
+    </div>
+
+    <!-- Card para a Tabela de usuários -->
+    <div class="table-card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Custo hora</th>
+                    <th>Tipo de Usuário</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in users)
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(u.UrlPhoto))
+                            {
+                                <img src="@($"http://10.0.0.44:5000/uploads/{u.UrlPhoto}?t={DateTime.UtcNow.Ticks}")"
+                                     alt="Foto" width="50" />
+                            }
+                        </td>
+                        <td>@u.IdentificationNumber</td>
+                        <td>@u.Name</td>
+                        <td>@u.Email</td>
+                        <td>@u.WorkHourCost</td>
+                        <td>@(u.UserType?.Name ?? "Sem Tipo")</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" @onclick="() => OpenEditUserModal(u)">
+                                <img src="img/editar.png" alt="Editar" style="width: 16px; height: 16px;" />
+                            </button>
+                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(u.Id)">
+                                <img src="img/lixeira.png" alt="Excluir" style="width: 16px; height: 16px;" />
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Controles de paginação -->
+    <div class="pagination-container">
+        <button class="btn btn-secondary"
+                @onclick="GoToPreviousPage"
+                disabled="@(!CanGoPrevious)">
+            <img src="img/seta-esquerda.png" alt="Anterior" style="width: 16px; height: 16px;" />
+        </button>
+
+        <span> @pageNumber de @totalPages</span>
+
+        <button class="btn btn-secondary"
+                @onclick="GoToNextPage"
+                disabled="@(!CanGoNext)">
+            <img src="img/seta-direita.png" alt="Próxima" style="width: 16px; height: 16px;" />
+        </button>
+    </div>
+}
+
+<UserModal
+    ShowModal="@showModal"
+    IsEditing="@isEditing"
+    CurrentUser="@currentUser"
+    UserTypes="@userTypes"
+    Departments="@departments"
+    CloseModal="CloseModal"
+    SaveUser="SaveUser"
+    UpdateUser="UpdateUser"
+    OnUploadImage="UploadImage"
+/>
+
+<UserTypeModal
+    ShowModal="@showUserTypeModal"
+    IsEditing="false"
+    UserTypeModel="@newUserType"
+    CloseModal="CloseUserTypeModal"
+    OnValidSubmit="SaveUserType" />

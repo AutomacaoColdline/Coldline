@@ -1,5 +1,6 @@
 using ColdlineAPI.Application.Factories;
 using ColdlineAPI.Application.Interfaces;
+using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Domain.Entities;
 using MongoDB.Driver;
 using MongoDB.Bson;
@@ -24,7 +25,8 @@ namespace ColdlineAPI.Application.Services
             var projection = Builders<UserType>.Projection
                 .Include(x => x.Id)
                 .Include(x => x.Name)
-                .Include(x => x.Description);
+                .Include(x => x.Description)
+                .Include(x => x.Department);
 
             var result = await _userTypes.Find(Builders<UserType>.Filter.Empty)
                 .Project<UserType>(projection)
@@ -62,6 +64,38 @@ namespace ColdlineAPI.Application.Services
 
             var result = await _userTypes.DeleteOneAsync(x => x.Id == id);
             return result.IsAcknowledged && result.DeletedCount > 0;
+        }
+
+        public async Task<List<UserType>> SearchUserTypesAsync(UserTypeFilter filter)
+        {
+            var fb = Builders<UserType>.Filter;
+            var filters = new List<FilterDefinition<UserType>>();
+
+            if (!string.IsNullOrWhiteSpace(filter?.name))
+            {
+                filters.Add(fb.Regex(ut => ut.Name, new BsonRegularExpression(filter.name, "i")));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter?.departmentId))
+            {
+                filters.Add(fb.Eq(ut => ut.Department!.Id, filter.departmentId));
+            }
+
+            var finalFilter = filters.Count > 0 ? fb.And(filters) : FilterDefinition<UserType>.Empty;
+
+            var projection = Builders<UserType>.Projection
+                .Include(x => x.Id)
+                .Include(x => x.Name)
+                .Include(x => x.Description)
+                .Include(x => x.Department);
+
+            var result = await _userTypes
+                .Find(finalFilter)
+                .Project<UserType>(projection)
+                .SortBy(x => x.Name)
+                .ToListAsync();
+
+            return result;
         }
     }
 }

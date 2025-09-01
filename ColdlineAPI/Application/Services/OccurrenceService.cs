@@ -48,6 +48,9 @@ namespace ColdlineAPI.Application.Services
             
             if (!string.IsNullOrWhiteSpace(f.MachineID))
                 filters.Add(builder.Eq(o => o.Machine.Id, f.MachineID));
+            
+            if (!string.IsNullOrWhiteSpace(f.DepartmentId))
+                filters.Add(builder.Eq(o => o.Department.Id, f.DepartmentId));
 
             // Finished (bool?)
             if (f.Finished.HasValue)

@@ -115,6 +115,9 @@ namespace ColdlineAPI.Application.Services
                         m => m.Id == process.Machine.Id,
                         Builders<Machine>.Update.Set(m => m.Status, MachineStatus.Stop));
                 }
+                var OBJDepartament = new ReferenceEntity ();
+                OBJDepartament.Id = "67f41c323a596bf4e95bfe6d";
+                OBJDepartament.Name = "Industria";
                 var newOccurrence = new Occurrence
                 {
                     Id = ObjectId.GenerateNewId().ToString(),
@@ -124,6 +127,7 @@ namespace ColdlineAPI.Application.Services
                     EndDate = enddateOcurrence,
                     Process = new ReferenceEntity(process.Id, process.IdentificationNumber),
                     OccurrenceType = requestOccurrence.OccurrenceType,
+                    Department = OBJDepartament,
                     Finished = FinishedOccurrence,
                     User = new ReferenceEntity(user.Id, user.Name),
                     Description = requestOccurrence.Description,

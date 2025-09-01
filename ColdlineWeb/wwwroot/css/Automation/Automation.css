@@ -1,0 +1,148 @@
+/* =====================================================================
+   Automation.css  —  Estilos globais da área de Automação
+   Importa o CSS específico do Sidebar da automação.
+   ===================================================================== */
+@import url('SidebarAutomation.css');
+
+/* ------------------------------
+   Variáveis (opcionais)
+--------------------------------*/
+:root {
+    --auto-bg: #ecf0f1;
+    --auto-card-bg: #ffffff;
+    --auto-text: #2c3e50;
+    --auto-primary: #0d6efd;
+    --auto-danger: #dc3545;
+    --auto-muted: #6c757d;
+    --auto-border: #e5e7eb;
+    --auto-shadow: 0 10px 20px rgba(0,0,0,.08);
+    --auto-radius: 14px;
+}
+
+/* ==============================
+   LAYOUT PRINCIPAL (/automation)
+================================*/
+.container-automation {
+    display: flex;
+    min-height: 100vh;
+    background: var(--auto-bg);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Imagem de fundo (página principal) */
+.background-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: clamp(260px, 50%, 780px);
+    height: auto;
+    opacity: .18;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* ==============================
+   LOGIN (/automation/login)
+================================*/
+.background-image-login {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: min(60%, 680px);
+    height: auto;
+    opacity: .10;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* container central do login */
+.login-container {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: var(--auto-bg);
+}
+
+/* card do login */
+.login-card {
+    width: min(440px, 92vw);
+    background: var(--auto-card-bg);
+    border: 1px solid var(--auto-border);
+    border-radius: var(--auto-radius);
+    box-shadow: var(--auto-shadow);
+    padding: 28px 24px;
+}
+
+/* input alinhado ao centro */
+.login-card .form-control {
+    text-align: center;
+    font-size: 1.05rem;
+    height: 48px;
+}
+
+/* botão primário ocupa toda a largura */
+.login-card .btn.btn-primary {
+    height: 48px;
+    font-weight: 600;
+    letter-spacing: .2px;
+}
+
+/* alert de erro */
+.alert.alert-danger {
+    margin-bottom: 16px;
+    font-size: .95rem;
+}
+
+/* ==============================
+   LOADER (overlay)
+================================*/
+.loader-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,.55);
+    display: grid;
+    place-items: center;
+    z-index: 10;
+}
+
+.loader {
+    width: 56px;
+    height: 56px;
+    border: 4px solid var(--auto-border);
+    border-top-color: var(--auto-primary);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ==============================
+   UTILITÁRIOS
+================================*/
+.error-message, .alert-danger {
+    color: #842029;
+}
+
+.btn-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--auto-border);
+    background: #fff;
+    box-shadow: var(--auto-shadow);
+    cursor: pointer;
+}
+
+.btn-circle i {
+    font-size: 18px;
+    color: var(--auto-text);
+}

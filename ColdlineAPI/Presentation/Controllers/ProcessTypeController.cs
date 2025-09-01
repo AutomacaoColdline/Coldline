@@ -1,4 +1,5 @@
 using ColdlineAPI.Application.Interfaces;
+using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -50,6 +51,13 @@ namespace ColdlineAPI.Presentation.Controllers
         {
             var deleted = await _processTypeService.DeleteProcessTypeAsync(id);
             return deleted ? NoContent() : NotFound();
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<List<ProcessType>>> Search([FromQuery] ProcessTypeFilter filter)
+        {
+            var result = await _processTypeService.SearchProcessTypesAsync(filter);
+            return Ok(result);
         }
     }
 }

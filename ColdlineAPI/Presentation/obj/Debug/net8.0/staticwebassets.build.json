@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "FP3ebBaFsu9RnXXHj1KXFLi6ErD6C6alUvYZ5q00Ys4=",
+  "Hash": "z+bsmUKKDPHY38gDd46oNmZc+XwVLNyLV5cdEjVGZPw=",
   "Source": "Presentation",
   "BasePath": "_content/Presentation",
   "Mode": "Default",
@@ -22,15 +22,17 @@
       "SourceType": "Discovered",
       "ContentRoot": "/app/Presentation/wwwroot/",
       "BasePath": "_content/Presentation",
-      "RelativePath": "arquivos/teste.pdf",
+      "RelativePath": "arquivos/teste#[.{fingerprint}]?.pdf",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeBehavior": "",
       "AssetMergeSource": "",
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
+      "Fingerprint": "ylnniofulc",
+      "Integrity": "RvnvBAzgoYweUeUJ57B4N9LIBa0lZx5Fj+wMl3+xlSw=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/arquivos/teste.pdf"
@@ -41,15 +43,17 @@
       "SourceType": "Discovered",
       "ContentRoot": "/app/Presentation/wwwroot/",
       "BasePath": "_content/Presentation",
-      "RelativePath": "uploads/Cicero Inacio Caetano de Melo.png",
+      "RelativePath": "uploads/Cicero Inacio Caetano de Melo#[.{fingerprint}]?.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeBehavior": "",
       "AssetMergeSource": "",
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
+      "Fingerprint": "ztzztd5ilf",
+      "Integrity": "JwE4SuFdvC4G6VFNS1eUnqytSFOyJ+qe4puRboLCX8s=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/uploads/Cicero Inacio Caetano de Melo.png"
@@ -60,15 +64,17 @@
       "SourceType": "Discovered",
       "ContentRoot": "/app/Presentation/wwwroot/",
       "BasePath": "_content/Presentation",
-      "RelativePath": "uploads/Douglas Fabiano Neves.png",
+      "RelativePath": "uploads/Douglas Fabiano Neves#[.{fingerprint}]?.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeBehavior": "",
       "AssetMergeSource": "",
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
+      "Fingerprint": "il37i2tw1o",
+      "Integrity": "Coi6enWidjmerEvy5I/B8hnE4ZBNuqtkRWi+/m2Jz7c=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/uploads/Douglas Fabiano Neves.png"
@@ -79,15 +85,17 @@
       "SourceType": "Discovered",
       "ContentRoot": "/app/Presentation/wwwroot/",
       "BasePath": "_content/Presentation",
-      "RelativePath": "uploads/Franke Allan Costa Freitas.png",
+      "RelativePath": "uploads/Franke Allan Costa Freitas#[.{fingerprint}]?.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeBehavior": "",
       "AssetMergeSource": "",
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
+      "Fingerprint": "qrg6t5hxpw",
+      "Integrity": "ZlsAQOQjC3dUJHyck0AP6fkfuFjAWHThw7jmiLKQ+n0=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/uploads/Franke Allan Costa Freitas.png"
@@ -98,15 +106,17 @@
       "SourceType": "Discovered",
       "ContentRoot": "/app/Presentation/wwwroot/",
       "BasePath": "_content/Presentation",
-      "RelativePath": "uploads/Jhony da Silva Alves.png",
+      "RelativePath": "uploads/Jhony da Silva Alves#[.{fingerprint}]?.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeBehavior": "",
       "AssetMergeSource": "",
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
+      "Fingerprint": "vxqz1d7dfp",
+      "Integrity": "3eeMIe5bSBaS3U1E9kbMXK8w6viRE2OJgHKmvRGlnAE=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/uploads/Jhony da Silva Alves.png"
@@ -117,15 +127,17 @@
       "SourceType": "Discovered",
       "ContentRoot": "/app/Presentation/wwwroot/",
       "BasePath": "_content/Presentation",
-      "RelativePath": "uploads/Luiz Felipe Nunes Assis.png",
+      "RelativePath": "uploads/Luiz Felipe Nunes Assis#[.{fingerprint}]?.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeBehavior": "",
       "AssetMergeSource": "",
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
+      "Fingerprint": "dr8l89ep1b",
+      "Integrity": "mQsQTAaYIYcNoDzBSxqFLqO55lqmzKE86B2/ZwmdO6Y=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/uploads/Luiz Felipe Nunes Assis.png"
@@ -136,15 +148,17 @@
       "SourceType": "Discovered",
       "ContentRoot": "/app/Presentation/wwwroot/",
       "BasePath": "_content/Presentation",
-      "RelativePath": "uploads/Raphael Nantes Lima.png",
+      "RelativePath": "uploads/Raphael Nantes Lima#[.{fingerprint}]?.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeBehavior": "",
       "AssetMergeSource": "",
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
+      "Fingerprint": "j1t3l7wzix",
+      "Integrity": "xyYS0LPWWXEFa7UziLYzDbiqIeS7/tb0YJCtU9TK6c0=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/uploads/Raphael Nantes Lima.png"
@@ -155,18 +169,678 @@
       "SourceType": "Discovered",
       "ContentRoot": "/app/Presentation/wwwroot/",
       "BasePath": "_content/Presentation",
-      "RelativePath": "uploads/teste.png",
+      "RelativePath": "uploads/teste#[.{fingerprint}]?.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
-      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeBehavior": "",
       "AssetMergeSource": "",
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
+      "Fingerprint": "lwd6hwc2vl",
+      "Integrity": "5fxwP//ZuYdwYPvFgmr8vsvUbXSP/oCjZWu08qkV67Q=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/uploads/teste.png"
+    }
+  ],
+  "Endpoints": [
+    {
+      "Route": "arquivos/teste.pdf",
+      "AssetFile": "/app/Presentation/wwwroot/arquivos/teste.pdf",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "11615760"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/pdf"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"RvnvBAzgoYweUeUJ57B4N9LIBa0lZx5Fj+wMl3+xlSw=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 18 Jun 2025 20:08:28 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-RvnvBAzgoYweUeUJ57B4N9LIBa0lZx5Fj+wMl3+xlSw="
+        }
+      ]
+    },
+    {
+      "Route": "arquivos/teste.ylnniofulc.pdf",
+      "AssetFile": "/app/Presentation/wwwroot/arquivos/teste.pdf",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "11615760"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/pdf"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"RvnvBAzgoYweUeUJ57B4N9LIBa0lZx5Fj+wMl3+xlSw=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 18 Jun 2025 20:08:28 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "ylnniofulc"
+        },
+        {
+          "Name": "label",
+          "Value": "arquivos/teste.pdf"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-RvnvBAzgoYweUeUJ57B4N9LIBa0lZx5Fj+wMl3+xlSw="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/Cicero Inacio Caetano de Melo.png",
+      "AssetFile": "/app/Presentation/wwwroot/uploads/Cicero Inacio Caetano de Melo.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "542059"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"JwE4SuFdvC4G6VFNS1eUnqytSFOyJ+qe4puRboLCX8s=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 11 Apr 2025 19:39:22 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-JwE4SuFdvC4G6VFNS1eUnqytSFOyJ+qe4puRboLCX8s="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/Cicero Inacio Caetano de Melo.ztzztd5ilf.png",
+      "AssetFile": "/app/Presentation/wwwroot/uploads/Cicero Inacio Caetano de Melo.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "542059"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"JwE4SuFdvC4G6VFNS1eUnqytSFOyJ+qe4puRboLCX8s=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 11 Apr 2025 19:39:22 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "ztzztd5ilf"
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/Cicero Inacio Caetano de Melo.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-JwE4SuFdvC4G6VFNS1eUnqytSFOyJ+qe4puRboLCX8s="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/Douglas Fabiano Neves.il37i2tw1o.png",
+      "AssetFile": "/app/Presentation/wwwroot/uploads/Douglas Fabiano Neves.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "712745"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"Coi6enWidjmerEvy5I/B8hnE4ZBNuqtkRWi+/m2Jz7c=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 11 Apr 2025 19:43:16 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "il37i2tw1o"
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/Douglas Fabiano Neves.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-Coi6enWidjmerEvy5I/B8hnE4ZBNuqtkRWi+/m2Jz7c="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/Douglas Fabiano Neves.png",
+      "AssetFile": "/app/Presentation/wwwroot/uploads/Douglas Fabiano Neves.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "712745"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"Coi6enWidjmerEvy5I/B8hnE4ZBNuqtkRWi+/m2Jz7c=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 11 Apr 2025 19:43:16 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-Coi6enWidjmerEvy5I/B8hnE4ZBNuqtkRWi+/m2Jz7c="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/Franke Allan Costa Freitas.png",
+      "AssetFile": "/app/Presentation/wwwroot/uploads/Franke Allan Costa Freitas.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "662347"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"ZlsAQOQjC3dUJHyck0AP6fkfuFjAWHThw7jmiLKQ+n0=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 11 Apr 2025 19:45:41 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-ZlsAQOQjC3dUJHyck0AP6fkfuFjAWHThw7jmiLKQ+n0="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/Franke Allan Costa Freitas.qrg6t5hxpw.png",
+      "AssetFile": "/app/Presentation/wwwroot/uploads/Franke Allan Costa Freitas.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "662347"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"ZlsAQOQjC3dUJHyck0AP6fkfuFjAWHThw7jmiLKQ+n0=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 11 Apr 2025 19:45:41 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "qrg6t5hxpw"
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/Franke Allan Costa Freitas.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-ZlsAQOQjC3dUJHyck0AP6fkfuFjAWHThw7jmiLKQ+n0="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/Jhony da Silva Alves.png",
+      "AssetFile": "/app/Presentation/wwwroot/uploads/Jhony da Silva Alves.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "486752"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"3eeMIe5bSBaS3U1E9kbMXK8w6viRE2OJgHKmvRGlnAE=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 11 Apr 2025 19:47:14 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-3eeMIe5bSBaS3U1E9kbMXK8w6viRE2OJgHKmvRGlnAE="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/Jhony da Silva Alves.vxqz1d7dfp.png",
+      "AssetFile": "/app/Presentation/wwwroot/uploads/Jhony da Silva Alves.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "486752"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"3eeMIe5bSBaS3U1E9kbMXK8w6viRE2OJgHKmvRGlnAE=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 11 Apr 2025 19:47:14 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "vxqz1d7dfp"
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/Jhony da Silva Alves.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-3eeMIe5bSBaS3U1E9kbMXK8w6viRE2OJgHKmvRGlnAE="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/Luiz Felipe Nunes Assis.dr8l89ep1b.png",
+      "AssetFile": "/app/Presentation/wwwroot/uploads/Luiz Felipe Nunes Assis.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "589659"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"mQsQTAaYIYcNoDzBSxqFLqO55lqmzKE86B2/ZwmdO6Y=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 11 Apr 2025 19:50:52 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "dr8l89ep1b"
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/Luiz Felipe Nunes Assis.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-mQsQTAaYIYcNoDzBSxqFLqO55lqmzKE86B2/ZwmdO6Y="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/Luiz Felipe Nunes Assis.png",
+      "AssetFile": "/app/Presentation/wwwroot/uploads/Luiz Felipe Nunes Assis.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "589659"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"mQsQTAaYIYcNoDzBSxqFLqO55lqmzKE86B2/ZwmdO6Y=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 11 Apr 2025 19:50:52 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-mQsQTAaYIYcNoDzBSxqFLqO55lqmzKE86B2/ZwmdO6Y="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/Raphael Nantes Lima.j1t3l7wzix.png",
+      "AssetFile": "/app/Presentation/wwwroot/uploads/Raphael Nantes Lima.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "643848"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"xyYS0LPWWXEFa7UziLYzDbiqIeS7/tb0YJCtU9TK6c0=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 11 Apr 2025 19:56:38 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "j1t3l7wzix"
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/Raphael Nantes Lima.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-xyYS0LPWWXEFa7UziLYzDbiqIeS7/tb0YJCtU9TK6c0="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/Raphael Nantes Lima.png",
+      "AssetFile": "/app/Presentation/wwwroot/uploads/Raphael Nantes Lima.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "643848"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"xyYS0LPWWXEFa7UziLYzDbiqIeS7/tb0YJCtU9TK6c0=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 11 Apr 2025 19:56:38 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-xyYS0LPWWXEFa7UziLYzDbiqIeS7/tb0YJCtU9TK6c0="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/teste.lwd6hwc2vl.png",
+      "AssetFile": "/app/Presentation/wwwroot/uploads/teste.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "229004"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"5fxwP//ZuYdwYPvFgmr8vsvUbXSP/oCjZWu08qkV67Q=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 11 Aug 2025 13:41:04 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "lwd6hwc2vl"
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/teste.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-5fxwP//ZuYdwYPvFgmr8vsvUbXSP/oCjZWu08qkV67Q="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/teste.png",
+      "AssetFile": "/app/Presentation/wwwroot/uploads/teste.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "229004"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"5fxwP//ZuYdwYPvFgmr8vsvUbXSP/oCjZWu08qkV67Q=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 11 Aug 2025 13:41:04 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-5fxwP//ZuYdwYPvFgmr8vsvUbXSP/oCjZWu08qkV67Q="
+        }
+      ]
     }
   ]
 }

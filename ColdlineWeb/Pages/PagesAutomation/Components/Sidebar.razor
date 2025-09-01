@@ -1,0 +1,67 @@
+@using ColdlineWeb.Models
+
+@code {
+    [Parameter] public UserModel? User { get; set; }
+    [Parameter] public EventCallback OnLogout { get; set; }
+    // ✅ NÃO-NULLABLE: permite usar HasDelegate e receber método do pai
+    [Parameter] public EventCallback<string> OnNavigate { get; set; }
+
+    private Task Go(string key)
+        => OnNavigate.HasDelegate ? OnNavigate.InvokeAsync(key) : Task.CompletedTask;
+}
+
+<div class="sidebar">
+    @if (User != null)
+    {
+        <div class="user-avatar">
+            <img src="@($"http://10.0.0.44:5000/uploads/{User.UrlPhoto}?t={DateTime.UtcNow.Ticks}")"
+                 alt="Foto do Usuário" width="80"
+                 onerror="this.onerror=null; this.src='https://via.placeholder.com/80';">
+        </div>
+
+        <div class="user-info">
+            <h5>@User.Name</h5>
+            <p>@User.Department?.Name</p>
+        </div>
+    }
+
+    <!-- Navbar vertical -->
+    <nav class="sidebar-nav" aria-label="Menu principal">
+        <button type="button" class="nav-item" @onclick='() => Go("home")'>
+            <i class="fa-solid fa-house" aria-hidden="true"></i><span>Home</span>
+        </button>
+
+        <button type="button" class="nav-item" @onclick='() => Go("users")'>
+            <i class="fa-solid fa-users" aria-hidden="true"></i><span>Usuários</span>
+        </button>
+
+        <button type="button" class="nav-item" @onclick='() => Go("monitoramento")'>
+            <i class="fa-solid fa-chart-line" aria-hidden="true"></i><span>Monitoramento</span>
+        </button>
+
+        <button type="button" class="nav-item" @onclick='() => Go("configuracoes")'>
+            <i class="fa-solid fa-gear" aria-hidden="true"></i><span>Configurações</span>
+        </button>
+
+        <button type="button" class="nav-item" @onclick='() => Go("processos")'>
+            <i class="fa-solid fa-diagram-project" aria-hidden="true"></i><span>Processos</span>
+        </button>
+
+        <button type="button" class="nav-item" @onclick='() => Go("ocorrencia")'>
+            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i><span>Ocorrência</span>
+        </button>
+
+        <button type="button" class="nav-item" @onclick='() => Go("relatorios")'>
+            <i class="fa-solid fa-file-lines" aria-hidden="true"></i><span>Relatórios</span>
+        </button>
+    </nav>
+
+    <div class="sidebar-logo">
+        <img src="img/logo.png" alt="Logo Coldline">
+    </div>
+
+    <button class="btn-circle" @onclick="() => OnLogout.InvokeAsync()">
+        <i class="fas fa-arrow-left" aria-hidden="true"></i>
+        <span class="visually-hidden">Sair</span>
+    </button>
+</div>

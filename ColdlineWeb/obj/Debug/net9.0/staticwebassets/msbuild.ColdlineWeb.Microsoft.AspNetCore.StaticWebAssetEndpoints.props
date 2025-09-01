@@ -24,6 +24,42 @@
       <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"ivqnti96v4"},{"Name":"integrity","Value":"sha256-zryTWxwEgpNk3iIScplexUfy9yuzOq/pXX0yY0u1QpA="},{"Name":"label","Value":"css/app.css"}]]]></EndpointProperties>
       <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"4142"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022zryTWxwEgpNk3iIScplexUfy9yuzOq/pXX0yY0u1QpA=\u0022"},{"Name":"Last-Modified","Value":"Mon, 31 Mar 2025 12:31:40 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="css/Automation/Automation.91nhmeynr1.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\Automation\Automation.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"91nhmeynr1"},{"Name":"integrity","Value":"sha256-3TzMF7uLT2lotzk3brqMEulxpumEFSUKI4zQ4qLt6uw="},{"Name":"label","Value":"css/Automation/Automation.css"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"3259"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u00223TzMF7uLT2lotzk3brqMEulxpumEFSUKI4zQ4qLt6uw=\u0022"},{"Name":"Last-Modified","Value":"Fri, 29 Aug 2025 19:03:00 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="css/Automation/Automation.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\Automation\Automation.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-3TzMF7uLT2lotzk3brqMEulxpumEFSUKI4zQ4qLt6uw="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"3259"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u00223TzMF7uLT2lotzk3brqMEulxpumEFSUKI4zQ4qLt6uw=\u0022"},{"Name":"Last-Modified","Value":"Fri, 29 Aug 2025 19:03:00 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="css/Automation/SidebarAutomation.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\Automation\SidebarAutomation.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-FjN1duvlfAtTrblqFrdyGiXj\u002B3hy\u002BfAWrB44DGq3KJ0="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"2964"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022FjN1duvlfAtTrblqFrdyGiXj\u002B3hy\u002BfAWrB44DGq3KJ0=\u0022"},{"Name":"Last-Modified","Value":"Fri, 29 Aug 2025 19:22:18 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="css/Automation/SidebarAutomation.itjjo0j84r.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\Automation\SidebarAutomation.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"itjjo0j84r"},{"Name":"integrity","Value":"sha256-FjN1duvlfAtTrblqFrdyGiXj\u002B3hy\u002BfAWrB44DGq3KJ0="},{"Name":"label","Value":"css/Automation/SidebarAutomation.css"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"2964"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022FjN1duvlfAtTrblqFrdyGiXj\u002B3hy\u002BfAWrB44DGq3KJ0=\u0022"},{"Name":"Last-Modified","Value":"Fri, 29 Aug 2025 19:22:18 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="css/Automation/UserAutomation.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\Automation\UserAutomation.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-RhntJQHdlchpOEV/XB2d9Zmo4XR4WymFQzYrv7n4U84="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"4995"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022RhntJQHdlchpOEV/XB2d9Zmo4XR4WymFQzYrv7n4U84=\u0022"},{"Name":"Last-Modified","Value":"Fri, 29 Aug 2025 20:32:50 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="css/Automation/UserAutomation.yl30rjuox5.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\Automation\UserAutomation.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"yl30rjuox5"},{"Name":"integrity","Value":"sha256-RhntJQHdlchpOEV/XB2d9Zmo4XR4WymFQzYrv7n4U84="},{"Name":"label","Value":"css/Automation/UserAutomation.css"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"4995"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022RhntJQHdlchpOEV/XB2d9Zmo4XR4WymFQzYrv7n4U84=\u0022"},{"Name":"Last-Modified","Value":"Fri, 29 Aug 2025 20:32:50 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="css/Configuration.10h81ukui0.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\Configuration.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>

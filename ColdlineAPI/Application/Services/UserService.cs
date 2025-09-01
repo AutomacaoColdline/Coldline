@@ -61,42 +61,55 @@ namespace ColdlineAPI.Application.Services
 
         public async Task<User?> GetUserByIdAsync(string id) => await _users.GetByIdAsync(u => u.Id == id);
 
-        public async Task<(List<User> Items, long TotalCount)> SearchUsersAsync(string? name, string? email, string? departmentId, string? userTypeId, int pageNumber, int pageSize)
+        public async Task<(List<User> Items, long TotalCount)> SearchUsersAsync(
+            string? name, string? email, string? departmentId, string? userTypeId,
+            int pageNumber, int pageSize)
         {
             var builder = Builders<User>.Filter;
             var filters = new List<FilterDefinition<User>>();
 
             if (!string.IsNullOrEmpty(name))
-                filters.Add(builder.Regex("name", new BsonRegularExpression(name, "i")));
+                filters.Add(builder.Regex(u => u.Name, new BsonRegularExpression(name, "i")));
+
             if (!string.IsNullOrEmpty(email))
-                filters.Add(builder.Regex("email", new BsonRegularExpression(email, "i")));
-            if (!string.IsNullOrEmpty(departmentId)) filters.Add(builder.Eq(p => p.Department.Id, departmentId));
-            
-            if (!string.IsNullOrEmpty(userTypeId)) filters.Add(builder.Eq(p => p.UserType.Id, userTypeId));
+                filters.Add(builder.Regex(u => u.Email, new BsonRegularExpression(email, "i")));
+
+            if (!string.IsNullOrEmpty(departmentId))
+                filters.Add(builder.Eq(u => u.Department!.Id, departmentId));
+
+            if (!string.IsNullOrEmpty(userTypeId))
+                filters.Add(builder.Eq(u => u.UserType!.Id, userTypeId));
 
             var finalFilter = filters.Count > 0 ? builder.And(filters) : builder.Empty;
 
             var collection = _users.GetCollection();
-            var findOptions = new FindOptions<User, User>
-            {
-                Projection = Builders<User>.Projection.Include(u => u.Id).Include(u => u.Name).Include(u => u.Email).Include(u => u.UserType).Include(u => u.Department).Include(u => u.IdentificationNumber).Include(u => u.UrlPhoto).Include(u => u.WorkHourCost),
-                Sort = Builders<User>.Sort.Ascending(u => u.Name)
-            };
 
-            var itemsCursor = await collection.FindAsync(finalFilter, new FindOptions<User>
-            {
-                Skip = (pageNumber - 1) * pageSize,
-                Limit = pageSize,
-                Sort = findOptions.Sort,
-                Projection = findOptions.Projection
-            });
+            // ✅ Projeção incluindo os campos usados no front
+            var projection = Builders<User>.Projection
+                .Include(u => u.Id)
+                .Include(u => u.Name)
+                .Include(u => u.Email)
+                .Include(u => u.UserType)
+                .Include(u => u.Department)
+                .Include(u => u.CurrentProcess)       // <-- necessário
+                .Include(u => u.CurrentOccurrence)    // <-- se o front usa
+                .Include(u => u.IdentificationNumber)
+                .Include(u => u.UrlPhoto)
+                .Include(u => u.WorkHourCost);
 
-            var items = await itemsCursor.ToListAsync();
+            var sort = Builders<User>.Sort.Ascending(u => u.Name);
 
-            var estimatedCount = items.Count < pageSize ? ((pageNumber - 1) * pageSize + items.Count) : await collection.CountDocumentsAsync(finalFilter);
+            var items = await collection.Find(finalFilter)
+                .Project<User>(projection)
+                .Sort(sort)
+                .Skip((pageNumber - 1) * pageSize)
+                .Limit(pageSize)
+                .ToListAsync();
 
-            return (items, estimatedCount);
-        }
+            var total = await collection.CountDocumentsAsync(finalFilter);
+
+            return (items, total);
+}
 
         public async Task<User> CreateUserAsync(User user)
         {

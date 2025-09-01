@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using ColdlineWeb.Models;
+using ColdlineWeb.Models.Filter;
 
 namespace ColdlineWeb.Services
 {
@@ -39,6 +40,27 @@ namespace ColdlineWeb.Services
         {
             var response = await _http.DeleteAsync($"api/UserType/{id}");
             return response.IsSuccessStatusCode;
+        }
+
+        public async Task<List<UserTypeModel>> SearchAsync(UserTypeFilterModel? filter = null)
+        {
+            string url = "api/UserType/search";
+
+            if (filter is not null)
+            {
+                var qs = new List<string>();
+
+                if (!string.IsNullOrWhiteSpace(filter.Name))
+                    qs.Add($"name={Uri.EscapeDataString(filter.Name)}");
+
+                if (!string.IsNullOrWhiteSpace(filter.DepartmentId))
+                    qs.Add($"departmentId={Uri.EscapeDataString(filter.DepartmentId)}");
+
+                if (qs.Count > 0)
+                    url += "?" + string.Join("&", qs);
+            }
+
+            return await _http.GetFromJsonAsync<List<UserTypeModel>>(url) ?? new();
         }
     }
 }

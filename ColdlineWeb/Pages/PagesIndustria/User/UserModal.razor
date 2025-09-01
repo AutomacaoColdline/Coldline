@@ -1,0 +1,92 @@
+@using ColdlineWeb.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+@if (ShowModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@((IsEditing) ? "Editar Usuário" : "Adicionar Usuário")</h5>
+                </div>
+                <div class="modal-body">
+                    <label>Nome:</label>
+                    <input class="form-control" @bind="CurrentUser.Name" />
+
+                    <label>Email:</label>
+                    <input class="form-control" @bind="CurrentUser.Email" />
+
+                    <label>Custo Hora:</label>
+                    <input class="form-control" @bind="CurrentUser.WorkHourCost" />
+
+                    <label>Identificação:</label>
+                    <input class="form-control" @bind="CurrentUser.IdentificationNumber" />
+
+                    <label>Tipo de Usuário:</label>
+                    <select class="form-control" @bind="CurrentUser.UserType.Id">
+                        <option value="">Selecione...</option>
+                        @foreach (var userType in UserTypes)
+                        {
+                            <option value="@userType.Id">@userType.Name</option>
+                        }
+                    </select>
+
+                    <label>Departamento:</label>
+                    <select class="form-control" @bind="CurrentUser.Department.Id">
+                        <option value="">Selecione...</option>
+                        @foreach (var department in Departments)
+                        {
+                            <option value="@department.Id">@department.Name</option>
+                        }
+                    </select>
+
+                    <label>Foto do Usuário:</label>
+                    <InputFile OnChange="OnUploadImageInternal" class="form-control" />
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModalInternal">Cancelar</button>
+                    <button class="btn btn-success" @onclick="SaveChanges">
+                        @((IsEditing) ? "Salvar" : "Criar")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    /* Parâmetros que vêm da página Users.razor */
+    [Parameter] public bool ShowModal { get; set; }
+    [Parameter] public bool IsEditing { get; set; }
+    [Parameter] public UserModel CurrentUser { get; set; } = new();
+    [Parameter] public List<ReferenceEntity> UserTypes { get; set; } = new();
+    [Parameter] public List<ReferenceEntity> Departments { get; set; } = new();
+
+    /* Callbacks para fechar modal, salvar e atualizar */
+    [Parameter] public EventCallback CloseModal { get; set; }
+    [Parameter] public EventCallback SaveUser { get; set; }
+    [Parameter] public EventCallback UpdateUser { get; set; }
+    [Parameter] public EventCallback<InputFileChangeEventArgs> OnUploadImage { get; set; }
+
+    private async Task CloseModalInternal()
+    {
+        await CloseModal.InvokeAsync();
+    }
+
+    private async Task SaveChanges()
+    {
+        if (IsEditing)
+        {
+            await UpdateUser.InvokeAsync();
+        }
+        else
+        {
+            await SaveUser.InvokeAsync();
+        }
+    }
+
+    private async Task OnUploadImageInternal(InputFileChangeEventArgs e)
+    {
+        await OnUploadImage.InvokeAsync(e);
+    }
+}

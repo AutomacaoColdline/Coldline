@@ -9,6 +9,18 @@
       "PackagePath": "staticwebassets/ColdlineWeb.styles.css"
     },
     {
+      "Id": "/app/wwwroot/css/Automation/Automation.css",
+      "PackagePath": "staticwebassets/css/Automation/Automation.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/Automation/SidebarAutomation.css",
+      "PackagePath": "staticwebassets/css/Automation/SidebarAutomation.css"
+    },
+    {
+      "Id": "/app/wwwroot/css/Automation/UserAutomation.css",
+      "PackagePath": "staticwebassets/css/Automation/UserAutomation.css"
+    },
+    {
       "Id": "/app/wwwroot/css/Configuration.css",
       "PackagePath": "staticwebassets/css/Configuration.css"
     },

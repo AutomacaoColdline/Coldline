@@ -39,7 +39,7 @@ namespace ColdlineAPI.Application.Services
         {
             return await _machines.GetByIdAsync(m => m.Id == id);
         }
-       public async Task<List<MachineByDateDto>> GetMachineCountPerDayAsync(DateTime startDate, DateTime endDate)
+        public async Task<List<MachineByDateDto>> GetMachineCountPerDayAsync(DateTime startDate, DateTime endDate)
         {
             var collection = _machines.GetCollection();
 
@@ -404,7 +404,7 @@ namespace ColdlineAPI.Application.Services
 
             if (!string.IsNullOrWhiteSpace(filter.IdentificationNumber))
             {
-                var pattern = Regex.Escape(filter.IdentificationNumber.Trim()); 
+                var pattern = Regex.Escape(filter.IdentificationNumber.Trim());
                 filters.Add(builder.Regex(m => m.IdentificationNumber, new BsonRegularExpression(pattern, "i")));
             }
             if (filter.Status.HasValue)
@@ -416,7 +416,7 @@ namespace ColdlineAPI.Application.Services
 
             if (!string.IsNullOrWhiteSpace(filter.UserId))
                 filters.Add(builder.ElemMatch(m => m.Users, u => u.Id == filter.UserId.Trim()));
-                
+
 
             var finalFilter = filters.Count > 0 ? builder.And(filters) : builder.Empty;
 
@@ -451,6 +451,25 @@ namespace ColdlineAPI.Application.Services
             var machines = await cursor.ToListAsync();
 
             return machines;
+        }
+        
+        public async Task<bool> FinalizeMachineAsync(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id) || !ObjectId.TryParse(id, out _))
+                return false;
+
+            var col = _machines.GetCollection();
+
+            var update = Builders<Machine>.Update
+                .Set(m => m.Status, MachineStatus.Finished)
+                .Unset(m => m.Process)
+                .Unset(m => m.Monitoring)
+                .Unset(m => m.Quality);
+
+            var result = await col.UpdateOneAsync(m => m.Id == id, update);
+
+            // Retorna true se encontrou o documento (mesmo que já estivesse finalizado)
+            return result.IsAcknowledged && result.MatchedCount > 0;
         }
     }
 }

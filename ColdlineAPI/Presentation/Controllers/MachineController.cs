@@ -155,5 +155,16 @@ namespace ColdlineAPI.Presentation.Controllers
             return Ok(result);
         }
 
+        [HttpPost("{id}/finalize")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Finalize(string id)
+        {
+            var ok = await _machineService.FinalizeMachineAsync(id);
+            if (!ok) return NotFound();
+
+            return NoContent();
+        }
+
     }
 }

@@ -20,5 +20,6 @@ namespace ColdlineAPI.Application.Interfaces
         Task<bool> DeleteMachineAsync(string id);
         Task<List<Machine>> SearchMachinesAsync(MachineFilter filter);
         Task<int> UpdateMachinesCreatedAtAsync();
+        Task<bool> FinalizeMachineAsync(string id);
     }
 }

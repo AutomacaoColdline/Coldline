@@ -32,22 +32,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0L0VtcHR5TGF5b3V0LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/AssistenciaTecnica/EditMonitoringModal.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQXNzaXN0ZW5jaWFUZWNuaWNhL0VkaXRNb25pdG9yaW5nTW9kYWwucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/AssistenciaTecnica/HomeAsssitencia.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQXNzaXN0ZW5jaWFUZWNuaWNhL0hvbWVBc3NzaXRlbmNpYS5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/AssistenciaTecnica/PasswordPromptModal.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQXNzaXN0ZW5jaWFUZWNuaWNhL1Bhc3N3b3JkUHJvbXB0TW9kYWwucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/AssistenciaTecnica/ViewMonitoringModal.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQXNzaXN0ZW5jaWFUZWNuaWNhL1ZpZXdNb25pdG9yaW5nTW9kYWwucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
 [/app/Pages/Bases/ TypeDefects.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvIFR5cGVEZWZlY3RzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
@@ -96,212 +80,248 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQmFzZXMvV2VhdGhlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Configuration/Configuration.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ29uZmlndXJhdGlvbi9Db25maWd1cmF0aW9uLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Configuration/DepartmentModalComponent.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ29uZmlndXJhdGlvbi9EZXBhcnRtZW50TW9kYWxDb21wb25lbnQucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Configuration/MachineTypeModalComponent.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ29uZmlndXJhdGlvbi9NYWNoaW5lVHlwZU1vZGFsQ29tcG9uZW50LnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Configuration/OccurrenceTypeModalComponent.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ29uZmlndXJhdGlvbi9PY2N1cnJlbmNlVHlwZU1vZGFsQ29tcG9uZW50LnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Configuration/PartModalComponent.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ29uZmlndXJhdGlvbi9QYXJ0TW9kYWxDb21wb25lbnQucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Configuration/ProcessTypeModalComponent.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ29uZmlndXJhdGlvbi9Qcm9jZXNzVHlwZU1vZGFsQ29tcG9uZW50LnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Configuration/UserTypeModalComponent.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQ29uZmlndXJhdGlvbi9Vc2VyVHlwZU1vZGFsQ29tcG9uZW50LnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Home/Home.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSG9tZS9Ib21lLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Home/HomeIndustria.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSG9tZS9Ib21lSW5kdXN0cmlhLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Industria/Components/OccurrenceForm.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kdXN0cmlhL0NvbXBvbmVudHMvT2NjdXJyZW5jZUZvcm0ucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Industria/Components/ProcessCard.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kdXN0cmlhL0NvbXBvbmVudHMvUHJvY2Vzc0NhcmQucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Industria/Components/Sidebar.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kdXN0cmlhL0NvbXBvbmVudHMvU2lkZWJhci5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Industria/Components/UserInfo.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kdXN0cmlhL0NvbXBvbmVudHMvVXNlckluZm8ucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Industria/Industria.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kdXN0cmlhL0luZHVzdHJpYS5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[/app/Pages/Industria/IndustriaLogin.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kdXN0cmlhL0luZHVzdHJpYUxvZ2luLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
 [/app/Pages/Login.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTG9naW4ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Machine/Machine.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZS9NYWNoaW5lLnJhem9y
+[/app/Pages/PagesAssistencia/AssistenciaTecnica/EditMonitoringModal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNBc3Npc3RlbmNpYS9Bc3Npc3RlbmNpYVRlY25pY2EvRWRpdE1vbml0b3JpbmdNb2RhbC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Machine/MachineModal.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZS9NYWNoaW5lTW9kYWwucmF6b3I=
+[/app/Pages/PagesAssistencia/AssistenciaTecnica/HomeAsssitencia.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNBc3Npc3RlbmNpYS9Bc3Npc3RlbmNpYVRlY25pY2EvSG9tZUFzc3NpdGVuY2lhLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Machine/MachineTypeModal.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZS9NYWNoaW5lVHlwZU1vZGFsLnJhem9y
+[/app/Pages/PagesAssistencia/AssistenciaTecnica/PasswordPromptModal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNBc3Npc3RlbmNpYS9Bc3Npc3RlbmNpYVRlY25pY2EvUGFzc3dvcmRQcm9tcHRNb2RhbC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Machine/MachineViewer.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFjaGluZS9NYWNoaW5lVmlld2VyLnJhem9y
+[/app/Pages/PagesAssistencia/AssistenciaTecnica/ViewMonitoringModal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNBc3Npc3RlbmNpYS9Bc3Npc3RlbmNpYVRlY25pY2EvVmlld01vbml0b3JpbmdNb2RhbC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Ocurrence/OccurrencePage.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT2N1cnJlbmNlL09jY3VycmVuY2VQYWdlLnJhem9y
+[/app/Pages/PagesAssistencia/Setup/Setup.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNBc3Npc3RlbmNpYS9TZXR1cC9TZXR1cC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Process/ProcessModal.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvY2Vzcy9Qcm9jZXNzTW9kYWwucmF6b3I=
+[/app/Pages/PagesAutomation/AutomationHome.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNBdXRvbWF0aW9uL0F1dG9tYXRpb25Ib21lLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Process/ProcessPage.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvY2Vzcy9Qcm9jZXNzUGFnZS5yYXpvcg==
+[/app/Pages/PagesAutomation/AutomationLogin.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNBdXRvbWF0aW9uL0F1dG9tYXRpb25Mb2dpbi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Process/ProcessTypeModal.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvY2Vzcy9Qcm9jZXNzVHlwZU1vZGFsLnJhem9y
+[/app/Pages/PagesAutomation/Components/Sidebar.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNBdXRvbWF0aW9uL0NvbXBvbmVudHMvU2lkZWJhci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Process/ProcessViewer.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvY2Vzcy9Qcm9jZXNzVmlld2VyLnJhem9y
+[/app/Pages/PagesAutomation/Users/UserModal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNBdXRvbWF0aW9uL1VzZXJzL1VzZXJNb2RhbC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/CostsByTypeMachine.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9Db3N0c0J5VHlwZU1hY2hpbmUucmF6b3I=
+[/app/Pages/PagesAutomation/Users/Users.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNBdXRvbWF0aW9uL1VzZXJzL1VzZXJzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/CostsByTypeProcess.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9Db3N0c0J5VHlwZVByb2Nlc3MucmF6b3I=
+[/app/Pages/PagesIndustria/Configuration/Configuration.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvQ29uZmlndXJhdGlvbi9Db25maWd1cmF0aW9uLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/Dashboard.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9EYXNoYm9hcmQucmF6b3I=
+[/app/Pages/PagesIndustria/Configuration/DepartmentModalComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvQ29uZmlndXJhdGlvbi9EZXBhcnRtZW50TW9kYWxDb21wb25lbnQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/IdleTimeByUsers.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9JZGxlVGltZUJ5VXNlcnMucmF6b3I=
+[/app/Pages/PagesIndustria/Configuration/MachineTypeModalComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvQ29uZmlndXJhdGlvbi9NYWNoaW5lVHlwZU1vZGFsQ29tcG9uZW50LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/NumberBrokenPartByTypeProcess.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJCcm9rZW5QYXJ0QnlUeXBlUHJvY2Vzcy5yYXpvcg==
+[/app/Pages/PagesIndustria/Configuration/OccurrenceTypeModalComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvQ29uZmlndXJhdGlvbi9PY2N1cnJlbmNlVHlwZU1vZGFsQ29tcG9uZW50LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/NumberBrokenPartByUsers.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJCcm9rZW5QYXJ0QnlVc2Vycy5yYXpvcg==
+[/app/Pages/PagesIndustria/Configuration/PartModalComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvQ29uZmlndXJhdGlvbi9QYXJ0TW9kYWxDb21wb25lbnQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/NumberBrokenPartDate.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJCcm9rZW5QYXJ0RGF0ZS5yYXpvcg==
+[/app/Pages/PagesIndustria/Configuration/ProcessTypeModalComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvQ29uZmlndXJhdGlvbi9Qcm9jZXNzVHlwZU1vZGFsQ29tcG9uZW50LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/NumberMachineByTypeMachine.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJNYWNoaW5lQnlUeXBlTWFjaGluZS5yYXpvcg==
+[/app/Pages/PagesIndustria/Configuration/UserTypeModalComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvQ29uZmlndXJhdGlvbi9Vc2VyVHlwZU1vZGFsQ29tcG9uZW50LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/NumberMachineDate.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJNYWNoaW5lRGF0ZS5yYXpvcg==
+[/app/Pages/PagesIndustria/Home/Home.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvSG9tZS9Ib21lLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/NumberOcurrenceDate.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJPY3VycmVuY2VEYXRlLnJhem9y
+[/app/Pages/PagesIndustria/Home/HomeIndustria.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvSG9tZS9Ib21lSW5kdXN0cmlhLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/NumberOcurrencesByUsers.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJPY3VycmVuY2VzQnlVc2Vycy5yYXpvcg==
+[/app/Pages/PagesIndustria/Industria/Components/OccurrenceForm.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvSW5kdXN0cmlhL0NvbXBvbmVudHMvT2NjdXJyZW5jZUZvcm0ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/NumberProcessByTypeProcess.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJQcm9jZXNzQnlUeXBlUHJvY2Vzcy5yYXpvcg==
+[/app/Pages/PagesIndustria/Industria/Components/ProcessCard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvSW5kdXN0cmlhL0NvbXBvbmVudHMvUHJvY2Vzc0NhcmQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/NumberProcessByUsers.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJQcm9jZXNzQnlVc2Vycy5yYXpvcg==
+[/app/Pages/PagesIndustria/Industria/Components/Sidebar.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvSW5kdXN0cmlhL0NvbXBvbmVudHMvU2lkZWJhci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/NumberProcessDate.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9OdW1iZXJQcm9jZXNzRGF0ZS5yYXpvcg==
+[/app/Pages/PagesIndustria/Industria/Components/UserInfo.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvSW5kdXN0cmlhL0NvbXBvbmVudHMvVXNlckluZm8ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/Quality.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9RdWFsaXR5LnJhem9y
+[/app/Pages/PagesIndustria/Industria/Industria.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvSW5kdXN0cmlhL0luZHVzdHJpYS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/TimeMachineByTypeMachine.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9UaW1lTWFjaGluZUJ5VHlwZU1hY2hpbmUucmF6b3I=
+[/app/Pages/PagesIndustria/Industria/IndustriaLogin.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvSW5kdXN0cmlhL0luZHVzdHJpYUxvZ2luLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/TimeOccurrenceByUsers.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9UaW1lT2NjdXJyZW5jZUJ5VXNlcnMucmF6b3I=
+[/app/Pages/PagesIndustria/Machine/Machine.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvTWFjaGluZS9NYWNoaW5lLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/TimeOcurrenceByTypeProcess.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9UaW1lT2N1cnJlbmNlQnlUeXBlUHJvY2Vzcy5yYXpvcg==
+[/app/Pages/PagesIndustria/Machine/MachineModal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvTWFjaGluZS9NYWNoaW5lTW9kYWwucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/TimeProcessByMachine.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9UaW1lUHJvY2Vzc0J5TWFjaGluZS5yYXpvcg==
+[/app/Pages/PagesIndustria/Machine/MachineTypeModal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvTWFjaGluZS9NYWNoaW5lVHlwZU1vZGFsLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/TimeProcessByTypeProcess.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9UaW1lUHJvY2Vzc0J5VHlwZVByb2Nlc3MucmF6b3I=
+[/app/Pages/PagesIndustria/Machine/MachineViewer.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvTWFjaGluZS9NYWNoaW5lVmlld2VyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/TimeProcessByUsers.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9UaW1lUHJvY2Vzc0J5VXNlcnMucmF6b3I=
+[/app/Pages/PagesIndustria/Ocurrence/OccurrencePage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvT2N1cnJlbmNlL09jY3VycmVuY2VQYWdlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Quality/TimeProcessByUsersIndividual.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUXVhbGl0eS9UaW1lUHJvY2Vzc0J5VXNlcnNJbmRpdmlkdWFsLnJhem9y
+[/app/Pages/PagesIndustria/Process/ProcessModal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUHJvY2Vzcy9Qcm9jZXNzTW9kYWwucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/Setup/Setup.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU2V0dXAvU2V0dXAucmF6b3I=
+[/app/Pages/PagesIndustria/Process/ProcessPage.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUHJvY2Vzcy9Qcm9jZXNzUGFnZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/User/DepartmentModal.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9EZXBhcnRtZW50TW9kYWwucmF6b3I=
+[/app/Pages/PagesIndustria/Process/ProcessTypeModal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUHJvY2Vzcy9Qcm9jZXNzVHlwZU1vZGFsLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/User/UserModal.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9Vc2VyTW9kYWwucmF6b3I=
+[/app/Pages/PagesIndustria/Process/ProcessViewer.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUHJvY2Vzcy9Qcm9jZXNzVmlld2VyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/User/Users.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9Vc2Vycy5yYXpvcg==
+[/app/Pages/PagesIndustria/Quality/CostsByTypeMachine.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9Db3N0c0J5VHlwZU1hY2hpbmUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/app/Pages/User/UserTypeModal.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlci9Vc2VyVHlwZU1vZGFsLnJhem9y
+[/app/Pages/PagesIndustria/Quality/CostsByTypeProcess.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9Db3N0c0J5VHlwZVByb2Nlc3MucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/Dashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9EYXNoYm9hcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/IdleTimeByUsers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9JZGxlVGltZUJ5VXNlcnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/NumberBrokenPartByTypeProcess.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9OdW1iZXJCcm9rZW5QYXJ0QnlUeXBlUHJvY2Vzcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/NumberBrokenPartByUsers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9OdW1iZXJCcm9rZW5QYXJ0QnlVc2Vycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/NumberBrokenPartDate.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9OdW1iZXJCcm9rZW5QYXJ0RGF0ZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/NumberMachineByTypeMachine.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9OdW1iZXJNYWNoaW5lQnlUeXBlTWFjaGluZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/NumberMachineDate.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9OdW1iZXJNYWNoaW5lRGF0ZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/NumberOcurrenceDate.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9OdW1iZXJPY3VycmVuY2VEYXRlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/NumberOcurrencesByUsers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9OdW1iZXJPY3VycmVuY2VzQnlVc2Vycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/NumberProcessByTypeProcess.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9OdW1iZXJQcm9jZXNzQnlUeXBlUHJvY2Vzcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/NumberProcessByUsers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9OdW1iZXJQcm9jZXNzQnlVc2Vycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/NumberProcessDate.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9OdW1iZXJQcm9jZXNzRGF0ZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/Quality.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9RdWFsaXR5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/TimeMachineByTypeMachine.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9UaW1lTWFjaGluZUJ5VHlwZU1hY2hpbmUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/TimeOccurrenceByUsers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9UaW1lT2NjdXJyZW5jZUJ5VXNlcnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/TimeOcurrenceByTypeProcess.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9UaW1lT2N1cnJlbmNlQnlUeXBlUHJvY2Vzcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/TimeProcessByMachine.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9UaW1lUHJvY2Vzc0J5TWFjaGluZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/TimeProcessByTypeProcess.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9UaW1lUHJvY2Vzc0J5VHlwZVByb2Nlc3MucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/TimeProcessByUsers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9UaW1lUHJvY2Vzc0J5VXNlcnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/Quality/TimeProcessByUsersIndividual.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvUXVhbGl0eS9UaW1lUHJvY2Vzc0J5VXNlcnNJbmRpdmlkdWFsLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/User/DepartmentModal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvVXNlci9EZXBhcnRtZW50TW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/User/UserModal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvVXNlci9Vc2VyTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/User/Users.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvVXNlci9Vc2Vycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesIndustria/User/UserTypeModal.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNJbmR1c3RyaWEvVXNlci9Vc2VyVHlwZU1vZGFsLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/_Imports.razor]

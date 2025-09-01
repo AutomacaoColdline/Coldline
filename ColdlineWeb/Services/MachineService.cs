@@ -89,19 +89,15 @@ namespace ColdlineWeb.Services
         }
         public async Task<bool> FinalizeMachineAsync(string id)
         {
-            // Busca a máquina atual para não sobrescrever campos
-            var machine = await GetMachineByIdAsync(id);
-            if (machine == null)
+            if (string.IsNullOrWhiteSpace(id))
                 return false;
 
-            machine.Status = MachineStatus.Finished;
-            machine.Process = null;
-            machine.Monitoring = null;
-            machine.Quality = null;
+            // Faz o POST para o endpoint específico de finalizar
+            var response = await _http.PostAsync($"api/Machine/{id}/finalize", null);
 
-            var response = await _http.PutAsJsonAsync($"api/Machine/{id}", machine);
             return response.IsSuccessStatusCode;
         }
+
 
 
 

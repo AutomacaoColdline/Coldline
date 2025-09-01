@@ -8,7 +8,7 @@ namespace ColdlineAPI.Domain.Entities
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string? Id { get; set; }  
+        public string? Id { get; set; }
 
         [BsonElement("name")]
         public string Name { get; set; } = string.Empty;
@@ -17,5 +17,7 @@ namespace ColdlineAPI.Domain.Entities
         public string Description { get; set; } = string.Empty;
         [BsonElement("Pending event")]
         public bool PendingEvent { get; set; }
+        [BsonElement("departament")]
+        public ReferenceEntity? Department { get; set; } = new ReferenceEntity();
     }
 }

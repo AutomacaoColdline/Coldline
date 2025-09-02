@@ -27,10 +27,6 @@ else
             <input class="form-control" placeholder="Nome" @bind="filterName" />
             <input class="form-control" placeholder="Email" @bind="filterEmail" />
 
-            <button class="btn btn-success mb-3"  @onclick="OpenUserTypeModal" >
-                <img src="img/adicionar-ficheiro.png" alt="Novo tipo de usuario" style="width: 16px; height: 16px;" />
-            </button>
-
             <button class="btn btn-primary" @onclick="ApplyFilters" aria-label="Buscar">
                 <img src="img/lupa.png" alt="Buscar" style="width: 16px; height: 16px;" />
             </button>  
@@ -110,10 +106,3 @@ else
     UpdateUser="UpdateUser"
     OnUploadImage="UploadImage"
 />
-
-<UserTypeModal
-    ShowModal="@showUserTypeModal"
-    IsEditing="false"
-    UserTypeModel="@newUserType"
-    CloseModal="CloseUserTypeModal"
-    OnValidSubmit="SaveUserType" />

@@ -1,0 +1,316 @@
+@using ColdlineWeb.Models
+@using ColdlineWeb.Models.Enum
+@inject Microsoft.JSInterop.IJSRuntime JS
+
+@if (Visible)
+{
+    <div class="viewer-overlay" @onclick="HandleOverlayBackgroundClick">
+        <div class="viewer-card" style="width:min(820px, 96vw)" @onclick:stopPropagation="true">
+            <div class="viewer-card-header">
+                <div class="d-flex align-items-center gap-2">
+                    <h5 class="m-0">
+                        @HeaderTitle
+                    </h5>
+                    @if (CurrentMode != ViewerMode.Create && BoundNote is not null)
+                    {
+                        <span class="badge bg-secondary">@GetNoteTypeDisplay(BoundNote.NoteType)</span>
+                    }
+                </div>
+
+                <button class="btn btn-outline-secondary btn-sm" @onclick="CloseRequested">Fechar</button>
+            </div>
+
+            <div class="viewer-card-body">
+                @if (CurrentMode == ViewerMode.View && BoundNote is not null)
+                {
+                    <!-- VISUALIZAÇÃO (somente leitura) -->
+                    <div class="mb-3">
+                        <label class="form-label">Nome</label>
+                        <div class="form-control" style="background:#f8f9fa">@BoundNote.Name</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo</label>
+                        <div class="form-control" style="background:#f8f9fa">@GetNoteTypeDisplay(BoundNote.NoteType)</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Elementos</label>
+
+                        @if (BoundNote.Element is null || BoundNote.Element.Count == 0)
+                        {
+                            <div class="text-muted">Sem elementos.</div>
+                        }
+                        else
+                        {
+                            <!--
+                                Importante: usamos overrides inline para NÃO cortar o texto no viewer.
+                                - white-space: normal; overflow: visible; text-overflow: initial;
+                                - max-width: 100% e display:flex para alinhar o botão de copiar.
+                                - container sem altura máxima para não “apertar” os itens.
+                            -->
+                            <div class="chip-list"
+                                 style="max-height:none; overflow:visible; padding-right:2px;">
+                                @foreach (var e in BoundNote.Element)
+                                {
+                                    <span class="chip"
+                                          title="@e"
+                                          style="
+                                            display:flex;
+                                            align-items:center;
+                                            gap:8px;
+                                            width:100%;
+                                            max-width:100%;
+                                            white-space:normal;
+                                            background:#f8f9fa;
+                                            ">
+                                        <span class="chip-text"
+                                              style="
+                                                white-space:normal;
+                                                overflow:visible;
+                                                text-overflow:initial;
+                                                max-width:100%;
+                                                ">
+                                            @e
+                                        </span>
+                                        <button type="button"
+                                                class="chip-copy-btn"
+                                                title="Copiar"
+                                                @onclick="() => CopyToClipboard(e)">
+                                            <img src="img/copiar.png" alt="Copiar" class="chip-copy-icon" />
+                                        </button>
+                                    </span>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <!-- CREATE / EDIT (formulário editável) -->
+                    <div class="mb-3">
+                        <label class="form-label">Nome</label>
+                        <input class="form-control"
+                               placeholder="Ex.: Senhas do servidor"
+                               @bind="formName" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo</label>
+                        <select class="form-select" @bind="formSelectedType">
+                            @foreach (var t in NoteTypeOptions)
+                            {
+                                <option value="@((int)t)">@GetNoteTypeDisplay(t)</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Elementos (um por linha)</label>
+                        <textarea class="form-control"
+                                  rows="8"
+                                  placeholder="Ex.:
+root
+docker login
+apt-get update"
+                                  @bind="formElementsText"></textarea>
+                        <div class="form-text">Cada linha será adicionada como um elemento na nota.</div>
+                    </div>
+                }
+            </div>
+
+            <div class="viewer-card-footer d-flex gap-2 justify-content-end">
+                @if (CurrentMode == ViewerMode.View)
+                {
+                    <button class="btn btn-secondary" @onclick="EnterEditMode">Editar</button>
+                    <button class="btn btn-light" @onclick="CloseRequested">Fechar</button>
+                }
+                else if (CurrentMode == ViewerMode.Edit)
+                {
+                    <button class="btn btn-light" @onclick="CancelEdit">Cancelar</button>
+                    <button class="btn btn-primary" @onclick="SaveEdit">Salvar</button>
+                }
+                else
+                {
+                    <!-- Create -->
+                    <button class="btn btn-light" @onclick="CloseRequested">Cancelar</button>
+                    <button class="btn btn-primary" @onclick="SaveCreate">Salvar</button>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code
+{
+    /* =========================
+       Parâmetros de integração
+       ========================= */
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public List<NoteType> NoteTypeOptions { get; set; } = new();
+
+    /// <summary>Modo do viewer: Create / View / Edit.</summary>
+    [Parameter] public ViewerMode Mode { get; set; } = ViewerMode.Create;
+
+    /// <summary>Nota vinculada quando em View/Edit. Em Create pode ser nulo.</summary>
+    [Parameter] public NoteModel? Note { get; set; }
+
+    /// <summary>Fechar viewer (sem salvar).</summary>
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    /// <summary>Evento de criação (novo registro).</summary>
+    [Parameter] public EventCallback<NoteModel> OnCreate { get; set; }
+
+    /// <summary>Evento de atualização (editar registro existente).</summary>
+    [Parameter] public EventCallback<NoteModel> OnUpdate { get; set; }
+
+    /* =========================
+       Estado interno
+       ========================= */
+    private ViewerMode CurrentMode;
+    private NoteModel? BoundNote;
+
+    // Formulário (Create/Edit)
+    private string formName = string.Empty;
+    private int formSelectedType;
+    private string formElementsText = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        CurrentMode = Mode;
+        BoundNote = Note;
+
+        if (CurrentMode == ViewerMode.Create)
+        {
+            LoadBlankForm();
+        }
+        else if (CurrentMode == ViewerMode.View && BoundNote is not null)
+        {
+            // somente leitura
+        }
+        else if (CurrentMode == ViewerMode.Edit && BoundNote is not null)
+        {
+            LoadFormFromNote(BoundNote);
+        }
+    }
+
+    private void LoadBlankForm()
+    {
+        formName = string.Empty;
+        formElementsText = string.Empty;
+        formSelectedType = NoteTypeOptions != null && NoteTypeOptions.Count > 0
+            ? (int)NoteTypeOptions.First()
+            : 0;
+    }
+
+    private void LoadFormFromNote(NoteModel note)
+    {
+        formName = note.Name ?? string.Empty;
+        formSelectedType = (int)note.NoteType;
+        formElementsText = note.Element == null || note.Element.Count == 0
+            ? string.Empty
+            : string.Join(Environment.NewLine, note.Element);
+    }
+
+    private string HeaderTitle =>
+        CurrentMode switch
+        {
+            ViewerMode.Create => "Nova Nota",
+            ViewerMode.Edit   => "Editar Nota",
+            _                 => "Visualização da Nota"
+        };
+
+    private string GetNoteTypeDisplay(NoteType type) => type.ToString();
+
+    private async Task CloseRequested()
+    {
+        await OnClose.InvokeAsync();
+    }
+
+    private async Task HandleOverlayBackgroundClick()
+    {
+        await OnClose.InvokeAsync();
+    }
+
+    /* ===== Transições de modo ===== */
+
+    private void EnterEditMode()
+    {
+        if (BoundNote is null) return;
+        CurrentMode = ViewerMode.Edit;
+        LoadFormFromNote(BoundNote);
+        StateHasChanged();
+    }
+
+    private void CancelEdit()
+    {
+        if (Mode == ViewerMode.View)
+        {
+            CurrentMode = ViewerMode.View;
+        }
+        else
+        {
+            _ = OnClose.InvokeAsync();
+        }
+    }
+
+    /* ===== Ações de Salvar ===== */
+
+    private async Task SaveCreate()
+    {
+        var model = BuildModelFromForm();
+        await OnCreate.InvokeAsync(model);
+    }
+
+    private async Task SaveEdit()
+    {
+        if (BoundNote is null) return;
+
+        var model = BuildModelFromForm();
+        model.Id = BoundNote.Id; // mantém o Id para atualização
+        await OnUpdate.InvokeAsync(model);
+    }
+
+    private NoteModel BuildModelFromForm()
+    {
+        var elements = formElementsText
+            .Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(s => s.Trim())
+            .Where(s => !string.IsNullOrWhiteSpace(s))
+            .ToList();
+
+        return new NoteModel
+        {
+            Name = formName?.Trim() ?? string.Empty,
+            NoteType = (NoteType)formSelectedType,
+            Element = elements
+        };
+    }
+
+    /* ===== Cópia para a área de transferência ===== */
+    private async Task CopyToClipboard(string text)
+    {
+        try
+        {
+            // usa o mesmo helper JS usado na página principal
+            var ok = await JS.InvokeAsync<bool>("copyToClipboard", text);
+            if (!ok)
+            {
+                // fallback simples (alguns navegadores permitem)
+                await JS.InvokeVoidAsync("navigator.clipboard.writeText", text);
+            }
+        }
+        catch
+        {
+            // silencioso para não poluir a UI do viewer
+        }
+    }
+
+    /* ===== Tipos auxiliares ===== */
+    public enum ViewerMode
+    {
+        Create = 0,
+        View   = 1,
+        Edit   = 2
+    }
+}

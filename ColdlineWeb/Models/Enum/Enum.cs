@@ -21,4 +21,19 @@ namespace ColdlineWeb.Models.Enum
         [Display(Name = "Pausada")]
         Stop = 6
     }
+    public enum NoteType
+    {
+        [Display(Name = "Senha")]
+        Passwords = 1,
+        [Display(Name = "Docker Comandos")]
+        DockerCommands = 2,
+        [Display(Name = "Linux Comandos")]
+        LinuxCommands = 3,
+        [Display(Name = "Windows Comandos")]
+        WindowsCommands = 4,
+        [Display(Name = "Avisos")]
+        Notices = 5,
+        [Display(Name = "Lembretes")]
+        Reminders = 6
+    }
 }

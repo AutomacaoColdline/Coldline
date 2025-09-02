@@ -2,6 +2,8 @@
 @page "/automation/{Section?}"
 @layout EmptyLayout
 @using ColdlineWeb.Models
+@using ColdlineWeb.Models.Enum
+@using ColdlineWeb.Models.Filter
 @using ColdlineWeb.Pages.PagesAutomation.Components
 @using ColdlineWeb.Pages.PagesAutomation.Users
 @inherits AutomationHomePage
@@ -35,16 +37,195 @@
                     <Users />
                     break;
 
-                // Outros módulos no futuro:
-                // case "monitoramento": <Monitoramento />; break;
-
                 default:
                     <div class="p-4 text-muted">
-                        <h5>Bem-vindo à Automação</h5>
-                        <p>Selecione uma seção no menu à esquerda.</p>
+
+                        <!-- ===== Card de Pesquisa / Filtros ===== -->
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <strong>Pesquisar Notas</strong>
+
+                                <!-- Botão Adicionar Nota -->
+                                <button class="btn btn-success btn-sm btn-icon"
+                                        title="Adicionar nova nota"
+                                        @onclick="OpenCreateNote">
+                                    <span class="btn-icon-plus">+</span>
+                                    <img src="img/copiar.png" alt="Adicionar" class="btn-icon-img" />
+                                </button>
+                            </div>
+
+                            <div class="card-body">
+                                <!-- Linha única: Nome | Element | Tipo | Ações -->
+                                <div class="row g-2 align-items-end filter-row">
+
+                                    <!-- Nome -->
+                                    <div class="col-12 col-md-4 col-lg-4">
+                                        <label class="form-label mb-1 d-none d-md-block">Name</label>
+                                        <input class="form-control"
+                                               placeholder="Ex.: Senhas banco"
+                                               @bind="filterModel.Name" />
+                                    </div>
+
+                                    <!-- Element -->
+                                    <div class="col-12 col-md-4 col-lg-4">
+                                        <label class="form-label mb-1 d-none d-md-block">Element</label>
+                                        <input class="form-control"
+                                               placeholder="Ex.: root, docker, apt-get"
+                                               @bind="filterModel.Element" />
+                                    </div>
+
+                                    <!-- Tipo -->
+                                    <div class="col-12 col-md-3 col-lg-3">
+                                        <label class="form-label mb-1 d-none d-md-block">Tipo</label>
+                                        <select class="form-select" @bind="selectedNoteTypeStr">
+                                            <option value="">-- Todos --</option>
+                                            @foreach (var t in noteTypeOptions)
+                                            {
+                                                <option value="@((int)t)">
+                                                    @GetNoteTypeDisplay(t)
+                                                </option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <!-- Ações (Buscar e Limpar) -->
+                                    <div class="col-12 col-md-1 col-lg-1">
+                                        <div class="filter-actions d-flex gap-2 justify-content-start justify-content-md-end">
+                                            <button class="btn btn-primary btn-icon filter-btn"
+                                                    title="Filtrar"
+                                                    @onclick="ApplyFilter">
+                                                <img src="img/lupa.png" alt="Filtrar" class="btn-icon-img" />
+                                            </button>
+
+                                            <button class="btn btn-outline-secondary btn-icon filter-btn"
+                                                    title="Limpar filtros"
+                                                    @onclick="ClearFilter">
+                                                <img src="img/limpar-limpo.png" alt="Limpar filtros" class="btn-icon-img" />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ===== /Card de Pesquisa ===== -->
+
+                        <div class="card mt-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <strong>Notas</strong>
+                                <small class="text-muted">
+                                    @((notes?.Count ?? 0)) itens
+                                </small>
+                            </div>
+
+                            <div class="card-body">
+                                @if (notes == null || notes.Count == 0)
+                                {
+                                    <div class="p-3 text-muted">Nenhuma nota encontrada.</div>
+                                }
+                                else
+                                {
+                                    <!-- ===== Board de Notas (cards estilo Trello) ===== -->
+                                    <div class="notes-board">
+                                        @foreach (var n in notes)
+                                        {
+                                            <article class="note-card" @onclick="() => OpenViewNote(n)">
+                                                <header class="note-card__header">
+                                                    <h6 class="note-card__title" title="@n.Name">@n.Name</h6>
+
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <span class="badge @GetNoteTypeCss(n.NoteType)"
+                                                              title="@n.NoteType.ToString()">
+                                                            @GetNoteTypeDisplay(n.NoteType)
+                                                        </span>
+
+                                                        <!-- Botão pequeno de apagar -->
+                                                        <button type="button"
+                                                                class="btn btn-outline-danger btn-sm"
+                                                                title="Apagar nota"
+                                                                @onclick:stopPropagation="true"
+                                                                @onclick="() => OpenDeleteNote(n)">
+                                                            <img src="img/lixeira.png" alt="Excluir" class="lixeira-icon" />
+                                                        </button>
+                                                    </div>
+                                                </header>
+
+                                                <section class="note-card__content">
+                                                    @if (n.Element == null || n.Element.Count == 0)
+                                                    {
+                                                        <div class="note-card__empty">
+                                                            <span class="badge bg-secondary">sem elementos</span>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="chip-list">
+                                                            @foreach (var e in n.Element)
+                                                            {
+                                                                <span class="chip" title="@e" @onclick:stopPropagation="true">
+                                                                    <span class="chip-text">@e</span>
+                                                                    <button type="button"
+                                                                            class="chip-copy-btn"
+                                                                            title="Copiar"
+                                                                            @onclick="() => CopyElement(e)">
+                                                                        <img src="img/copiar.png" alt="Copiar" class="chip-copy-icon" />
+                                                                    </button>
+                                                                </span>
+                                                            }
+                                                        </div>
+                                                    }
+                                                </section>
+                                            </article>
+                                        }
+                                    </div>
+                                    <!-- ===== /Board de Notas ===== -->
+                                }
+                            </div>
+                        </div>
                     </div>
                     break;
             }
         }
     </div>
 </div>
+
+<!-- NoteViewer reutilizado para criar / visualizar / editar -->
+@if (viewerVisible)
+{
+    <NoteViewer Visible="viewerVisible"
+                Mode="viewerMode"
+                NoteTypeOptions="noteTypeOptions"
+                Note="viewerNote"
+                OnClose="CloseViewer"
+                OnCreate="HandleSaveNote"
+                OnUpdate="HandleUpdateNote" />
+}
+
+<!-- Modal de confirmação de exclusão -->
+@if (showDeleteConfirm)
+{
+    <div class="viewer-overlay" @onclick="CloseDeleteNote">
+        <div class="viewer-card" style="width:min(520px, 95vw)" @onclick:stopPropagation="true">
+            <div class="viewer-card-header">
+                <h5 class="m-0">Confirmar exclusão</h5>
+            </div>
+            <div class="viewer-card-body">
+                <p class="mb-2">
+                    Tem certeza que deseja <strong>excluir</strong> esta nota?
+                </p>
+                @if (notePendingDelete is not null)
+                {
+                    <ul class="mb-0">
+                        <li><strong>Nome:</strong> @notePendingDelete.Name</li>
+                        <li><strong>Tipo:</strong> @GetNoteTypeDisplay(notePendingDelete.NoteType)</li>
+                        <li><strong>Elementos:</strong> @(notePendingDelete.Element?.Count ?? 0)</li>
+                    </ul>
+                }
+            </div>
+            <div class="viewer-card-footer d-flex justify-content-end gap-2">
+                <button class="btn btn-light" @onclick="CloseDeleteNote">Cancelar</button>
+                <button class="btn btn-danger" @onclick="ConfirmDeleteNote">Excluir</button>
+            </div>
+        </div>
+    </div>
+}

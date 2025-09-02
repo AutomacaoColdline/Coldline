@@ -209,6 +209,10 @@
       "PackagePath": "staticwebassets/img/configuration.png"
     },
     {
+      "Id": "/app/wwwroot/img/copiar.png",
+      "PackagePath": "staticwebassets/img/copiar.png"
+    },
+    {
       "Id": "/app/wwwroot/img/editar.png",
       "PackagePath": "staticwebassets/img/editar.png"
     },
@@ -303,6 +307,10 @@
     {
       "Id": "/app/wwwroot/js/Dashboard.js",
       "PackagePath": "staticwebassets/js/Dashboard.js"
+    },
+    {
+      "Id": "/app/wwwroot/js/clipboard.js",
+      "PackagePath": "staticwebassets/js/clipboard.js"
     },
     {
       "Id": "/app/wwwroot/js/costsByTypeMachine.js",

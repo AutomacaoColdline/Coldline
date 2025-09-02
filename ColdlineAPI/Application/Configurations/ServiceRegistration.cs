@@ -29,6 +29,7 @@ namespace ColdlineAPI.Application.Configurations
             services.AddScoped<IMachineTypeService, MachineTypeService>();
             services.AddScoped<IOccurrenceTypeService, OccurrenceTypeService>();
             services.AddScoped<RepositoryFactory>();
+            services.AddScoped<INoteService, NoteService>();
 
 
         }

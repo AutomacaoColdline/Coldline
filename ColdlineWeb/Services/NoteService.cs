@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Filter;
+using ColdlineWeb.Models.Common; 
+using Microsoft.AspNetCore.WebUtilities; 
 
 namespace ColdlineWeb.Services
 {
@@ -46,9 +48,9 @@ namespace ColdlineWeb.Services
             var response = await _http.DeleteAsync($"api/Note/{id}");
             return response.IsSuccessStatusCode;
         }
-        public async Task<List<NoteModel>> SearchAsync(NoteFilterModel filter)
+        public async Task<ColdlineWeb.Models.Common.PagedResult<NoteModel>> SearchAsync(NoteFilterModel filter)
         {
-            var query = HttpUtility.ParseQueryString(string.Empty);
+            var query = new Dictionary<string, string>();
 
             if (!string.IsNullOrWhiteSpace(filter.Name))
                 query["name"] = filter.Name;
@@ -59,9 +61,22 @@ namespace ColdlineWeb.Services
             if (filter.NoteType.HasValue)
                 query["noteType"] = ((int)filter.NoteType.Value).ToString();
 
-            var url = $"api/Note/search?{query}";
+            query["page"] = (filter.Page <= 0 ? 1 : filter.Page).ToString();
+            query["pageSize"] = (filter.PageSize <= 0 ? 10 : filter.PageSize).ToString();
 
-            return await _http.GetFromJsonAsync<List<NoteModel>>(url) ?? new();
+            if (!string.IsNullOrWhiteSpace(filter.SortBy))
+                query["sortBy"] = filter.SortBy!;
+            query["sortDesc"] = filter.SortDesc.ToString().ToLowerInvariant();
+
+            var url = QueryHelpers.AddQueryString("api/Note/search", query);
+
+            var result = await _http.GetFromJsonAsync<ColdlineWeb.Models.Common.PagedResult<NoteModel>>(url);
+            return result ?? new ColdlineWeb.Models.Common.PagedResult<NoteModel>
+            {
+                Items = System.Array.Empty<NoteModel>(),
+                Page = filter.Page,
+                PageSize = filter.PageSize
+            };
         }
     }
 }

@@ -112,12 +112,20 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNBdXRvbWF0aW9uL0F1dG9tYXRpb25Mb2dpbi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/app/Pages/PagesAutomation/Components/MonitoringViewer.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNBdXRvbWF0aW9uL0NvbXBvbmVudHMvTW9uaXRvcmluZ1ZpZXdlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/app/Pages/PagesAutomation/Components/NoteViewer.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNBdXRvbWF0aW9uL0NvbXBvbmVudHMvTm90ZVZpZXdlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/PagesAutomation/Components/Sidebar.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNBdXRvbWF0aW9uL0NvbXBvbmVudHMvU2lkZWJhci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/app/Pages/PagesAutomation/Monitoring/Monitoring.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGFnZXNBdXRvbWF0aW9uL01vbml0b3JpbmcvTW9uaXRvcmluZy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/app/Pages/PagesAutomation/Users/UserModal.razor]

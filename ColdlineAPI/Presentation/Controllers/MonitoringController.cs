@@ -1,4 +1,5 @@
 using ColdlineAPI.Application.Interfaces;
+using ColdlineAPI.Application.Common;
 using ColdlineAPI.Domain.Entities;
 using ColdlineAPI.Application.Filters;
 using Microsoft.AspNetCore.Mvc;
@@ -24,10 +25,11 @@ namespace ColdlineAPI.Presentation.Controllers
             var monitorings = await _monitoringService.GetAllMonitoringsAsync();
             return Ok(monitorings);
         }
-        [HttpPost("filter")]
-        public async Task<ActionResult<IEnumerable<Monitoring>>> GetFiltered([FromBody] MonitoringFilter filter)
+        [HttpGet("search")]
+        [ProducesResponseType(typeof(PagedResult<Monitoring>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PagedResult<Monitoring>>> Search([FromQuery] MonitoringFilter filter)
         {
-            var result = await _monitoringService.GetFilteredMonitoringsAsync(filter);
+            var result = await _monitoringService.SearchMonitoringsAsync(filter);
             return Ok(result);
         }
 

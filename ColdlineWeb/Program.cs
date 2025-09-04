@@ -28,5 +28,8 @@ builder.Services.AddScoped<TypeDefectService>();
 builder.Services.AddScoped<OccurrenceService>();
 builder.Services.AddScoped<OccurrenceTypeService>();
 builder.Services.AddScoped<NoteService>();
+builder.Services.AddScoped<MonitoringService>();
+builder.Services.AddScoped<MonitoringTypeService>();
+
 
 await builder.Build().RunAsync();

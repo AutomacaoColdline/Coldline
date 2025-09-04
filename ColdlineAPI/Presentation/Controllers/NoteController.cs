@@ -1,5 +1,6 @@
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Application.Filters;
+using ColdlineAPI.Application.Common;
 using ColdlineAPI.Domain.Entities;
 using ColdlineAPI.Domain.Enum;
 using Microsoft.AspNetCore.Mvc;
@@ -56,10 +57,10 @@ namespace ColdlineAPI.Presentation.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<ActionResult<List<Note>>> Search([FromQuery] NoteFilter filter)
+        public async Task<ActionResult<PagedResult<Note>>> Search([FromQuery] NoteFilter filter)
         {
-            var notes = await _noteService.SearchNotesAsync(filter);
-            return Ok(notes);
+            var result = await _noteService.SearchNotesAsync(filter);
+            return Ok(result);
         }
     }
 }

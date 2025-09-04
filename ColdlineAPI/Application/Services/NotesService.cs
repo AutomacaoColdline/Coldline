@@ -1,4 +1,5 @@
 using ColdlineAPI.Application.Interfaces;
+using ColdlineAPI.Application.Common;
 using ColdlineAPI.Domain.Entities;
 using ColdlineAPI.Domain.Enum;
 using ColdlineAPI.Application.Filters;
@@ -21,33 +22,27 @@ namespace ColdlineAPI.Application.Services
             _notes = factory.CreateRepository<Note>("Notes");
         }
 
-        public async Task<List<Note>> SearchNotesAsync(NoteFilter filter)
+        public async Task<PagedResult<Note>> SearchNotesAsync(NoteFilter filter)
         {
             var fb = Builders<Note>.Filter;
             var filters = new List<FilterDefinition<Note>>();
 
-            // name: regex case-insensitive (parcial)
             if (!string.IsNullOrWhiteSpace(filter.name))
             {
-                // Escape para evitar regex injection e casar literal
                 var pattern = Regex.Escape(filter.name);
                 filters.Add(fb.Regex(n => n.Name, new BsonRegularExpression(pattern, "i")));
             }
 
-            // element: campo é um array de string. Regex no campo "element" casa qualquer item do array.
             if (!string.IsNullOrWhiteSpace(filter.element))
             {
                 var pattern = Regex.Escape(filter.element);
-                // Duas opções equivalentes; escolha UMA:
-                // 1) Regex direto no caminho do campo (funciona para arrays de strings):
+                // Regex direto no caminho "element" (array de string)
                 filters.Add(fb.Regex(nameof(Note.Element), new BsonRegularExpression(pattern, "i")));
-
-                // 2) (alternativa) ElemMatch com Regex (sem LINQ):
+                // Alternativa com ElemMatch (comentado):
                 // var stringFilter = Builders<string>.Filter.Regex(x => x, new BsonRegularExpression(pattern, "i"));
                 // filters.Add(fb.ElemMatch(n => n.Element, stringFilter));
             }
 
-            // noteType: igualdade simples
             if (filter.noteType.HasValue)
             {
                 filters.Add(fb.Eq(n => n.NoteType, filter.noteType.Value));
@@ -55,16 +50,56 @@ namespace ColdlineAPI.Application.Services
 
             var finalFilter = filters.Count > 0 ? fb.And(filters) : FilterDefinition<Note>.Empty;
 
+            // paginação (com saneamento)
+            var page = Math.Max(1, filter.page ?? 1);
+            var pageSizeRaw = filter.pageSize ?? 20;
+            var pageSize = Math.Clamp(pageSizeRaw, 1, 200); // evite pageSize gigantes
+
+            var skip = (page - 1) * pageSize;
+
+            // ordenação
+            SortDefinition<Note> sort = Builders<Note>.Sort.Ascending(n => n.Name);
+            if (!string.IsNullOrWhiteSpace(filter.sortBy))
+            {
+                var by = filter.sortBy.Trim().ToLowerInvariant();
+                var desc = filter.sortDesc ?? false;
+
+                sort = by switch
+                {
+                    "name"     => desc ? Builders<Note>.Sort.Descending(n => n.Name)     : Builders<Note>.Sort.Ascending(n => n.Name),
+                    "notetype" => desc ? Builders<Note>.Sort.Descending(n => n.NoteType) : Builders<Note>.Sort.Ascending(n => n.NoteType),
+                    // adicione mais campos se necessário
+                    _ => sort
+                };
+            }
+
             var projection = Builders<Note>.Projection
                 .Include(p => p.Id)
                 .Include(p => p.Name)
                 .Include(p => p.Element)
                 .Include(p => p.NoteType);
 
-            return await _notes.GetCollection()
+            var collection = _notes.GetCollection();
+
+            // total antes do Skip/Limit
+            var total = await collection.CountDocumentsAsync(finalFilter);
+
+            // página de dados
+            var items = await collection
                 .Find(finalFilter)
+                .Sort(sort)
+                .Skip(skip)
+                .Limit(pageSize)
                 .Project<Note>(projection)
                 .ToListAsync();
+
+            return new PagedResult<Note>
+            {
+                Items = items,
+                Total = total,
+                Page = page,
+                PageSize = pageSize
+            };
         }
 
         public async Task<List<Note>> GetAllNotesAsync()

@@ -1,0 +1,411 @@
+@using ColdlineWeb.Models
+@inject Microsoft.JSInterop.IJSRuntime JS
+
+@if (Visible)
+{
+    <div class="viewer-overlay" @onclick="HandleOverlayBackgroundClick">
+        <div class="viewer-card" style="width:min(920px, 96vw)" @onclick:stopPropagation="true">
+            <div class="viewer-card-header">
+                <div class="d-flex align-items-center gap-2">
+                    <h5 class="m-0">@HeaderTitle</h5>
+
+                    @if (CurrentMode != ViewerMode.Create && BoundMonitoring is not null && !string.IsNullOrWhiteSpace(BoundMonitoring.MonitoringType?.Name))
+                    {
+                        <span class="badge bg-secondary">@BoundMonitoring.MonitoringType.Name</span>
+                    }
+                </div>
+
+                <button class="btn btn-outline-secondary btn-sm" @onclick="CloseRequested">Fechar</button>
+            </div>
+
+            <div class="viewer-card-body">
+                @if (CurrentMode == ViewerMode.View && BoundMonitoring is not null)
+                {
+                    <!-- VISUALIZAÇÃO (somente leitura) -->
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Identificador</label>
+                            <div class="d-flex gap-2">
+                                <div class="form-control" style="background:#f8f9fa">@BoundMonitoring.Identificador</div>
+                                @if (!string.IsNullOrWhiteSpace(BoundMonitoring.Identificador))
+                                {
+                                    <button type="button" class="btn btn-light"
+                                            title="Copiar"
+                                            @onclick="() => CopyToClipboard(BoundMonitoring.Identificador!)">
+                                        <img src="img/copiar.png" class="chip-copy-icon" alt="Copiar" />
+                                    </button>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Unidade</label>
+                            <div class="form-control" style="background:#f8f9fa">@BoundMonitoring.Unidade</div>
+                        </div>
+
+                        <div class="col-6 col-md-3">
+                            <label class="form-label">Estado</label>
+                            <div class="form-control" style="background:#f8f9fa">@BoundMonitoring.Estado</div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label">Cidade</label>
+                            <div class="form-control" style="background:#f8f9fa">@BoundMonitoring.Cidade</div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label">IHM</label>
+                            <div class="form-control" style="background:#f8f9fa">@BoundMonitoring.Ihm</div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label">Gateway</label>
+                            <div class="form-control" style="background:#f8f9fa">@BoundMonitoring.Gateway</div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">CLP (1 por linha)</label>
+                            @if (BoundMonitoring.Clp is null || BoundMonitoring.Clp.Count == 0)
+                            {
+                                <div class="text-muted">Sem CLPs.</div>
+                            }
+                            else
+                            {
+                                <div class="chip-list" style="max-height:none; overflow:visible;">
+                                    @foreach (var clp in BoundMonitoring.Clp)
+                                    {
+                                        <span class="chip" title="@clp" style="background:#f8f9fa">
+                                            <span class="chip-text">@clp</span>
+                                        </span>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">MACs (1 por linha)</label>
+                            @if (BoundMonitoring.Macs is null || BoundMonitoring.Macs.Count == 0)
+                            {
+                                <div class="text-muted">Sem MACs.</div>
+                            }
+                            else
+                            {
+                                <div class="chip-list" style="max-height:none; overflow:visible;">
+                                    @foreach (var mac in BoundMonitoring.Macs)
+                                    {
+                                        <span class="chip" title="@mac" style="background:#f8f9fa">
+                                            <span class="chip-text">@mac</span>
+                                        </span>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Máscara</label>
+                            <div class="form-control" style="background:#f8f9fa">@BoundMonitoring.Masc</div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">AnyDesk</label>
+                            <div class="form-control" style="background:#f8f9fa">@BoundMonitoring.IdAnydesk</div>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">TeamViewer</label>
+                            <div class="form-control" style="background:#f8f9fa">@BoundMonitoring.IdTeamViewer</div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">RustDesk</label>
+                            <div class="d-flex gap-2">
+                                <div class="form-control" style="background:#f8f9fa">@BoundMonitoring.IdRustdesk</div>
+                                @if (!string.IsNullOrWhiteSpace(BoundMonitoring.IdRustdesk))
+                                {
+                                    <button type="button" class="btn btn-light"
+                                            title="Copiar"
+                                            @onclick="() => CopyToClipboard(BoundMonitoring.IdRustdesk!)">
+                                        <img src="img/copiar.png" class="chip-copy-icon" alt="Copiar" />
+                                    </button>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Tipo</label>
+                            <div class="form-control" style="background:#f8f9fa">@BoundMonitoring.MonitoringType?.Name</div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <!-- CREATE / EDIT -->
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Identificador</label>
+                            <input class="form-control" @bind="formIdentificador" placeholder="Ex.: CL-0001" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Unidade</label>
+                            <input class="form-control" @bind="formUnidade" placeholder="Ex.: Matriz" />
+                        </div>
+
+                        <div class="col-6 col-md-3">
+                            <label class="form-label">Estado</label>
+                            <input class="form-control" @bind="formEstado" placeholder="Ex.: SP" />
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label">Cidade</label>
+                            <input class="form-control" @bind="formCidade" placeholder="Ex.: São Paulo" />
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label">IHM</label>
+                            <input class="form-control" @bind="formIhm" />
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label class="form-label">Gateway</label>
+                            <input class="form-control" @bind="formGateway" />
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">CLP (um por linha)</label>
+                            <textarea class="form-control" rows="6" @bind="formClpText"
+                                      placeholder="Ex.:
+CLP1
+CLP2"></textarea>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">MACs (um por linha)</label>
+                            <textarea class="form-control" rows="6" @bind="formMacsText"
+                                      placeholder="Ex.:
+AA:BB:CC:DD:EE:FF
+11:22:33:44:55:66"></textarea>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">Máscara</label>
+                            <input class="form-control" @bind="formMasc" placeholder="Ex.: 255.255.255.0" />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">AnyDesk</label>
+                            <input class="form-control" @bind="formIdAnydesk" />
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label">TeamViewer</label>
+                            <input class="form-control" @bind="formIdTeamViewer" />
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">RustDesk</label>
+                            <input class="form-control" @bind="formIdRustdesk" />
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Tipo de Monitoramento</label>
+                            <select class="form-select" @bind="formMonitoringTypeId">
+                                <option value="">-- Selecione --</option>
+                                @if (MonitoringTypeOptions is not null)
+                                {
+                                    @foreach (var t in MonitoringTypeOptions)
+                                    {
+                                        <option value="@t.Id">@t.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="viewer-card-footer d-flex gap-2 justify-content-end">
+                @if (CurrentMode == ViewerMode.View)
+                {
+                    <button class="btn btn-secondary" @onclick="EnterEditMode">Editar</button>
+                    <button class="btn btn-light" @onclick="CloseRequested">Fechar</button>
+                }
+                else if (CurrentMode == ViewerMode.Edit)
+                {
+                    <button class="btn btn-light" @onclick="CancelEdit">Cancelar</button>
+                    <button class="btn btn-primary" @onclick="SaveEdit">Salvar</button>
+                }
+                else
+                {
+                    <!-- Create -->
+                    <button class="btn btn-light" @onclick="CloseRequested">Cancelar</button>
+                    <button class="btn btn-primary" @onclick="SaveCreate">Salvar</button>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    /* ========= Parâmetros ========= */
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public ViewerMode Mode { get; set; } = ViewerMode.Create;
+    [Parameter] public MonitoringModel? Monitoring { get; set; }
+    [Parameter] public List<MonitoringTypeModel>? MonitoringTypeOptions { get; set; }
+
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback<MonitoringModel> OnCreate { get; set; }
+    [Parameter] public EventCallback<MonitoringModel> OnUpdate { get; set; }
+
+    /* ========= Estado ========= */
+    private ViewerMode CurrentMode;
+    private MonitoringModel? BoundMonitoring;
+
+    // Form (Create/Edit)
+    private string formIdentificador = string.Empty;
+    private string formUnidade = string.Empty;
+    private string formEstado = string.Empty;
+    private string formCidade = string.Empty;
+    private string formIhm = string.Empty;
+    private string formGateway = string.Empty;
+    private string formClpText = string.Empty;
+    private string formMacsText = string.Empty;
+    private string formMasc = string.Empty;
+    private string formIdAnydesk = string.Empty;
+    private string formIdRustdesk = string.Empty;
+    private string formIdTeamViewer = string.Empty;
+    private string? formMonitoringTypeId;
+
+    protected override void OnParametersSet()
+    {
+        CurrentMode = Mode;
+        BoundMonitoring = Monitoring;
+
+        if (CurrentMode == ViewerMode.Create)
+        {
+            LoadBlankForm();
+        }
+        else if (CurrentMode == ViewerMode.View && BoundMonitoring is not null)
+        {
+            // somente leitura
+        }
+        else if (CurrentMode == ViewerMode.Edit && BoundMonitoring is not null)
+        {
+            LoadFormFrom(BoundMonitoring);
+        }
+    }
+
+    private void LoadBlankForm()
+    {
+        formIdentificador = formUnidade = formEstado = formCidade = string.Empty;
+        formIhm = formGateway = string.Empty;
+        formClpText = formMacsText = string.Empty;
+        formMasc = formIdAnydesk = formIdRustdesk = formIdTeamViewer = string.Empty;
+        formMonitoringTypeId = null;
+    }
+
+    private void LoadFormFrom(MonitoringModel m)
+    {
+        formIdentificador = m.Identificador ?? string.Empty;
+        formUnidade = m.Unidade ?? string.Empty;
+        formEstado = m.Estado ?? string.Empty;
+        formCidade = m.Cidade ?? string.Empty;
+        formIhm = m.Ihm ?? string.Empty;
+        formGateway = m.Gateway ?? string.Empty;
+        formClpText = m.Clp is null || m.Clp.Count == 0 ? string.Empty : string.Join(Environment.NewLine, m.Clp);
+        formMacsText = m.Macs is null || m.Macs.Count == 0 ? string.Empty : string.Join(Environment.NewLine, m.Macs);
+        formMasc = m.Masc ?? string.Empty;
+        formIdAnydesk = m.IdAnydesk ?? string.Empty;
+        formIdRustdesk = m.IdRustdesk ?? string.Empty;
+        formIdTeamViewer = m.IdTeamViewer ?? string.Empty;
+        formMonitoringTypeId = m.MonitoringType?.Id;
+    }
+
+    private string HeaderTitle => CurrentMode switch
+    {
+        ViewerMode.Create => "Novo Monitoramento",
+        ViewerMode.Edit   => "Editar Monitoramento",
+        _                 => "Detalhes do Monitoramento"
+    };
+
+    private async Task CloseRequested() => await OnClose.InvokeAsync();
+    private async Task HandleOverlayBackgroundClick() => await OnClose.InvokeAsync();
+
+    /* ===== Transições ===== */
+    private void EnterEditMode()
+    {
+        if (BoundMonitoring is null) return;
+        CurrentMode = ViewerMode.Edit;
+        LoadFormFrom(BoundMonitoring);
+        StateHasChanged();
+    }
+
+    private void CancelEdit()
+    {
+        if (Mode == ViewerMode.View)
+            CurrentMode = ViewerMode.View;
+        else
+            _ = OnClose.InvokeAsync();
+    }
+
+    /* ===== Ações ===== */
+    private async Task SaveCreate()
+    {
+        var model = BuildFromForm();
+        await OnCreate.InvokeAsync(model);
+    }
+
+    private async Task SaveEdit()
+    {
+        if (BoundMonitoring is null) return;
+
+        var model = BuildFromForm();
+        model.Id = BoundMonitoring.Id; // mantém ID
+        await OnUpdate.InvokeAsync(model);
+    }
+
+    private MonitoringModel BuildFromForm()
+    {
+        var clps = SplitLines(formClpText);
+        var macs = SplitLines(formMacsText);
+
+        return new MonitoringModel
+        {
+            Identificador = formIdentificador?.Trim() ?? string.Empty,
+            Unidade       = formUnidade?.Trim() ?? string.Empty,
+            Estado        = formEstado?.Trim() ?? string.Empty,
+            Cidade        = formCidade?.Trim() ?? string.Empty,
+            Ihm           = formIhm?.Trim() ?? string.Empty,
+            Gateway       = formGateway?.Trim() ?? string.Empty,
+            Clp           = clps,
+            Macs          = macs,
+            Masc          = formMasc?.Trim() ?? string.Empty,
+            IdAnydesk     = formIdAnydesk?.Trim() ?? string.Empty,
+            IdRustdesk    = formIdRustdesk?.Trim() ?? string.Empty,
+            IdTeamViewer  = formIdTeamViewer?.Trim() ?? string.Empty,
+            MonitoringType = new MonitoringTypeModel
+            {
+                Id   = string.IsNullOrWhiteSpace(formMonitoringTypeId) ? string.Empty : formMonitoringTypeId!,
+                Name = FindTypeName(formMonitoringTypeId)
+            }
+        };
+    }
+
+    private static List<string> SplitLines(string? text) =>
+        (text ?? string.Empty)
+            .Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(s => s.Trim())
+            .Where(s => !string.IsNullOrWhiteSpace(s))
+            .ToList();
+
+    private string FindTypeName(string? id)
+    {
+        if (string.IsNullOrWhiteSpace(id) || MonitoringTypeOptions is null) return string.Empty;
+        var item = MonitoringTypeOptions.FirstOrDefault(t => t.Id == id);
+        return item?.Name ?? string.Empty;
+    }
+
+    /* ===== Copiar ===== */
+    private async Task CopyToClipboard(string text)
+    {
+        try
+        {
+            var ok = await JS.InvokeAsync<bool>("copyToClipboard", text);
+            if (!ok) await JS.InvokeVoidAsync("navigator.clipboard.writeText", text);
+        }
+        catch { /* silencioso */ }
+    }
+
+    public enum ViewerMode { Create = 0, View = 1, Edit = 2 }
+}

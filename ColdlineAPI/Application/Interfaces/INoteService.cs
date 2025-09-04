@@ -1,4 +1,5 @@
 using ColdlineAPI.Domain.Entities;
+using ColdlineAPI.Application.Common;
 using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Domain.Enum;
 using System.Collections.Generic;
@@ -13,6 +14,6 @@ namespace ColdlineAPI.Application.Interfaces
         Task<Note> CreateNoteAsync(Note notes);
         Task<bool> UpdateNoteAsync(string id, Note notes);
         Task<bool> DeleteNoteAsync(string id);
-        Task<List<Note>> SearchNotesAsync(NoteFilter filter);
+        Task<PagedResult<Note>> SearchNotesAsync(NoteFilter filter);
     }
 }

@@ -33,10 +33,6 @@
       "PackagePath": "staticwebassets/uploads/teste.png"
     },
     {
-      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.Presentation.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
-      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
-    },
-    {
       "Id": "obj/Debug/net8.0/staticwebassets/msbuild.Presentation.Microsoft.AspNetCore.StaticWebAssets.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
     },

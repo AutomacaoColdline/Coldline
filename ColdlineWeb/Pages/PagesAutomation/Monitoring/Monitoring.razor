@@ -1,0 +1,244 @@
+@using System.Net.Http.Json
+@using ColdlineWeb.Models
+@using ColdlineWeb.Models.Enum
+@using ColdlineWeb.Models.Filter
+@using ColdlineWeb.Pages.PagesAutomation.Components   <!-- Sidebar -->
+@inherits MonitoringPage
+
+<link rel="stylesheet" href="css/Automation/Automation.css" />
+
+<div class="container-automation">
+    <div class="main-content">
+        <img src="img/logofundo.png" class="background-image" alt="Logo Fundo" />
+
+        @if (isLoading)
+        {
+            <div class="loader-overlay"><div class="loader"></div></div>
+        }
+        else if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger mt-3">@errorMessage</div>
+            <button class="btn btn-secondary mt-2" @onclick="Logout">
+                Voltar ao Login
+            </button>
+        }
+        else
+        {
+            <div class="p-4 text-muted">
+
+                <!-- ===== Card de Pesquisa / Filtros ===== -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <strong>Pesquisar Monitoramentos</strong>
+
+                        <!-- Adicionar novo -->
+                        <button class="btn btn-success btn-sm btn-icon"
+                                title="Adicionar novo monitoramento"
+                                @onclick="OpenCreateMonitoring">
+                            <span class="btn-icon-plus">+</span>
+                            <img src="img/copiar.png" alt="Adicionar" class="btn-icon-img" />
+                        </button>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row g-2 align-items-end filter-row">
+
+                            <div class="col-12 col-md-3">
+                                <label class="form-label mb-1 d-none d-md-block">Identificador</label>
+                                <input class="form-control"
+                                       placeholder="Ex.: 0001, CL-ABC"
+                                       @bind="filterModel.Identificador" />
+                            </div>
+
+                            <div class="col-12 col-md-3">
+                                <label class="form-label mb-1 d-none d-md-block">Unidade</label>
+                                <input class="form-control"
+                                       placeholder="Ex.: Matriz, Loja 12"
+                                       @bind="filterModel.Unidade" />
+                            </div>
+
+                            <div class="col-12 col-md-2">
+                                <label class="form-label mb-1 d-none d-md-block">Estado</label>
+                                <input class="form-control" placeholder="Ex.: SP, MG" @bind="filterModel.Estado" />
+                            </div>
+
+                            <div class="col-12 col-md-2">
+                                <label class="form-label mb-1 d-none d-md-block">Cidade</label>
+                                <input class="form-control" placeholder="Ex.: São Paulo" @bind="filterModel.Cidade" />
+                            </div>
+
+                            <div class="col-12 col-md-2">
+                                <label class="form-label mb-1 d-none d-md-block">Tipo</label>
+                                <select class="form-select" @bind="selectedMonitoringTypeId">
+                                    <option value="">-- Todos --</option>
+                                    @if (monitoringTypes is not null)
+                                    {
+                                        @foreach (var t in monitoringTypes)
+                                        {
+                                            <option value="@t.Id">@t.Name</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="d-flex gap-2 mt-2 justify-content-start justify-content-md-end filter-actions">
+                                    <button class="btn btn-primary btn-icon filter-btn" title="Filtrar" @onclick="ApplyFilter">
+                                        <img src="img/lupa.png" alt="Filtrar" class="btn-icon-img" />
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-icon filter-btn" title="Limpar filtros" @onclick="ClearFilter">
+                                        <img src="img/limpar-limpo.png" alt="Limpar filtros" class="btn-icon-img" />
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!-- ===== /Card de Pesquisa ===== -->
+
+                <!-- ===== Lista + Paginação ===== -->
+                <div class="card mt-4">
+                    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <strong>Resultados</strong>
+
+                        <div class="d-flex align-items-center gap-3">
+                            <small class="text-muted">
+                                @((monitoringsPage?.Items?.Count ?? 0)) de @monitoringsPage.Total itens ·
+                                Página @monitoringsPage.Page/@monitoringsPage.TotalPages
+                            </small>
+
+                            <div class="d-flex align-items-center gap-1">
+                                <small class="text-muted">por página</small>
+                                <select class="form-select form-select-sm w-auto"
+                                        value="@monitoringsPage.PageSize"
+                                        @onchange="ChangePageSize">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                </select>
+                            </div>
+
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-secondary"
+                                        disabled="@(!monitoringsPage.HasPrevious)"
+                                        @onclick="PrevPage">«</button>
+                                <button class="btn btn-sm btn-outline-secondary"
+                                        disabled="@(!monitoringsPage.HasNext)"
+                                        @onclick="NextPage">»</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        @if (monitoringsPage is null || monitoringsPage.Items is null || monitoringsPage.Items.Count == 0)
+                        {
+                            <div class="p-3 text-muted">Nenhum monitoramento encontrado.</div>
+                        }
+                        else
+                        {
+                            <div class="notes-board">
+                                @foreach (var m in monitoringsPage.Items)
+                                {
+                                    <article class="note-card" @onclick="() => OpenViewMonitoring(m)">
+                                        <header class="note-card__header">
+                                            <h6 class="note-card__title" title="@m.Unidade">@m.Unidade</h6>
+
+                                            <div class="d-flex align-items-center gap-2">
+                                                @if (!string.IsNullOrWhiteSpace(m.MonitoringType?.Name))
+                                                {
+                                                    <span class="badge bg-primary" title="Tipo de monitoramento">
+                                                        @m.MonitoringType.Name
+                                                    </span>
+                                                }
+
+                                                <!-- Excluir -->
+                                                <button type="button"
+                                                        class="btn btn-outline-danger btn-sm"
+                                                        title="Apagar"
+                                                        @onclick:stopPropagation="true"
+                                                        @onclick="() => OpenDeleteMonitoring(m)">
+                                                    <img src="img/lixeira.png" alt="Excluir" class="lixeira-icon" />
+                                                </button>
+                                            </div>
+                                        </header>
+
+                                        <section class="note-card__content">
+                                            <div class="chip-list">
+
+                                                @if (!string.IsNullOrWhiteSpace(m.IdRustdesk))
+                                                {
+                                                    <span class="chip" title="RustDesk" @onclick:stopPropagation="true">
+                                                        <span class="chip-text">RustDesk: @m.IdRustdesk</span>
+                                                        <button type="button" class="chip-copy-btn" title="Copiar"
+                                                                @onclick="() => CopyValue(m.IdRustdesk)">
+                                                            <img src="img/copiar.png" alt="Copiar" class="chip-copy-icon" />
+                                                        </button>
+                                                    </span>
+                                                }
+
+                                                @if (!string.IsNullOrWhiteSpace(m.Identificador))
+                                                {
+                                                    <span class="chip" title="Identificador" @onclick:stopPropagation="true">
+                                                        <span class="chip-text">Identificador: @m.Identificador</span>
+                                                        <button type="button" class="chip-copy-btn" title="Copiar"
+                                                                @onclick="() => CopyValue(m.Identificador)">
+                                                            <img src="img/copiar.png" alt="Copiar" class="chip-copy-icon" />
+                                                        </button>
+                                                    </span>
+                                                }
+                                            </div>
+                                        </section>
+                                    </article>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+                <!-- ===== /Lista + Paginação ===== -->
+            </div>
+        }
+    </div>
+</div>
+
+<!-- MonitoringViewer: criar / visualizar / editar -->
+@if (viewerVisible)
+{
+    <MonitoringViewer Visible="viewerVisible"
+                      Mode="viewerMode"
+                      MonitoringTypeOptions="monitoringTypes"
+                      Monitoring="viewerMonitoring"
+                      OnClose="CloseMonitoringViewer"
+                      OnCreate="HandleSaveMonitoring"
+                      OnUpdate="HandleUpdateMonitoring" />
+}
+
+<!-- Modal de confirmação de exclusão -->
+@if (showDeleteConfirm)
+{
+    <div class="viewer-overlay" @onclick="CloseDeleteMonitoring">
+        <div class="viewer-card" style="width:min(520px, 95vw)" @onclick:stopPropagation="true">
+            <div class="viewer-card-header">
+                <h5 class="m-0">Confirmar exclusão</h5>
+            </div>
+            <div class="viewer-card-body">
+                <p class="mb-2">
+                    Tem certeza que deseja <strong>excluir</strong> este monitoramento?
+                </p>
+                @if (monitoringPendingDelete is not null)
+                {
+                    <ul class="mb-0">
+                        <li><strong>Unidade:</strong> @monitoringPendingDelete.Unidade</li>
+                        <li><strong>Identificador:</strong> @monitoringPendingDelete.Identificador</li>
+                        <li><strong>Tipo:</strong> @monitoringPendingDelete.MonitoringType?.Name</li>
+                    </ul>
+                }
+            </div>
+            <div class="viewer-card-footer d-flex justify-content-end gap-2">
+                <button class="btn btn-light" @onclick="CloseDeleteMonitoring">Cancelar</button>
+                <button class="btn btn-danger" @onclick="ConfirmDeleteMonitoring">Excluir</button>
+            </div>
+        </div>
+    </div>
+}

@@ -6,6 +6,7 @@
 @using ColdlineWeb.Models.Filter
 @using ColdlineWeb.Pages.PagesAutomation.Components
 @using ColdlineWeb.Pages.PagesAutomation.Users
+@using ColdlineWeb.Pages.PagesAutomation.Monitoring
 @inherits AutomationHomePage
 
 <link rel="stylesheet" href="css/Automation/Automation.css" />
@@ -35,6 +36,9 @@
             {
                 case "users":
                     <Users />
+                    break;
+                case "monitoring":
+                    <Monitoring />
                     break;
 
                 default:
@@ -110,36 +114,60 @@
                         </div>
                         <!-- ===== /Card de Pesquisa ===== -->
 
+                        <!-- ===== Lista + Paginação ===== -->
                         <div class="card mt-4">
-                            <div class="card-header d-flex justify-content-between align-items-center">
+                            <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
                                 <strong>Notas</strong>
-                                <small class="text-muted">
-                                    @((notes?.Count ?? 0)) itens
-                                </small>
+
+                                <div class="d-flex align-items-center gap-3">
+                                    <small class="text-muted">
+                                        @((notesPage?.Items?.Count ?? 0)) de @notesPage.Total itens ·
+                                        Página @notesPage.Page/@notesPage.TotalPages
+                                    </small>
+
+                                    <!-- PageSize -->
+                                    <div class="d-flex align-items-center gap-1">
+                                        <small class="text-muted">por página</small>
+                                        <select class="form-select form-select-sm w-auto"
+                                                value="@notesPage.PageSize"
+                                                @onchange="ChangePageSize">
+                                            <option value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="50">50</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Pager -->
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                                disabled="@(!notesPage.HasPrevious)"
+                                                @onclick="PrevPage">«</button>
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                                disabled="@(!notesPage.HasNext)"
+                                                @onclick="NextPage">»</button>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="card-body">
-                                @if (notes == null || notes.Count == 0)
+                                @if (notesPage is null || notesPage.Items is null || notesPage.Items.Count == 0)
                                 {
                                     <div class="p-3 text-muted">Nenhuma nota encontrada.</div>
                                 }
                                 else
                                 {
-                                    <!-- ===== Board de Notas (cards estilo Trello) ===== -->
+                                    <!-- Board de Notas (cards estilo Trello) -->
                                     <div class="notes-board">
-                                        @foreach (var n in notes)
+                                        @foreach (var n in notesPage.Items)
                                         {
                                             <article class="note-card" @onclick="() => OpenViewNote(n)">
                                                 <header class="note-card__header">
                                                     <h6 class="note-card__title" title="@n.Name">@n.Name</h6>
-
                                                     <div class="d-flex align-items-center gap-2">
-                                                        <span class="badge @GetNoteTypeCss(n.NoteType)"
-                                                              title="@n.NoteType.ToString()">
+                                                        <span class="badge @GetNoteTypeCss(n.NoteType)" title="@n.NoteType.ToString()">
                                                             @GetNoteTypeDisplay(n.NoteType)
                                                         </span>
-
-                                                        <!-- Botão pequeno de apagar -->
                                                         <button type="button"
                                                                 class="btn btn-outline-danger btn-sm"
                                                                 title="Apagar nota"
@@ -178,10 +206,10 @@
                                             </article>
                                         }
                                     </div>
-                                    <!-- ===== /Board de Notas ===== -->
                                 }
                             </div>
                         </div>
+                        <!-- ===== /Lista + Paginação ===== -->
                     </div>
                     break;
             }

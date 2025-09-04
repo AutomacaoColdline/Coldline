@@ -1,128 +1,81 @@
-using ColdlineAPI.Application.Interfaces;
-using ColdlineAPI.Application.Factories;
-using ColdlineAPI.Application.Repositories;
-using ColdlineAPI.Application.Filters;
-using ColdlineAPI.Domain.Entities;
-using System.Text.RegularExpressions;
-using MongoDB.Bson;
-using MongoDB.Driver;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.WebUtilities;          // <- QueryHelpers
+using ColdlineWeb.Models;
+using ColdlineWeb.Models.Filter;
 
-namespace ColdlineAPI.Application.Services
+namespace ColdlineWeb.Services
 {
-    public class MonitoringService : IMonitoringService
+    public class MonitoringService
     {
-        private readonly MongoRepository<Monitoring> _monitorings;
+        private readonly HttpClient _http;
 
-        public MonitoringService(RepositoryFactory factory)
+        public MonitoringService(HttpClient http)
         {
-            _monitorings = factory.CreateRepository<Monitoring>("Monitorings");
+            _http = http;
         }
 
-        public async Task<List<Monitoring>> GetAllMonitoringsAsync()
+        public async Task<List<MonitoringModel>> GetAllAsync()
+            => await _http.GetFromJsonAsync<List<MonitoringModel>>("api/Monitoring") ?? new();
+
+        public async Task<MonitoringModel?> GetByIdAsync(string id)
+            => await _http.GetFromJsonAsync<MonitoringModel>($"api/Monitoring/{id}");
+
+        // 🔎 Agora paginado via GET /api/Monitoring/search
+        public async Task<ColdlineWeb.Models.Common.PagedResult<MonitoringModel>> FilterAsync(MonitoringFilterModel filter)
         {
-            var projection = Builders<Monitoring>.Projection
-                .Include(x => x.Id)
-                .Include(x => x.Identificador)
-                .Include(x => x.Unidade)
-                .Include(x => x.Estado)
-                .Include(x => x.Cidade)
-                .Include(x => x.IHM)
-                .Include(x => x.Gateway)
-                .Include(x => x.CLP)
-                .Include(x => x.MACs)
-                .Include(x => x.MASC)
-                .Include(x => x.IdRustdesk)
-                .Include(x => x.IdAnydesk)
-                .Include(x => x.IdTeamViewer)
-                .Include(x => x.MonitoringType);
+            var query = new Dictionary<string, string>();
 
-            var collection = _monitorings.GetCollection();
-            var result = await collection.Find(_ => true).Project<Monitoring>(projection).ToListAsync();
-            return result;
-        }
+            if (!string.IsNullOrWhiteSpace(filter.Estado))
+                query["Estado"] = filter.Estado;
 
-        public async Task<List<Monitoring>> GetFilteredMonitoringsAsync(MonitoringFilter filter)
-        {
-            var builder = Builders<Monitoring>.Filter;
-            var filters = new List<FilterDefinition<Monitoring>>();
+            if (!string.IsNullOrWhiteSpace(filter.Cidade))
+                query["Cidade"] = filter.Cidade;
 
-            if (!string.IsNullOrEmpty(filter.Estado))
-                filters.Add(builder.Eq(m => m.Estado, filter.Estado));
+            if (!string.IsNullOrWhiteSpace(filter.Identificador))
+                query["Identificador"] = filter.Identificador;
 
-            if (!string.IsNullOrEmpty(filter.Cidade))
-                filters.Add(builder.Eq(m => m.Cidade, filter.Cidade));
+            if (!string.IsNullOrWhiteSpace(filter.Unidade))
+                query["Unidade"] = filter.Unidade;
 
-            if (!string.IsNullOrEmpty(filter.Identificador))
-                filters.Add(builder.Regex(m => m.Identificador, new BsonRegularExpression($"^{Regex.Escape(filter.Identificador)}", "i")));
+            if (!string.IsNullOrWhiteSpace(filter.MonitoringTypeId))
+                query["MonitoringTypeId"] = filter.MonitoringTypeId;
 
-            if (!string.IsNullOrEmpty(filter.Unidade))
-                filters.Add(builder.Regex(m => m.Unidade, new BsonRegularExpression($"^{Regex.Escape(filter.Unidade)}", "i")));
+            // paginação
+            query["Page"] = (filter.Page <= 0 ? 1 : filter.Page).ToString();
+            query["PageSize"] = (filter.PageSize <= 0 ? 20 : filter.PageSize).ToString();
 
-            if (!string.IsNullOrEmpty(filter.MonitoringTypeId))
-                filters.Add(builder.Eq("MonitoringType.Id", filter.MonitoringTypeId));
+            var url = QueryHelpers.AddQueryString("api/Monitoring/search", query);
 
-            var finalFilter = filters.Count > 0 ? builder.And(filters) : builder.Empty;
-
-            return await _monitorings.GetCollection()
-                .Find(finalFilter)
-                .Skip((filter.Page - 1) * filter.PageSize)
-                .Limit(filter.PageSize)
-                .ToListAsync();
-        }
-
-        public async Task<Monitoring?> GetMonitoringByIdAsync(string id)
-        {
-            return await _monitorings.GetByIdAsync(m => m.Id == id);
-        }
-
-        public async Task<Monitoring> CreateMonitoringAsync(Monitoring monitoring)
-        {
-            if (string.IsNullOrEmpty(monitoring.Id))
-                monitoring.Id = ObjectId.GenerateNewId().ToString();
-
-            return await _monitorings.CreateAsync(monitoring);
-        }
-
-        public async Task<List<Monitoring>> CreateAllMonitoringsAsync(List<Monitoring> monitorings)
-        {
-            foreach (var monitoring in monitorings)
+            var result = await _http.GetFromJsonAsync<ColdlineWeb.Models.Common.PagedResult<MonitoringModel>>(url);
+            return result ?? new ColdlineWeb.Models.Common.PagedResult<MonitoringModel>
             {
-                if (string.IsNullOrEmpty(monitoring.Id))
-                {
-                    monitoring.Id = ObjectId.GenerateNewId().ToString();
-                }
-            }
-
-            await _monitorings.GetCollection().InsertManyAsync(monitorings);
-            return monitorings;
+                Items = System.Array.Empty<MonitoringModel>(),
+                Page = filter.Page,
+                PageSize = filter.PageSize
+            };
         }
 
-        public async Task<bool> UpdateMonitoringAsync(string id, Monitoring monitoring)
+        public async Task<MonitoringModel?> CreateAsync(MonitoringModel monitoring)
         {
-            var update = Builders<Monitoring>.Update
-                .Set(x => x.Identificador, monitoring.Identificador)
-                .Set(x => x.Unidade, monitoring.Unidade)
-                .Set(x => x.Estado, monitoring.Estado)
-                .Set(x => x.Cidade, monitoring.Cidade)
-                .Set(x => x.IHM, monitoring.IHM)
-                .Set(x => x.Gateway, monitoring.Gateway)
-                .Set(x => x.CLP, monitoring.CLP)
-                .Set(x => x.MACs, monitoring.MACs)
-                .Set(x => x.MASC, monitoring.MASC)
-                .Set(x => x.IdRustdesk, monitoring.IdRustdesk)
-                .Set(x => x.IdAnydesk, monitoring.IdAnydesk)
-                .Set(x => x.IdTeamViewer, monitoring.IdTeamViewer)
-                .Set(x => x.MonitoringType, monitoring.MonitoringType);
-
-            var result = await _monitorings.GetCollection()
-                .UpdateOneAsync(m => m.Id == id, update);
-
-            return result.IsAcknowledged && result.ModifiedCount > 0;
+            var response = await _http.PostAsJsonAsync("api/Monitoring", monitoring);
+            return response.IsSuccessStatusCode
+                ? await response.Content.ReadFromJsonAsync<MonitoringModel>()
+                : null;
         }
 
-        public async Task<bool> DeleteMonitoringAsync(string id)
+        public async Task<bool> UpdateAsync(string id, MonitoringModel monitoring)
         {
-            return await _monitorings.DeleteAsync(m => m.Id == id);
+            var response = await _http.PutAsJsonAsync($"api/Monitoring/{id}", monitoring);
+            return response.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> DeleteAsync(string id)
+        {
+            var response = await _http.DeleteAsync($"api/Monitoring/{id}");
+            return response.IsSuccessStatusCode;
         }
     }
 }

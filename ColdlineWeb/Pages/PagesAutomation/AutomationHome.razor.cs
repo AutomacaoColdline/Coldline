@@ -1,17 +1,14 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Enum;
 using ColdlineWeb.Models.Filter;
 using ColdlineWeb.Services;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.JSInterop;
-
-// >>> IMPORTANTE: adiciona o namespace do componente NoteViewer
 using ColdlineWeb.Pages.PagesAutomation.Components;
 
 namespace ColdlineWeb.Pages.PagesAutomation
@@ -29,16 +26,23 @@ namespace ColdlineWeb.Pages.PagesAutomation
         protected string? errorMessage;
         protected bool isLoading = true;
 
-        protected List<NoteModel> notes = new();
-        protected NoteFilterModel filterModel = new();
-        protected List<NoteType> noteTypeOptions = Enum.GetValues(typeof(NoteType)).Cast<NoteType>().ToList();
+        // 🔧 Tipo qualificado para evitar ambiguidade:
+        protected ColdlineWeb.Models.Common.PagedResult<NoteModel> notesPage = new()
+        {
+            Items = System.Array.Empty<NoteModel>(),
+            Page = 1,
+            PageSize = 12
+        };
+
+        protected NoteFilterModel filterModel = new() { Page = 1, PageSize = 10 };
+
+        protected System.Collections.Generic.List<NoteType> noteTypeOptions =
+            Enum.GetValues(typeof(NoteType)).Cast<NoteType>().ToList();
         protected string? selectedNoteTypeStr;
 
-        // ===== Overlays =====
         protected bool showDeleteConfirm = false;
         protected NoteModel? notePendingDelete;
 
-        // ===== NoteViewer (Create/View/Edit) =====
         protected bool viewerVisible = false;
         protected NoteViewer.ViewerMode viewerMode = NoteViewer.ViewerMode.Create;
         protected NoteModel? viewerNote = null;
@@ -58,7 +62,7 @@ namespace ColdlineWeb.Pages.PagesAutomation
                 }
 
                 await LoadUserAsync(identificationNumber);
-                await LoadAllNotesAsync();
+                await LoadPageAsync(resetPage: true);
             }
             catch
             {
@@ -70,7 +74,56 @@ namespace ColdlineWeb.Pages.PagesAutomation
             }
         }
 
-        // ===== Visualizar / Criar / Editar =====
+        private async Task LoadPageAsync(bool resetPage = false)
+        {
+            try
+            {
+                if (resetPage) filterModel.Page = 1;
+
+                var result = await NoteService.SearchAsync(filterModel);
+                notesPage = result ?? new ColdlineWeb.Models.Common.PagedResult<NoteModel>
+                {
+                    Items = System.Array.Empty<NoteModel>(),
+                    Page = filterModel.Page,
+                    PageSize = filterModel.PageSize
+                };
+
+                if (notesPage.Items.Count == 0 && notesPage.Page > 1)
+                {
+                    filterModel.Page--;
+                    result = await NoteService.SearchAsync(filterModel);
+                    notesPage = result ?? notesPage;
+                }
+            }
+            catch
+            {
+                errorMessage ??= "Falha ao carregar as notas.";
+            }
+        }
+
+        protected async Task NextPage()
+        {
+            if (!notesPage.HasNext) return;
+            filterModel.Page++;
+            await LoadPageAsync();
+        }
+
+        protected async Task PrevPage()
+        {
+            if (!notesPage.HasPrevious) return;
+            filterModel.Page--;
+            await LoadPageAsync();
+        }
+
+        protected async Task ChangePageSize(ChangeEventArgs e)
+        {
+            if (int.TryParse(e?.Value?.ToString(), out var newSize) && newSize > 0)
+            {
+                filterModel.PageSize = newSize;
+                await LoadPageAsync(resetPage: true);
+            }
+        }
+
         protected void OpenCreateNote()
         {
             viewerMode = NoteViewer.ViewerMode.Create;
@@ -103,10 +156,8 @@ namespace ColdlineWeb.Pages.PagesAutomation
                 {
                     errorMessage = "Não foi possível salvar a nota.";
                 }
-                else
-                {
-                    await ReloadAfterMutationAsync();
-                }
+
+                await LoadPageAsync(resetPage: true);
             }
             catch
             {
@@ -137,10 +188,8 @@ namespace ColdlineWeb.Pages.PagesAutomation
                 {
                     errorMessage = "Não foi possível atualizar a nota.";
                 }
-                else
-                {
-                    await ReloadAfterMutationAsync();
-                }
+
+                await LoadPageAsync();
             }
             catch
             {
@@ -153,25 +202,6 @@ namespace ColdlineWeb.Pages.PagesAutomation
             }
         }
 
-        private async Task ReloadAfterMutationAsync()
-        {
-            var hasAnyFilter =
-                !string.IsNullOrWhiteSpace(filterModel.Name) ||
-                !string.IsNullOrWhiteSpace(filterModel.Element) ||
-                filterModel.NoteType.HasValue;
-
-            if (hasAnyFilter)
-            {
-                var filteredNotes = await NoteService.SearchAsync(filterModel);
-                notes = filteredNotes ?? new List<NoteModel>();
-            }
-            else
-            {
-                await LoadAllNotesAsync();
-            }
-        }
-
-        // ===== Utilitários =====
         protected async Task CopyElement(string text)
         {
             try
@@ -197,19 +227,6 @@ namespace ColdlineWeb.Pages.PagesAutomation
             }
         }
 
-        private async Task LoadAllNotesAsync()
-        {
-            try
-            {
-                var notesResult = await NoteService.GetAllAsync();
-                notes = notesResult ?? new List<NoteModel>();
-            }
-            catch
-            {
-                errorMessage ??= "Falha ao carregar as notas.";
-            }
-        }
-
         protected async Task ApplyFilter()
         {
             isLoading = true;
@@ -221,8 +238,8 @@ namespace ColdlineWeb.Pages.PagesAutomation
                 {
                     filterModel.NoteType = null;
                 }
-                else if (int.TryParse(selectedNoteTypeStr, out var noteTypeInt)
-                         && Enum.IsDefined(typeof(NoteType), noteTypeInt))
+                else if (int.TryParse(selectedNoteTypeStr, out var noteTypeInt) &&
+                         Enum.IsDefined(typeof(NoteType), noteTypeInt))
                 {
                     filterModel.NoteType = (NoteType)noteTypeInt;
                 }
@@ -231,20 +248,7 @@ namespace ColdlineWeb.Pages.PagesAutomation
                     filterModel.NoteType = null;
                 }
 
-                var hasAnyFilter =
-                    !string.IsNullOrWhiteSpace(filterModel.Name) ||
-                    !string.IsNullOrWhiteSpace(filterModel.Element) ||
-                    filterModel.NoteType.HasValue;
-
-                if (!hasAnyFilter)
-                {
-                    await LoadAllNotesAsync();
-                }
-                else
-                {
-                    var filteredNotes = await NoteService.SearchAsync(filterModel);
-                    notes = filteredNotes ?? new List<NoteModel>();
-                }
+                await LoadPageAsync(resetPage: true);
             }
             catch
             {
@@ -263,9 +267,9 @@ namespace ColdlineWeb.Pages.PagesAutomation
 
             try
             {
-                filterModel = new NoteFilterModel();
+                filterModel = new NoteFilterModel { Page = 1, PageSize = notesPage.PageSize };
                 selectedNoteTypeStr = null;
-                await LoadAllNotesAsync();
+                await LoadPageAsync(resetPage: true);
             }
             catch
             {
@@ -277,7 +281,6 @@ namespace ColdlineWeb.Pages.PagesAutomation
             }
         }
 
-        // ===== Exclusão =====
         protected void OpenDeleteNote(NoteModel note)
         {
             notePendingDelete = note;
@@ -308,10 +311,8 @@ namespace ColdlineWeb.Pages.PagesAutomation
                 {
                     errorMessage = "Não foi possível excluir a nota.";
                 }
-                else
-                {
-                    await ReloadAfterMutationAsync();
-                }
+
+                await LoadPageAsync();
             }
             catch
             {
@@ -325,7 +326,6 @@ namespace ColdlineWeb.Pages.PagesAutomation
             }
         }
 
-        // ===== Navegação =====
         protected void Logout() => Navigation.NavigateTo("/automation/login", replace: true);
 
         protected void HandleNavigate(string key)
@@ -345,7 +345,6 @@ namespace ColdlineWeb.Pages.PagesAutomation
             Navigation.NavigateTo(target, replace: false);
         }
 
-        // ===== Helpers =====
         protected string GetNoteTypeDisplay(NoteType type)
         {
             var member = typeof(NoteType).GetMember(type.ToString()).FirstOrDefault();

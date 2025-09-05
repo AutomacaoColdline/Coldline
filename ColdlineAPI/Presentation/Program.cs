@@ -12,65 +12,73 @@ QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ 1. CONFIGURAR CORS PERMITINDO O BLAZOR WEBASSEMBLY
+// 1) CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        policy =>
-        {
-            policy.WithOrigins("http://10.0.0.44:5173", "http://coldline.industria.com", "http://coldline.coldnex.com","http://coldnex.com")
-                  .AllowAnyMethod()
-                  .AllowAnyHeader()
-                  .AllowCredentials();
-        });
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.WithOrigins(
+                "http://10.0.0.44:5173",
+                "http://coldline.industria.com",
+                "http://coldline.coldnex.com",
+                "http://coldnex.com")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
 });
 
-// ✅ 2. Configuração dos serviços
+// 2) Services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
 ServiceRegistration.ConfigureServices(builder.Services);
 AuthenticationConfig.ConfigureAuthentication(builder.Services, builder.Configuration);
 DatabaseConfig.ConfigureDatabase(builder.Services, builder.Configuration);
-SwaggerConfig.ConfigureSwagger(builder.Services);
+SwaggerConfig.ConfigureSwagger(builder.Services); // registra Swagger sempre
 
 var app = builder.Build();
 
-// ✅ 3. APLICAR O CORS ANTES DOS OUTROS MIDDLEWARES
+// 3) CORS primeiro
 app.UseCors("AllowAll");
 
-// ✅ 4. Configuração do Swagger para ambiente de desenvolvimento
-if (app.Environment.IsDevelopment())
+// 4) Swagger em Dev OU quando habilitado no appsettings.{Environment}.json
+var enableSwaggerInProd = builder.Configuration.GetValue<bool>("Swagger:EnableInProduction", false);
+if (app.Environment.IsDevelopment() || enableSwaggerInProd)
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "ColdlineBackEnd API v1");
+        c.RoutePrefix = "swagger";
     });
+
+    // redireciona raiz para /swagger (opcional)
+    app.MapGet("/", () => Results.Redirect("/swagger"));
 }
 
-// ✅ 5. Configurar arquivos estáticos corretamente
+// 5) Arquivos estáticos (uploads)
 var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-
 if (!Directory.Exists(uploadsPath))
 {
     Directory.CreateDirectory(uploadsPath);
 }
-
-// ✅ Garante que a API sirva corretamente os arquivos na pasta `wwwroot/uploads`
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(uploadsPath),
     RequestPath = "/uploads"
 });
 
+// 6) Pipeline
+// Em contêiner sem HTTPS publicado, evite redirecionar para https em produção.
+// Mantemos apenas no Development para não gerar warning de porta HTTPS.
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
-
-
-
-// ✅ 6. Ordem correta dos middlewares
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
 
+app.MapControllers();
 app.Run();

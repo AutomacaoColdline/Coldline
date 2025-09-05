@@ -27,11 +27,11 @@ namespace ColdlineAPI.Presentation.Controllers
         }
         [HttpGet("search")]
         [ProducesResponseType(typeof(PagedResult<Monitoring>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<PagedResult<Monitoring>>> Search([FromQuery] MonitoringFilter filter)
-        {
-            var result = await _monitoringService.SearchMonitoringsAsync(filter);
+         public async Task<ActionResult<PagedResult<Monitoring>>> Search([FromQuery] MonitoringFilter filter)
+         {
+             var result = await _monitoringService.SearchMonitoringsAsync(filter);
             return Ok(result);
-        }
+         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Monitoring>> GetById(string id)

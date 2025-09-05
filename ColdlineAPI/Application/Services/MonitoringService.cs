@@ -1,81 +1,177 @@
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.WebUtilities;          // <- QueryHelpers
-using ColdlineWeb.Models;
-using ColdlineWeb.Models.Filter;
+using ColdlineAPI.Application.Common;
+using ColdlineAPI.Application.Factories;
+using ColdlineAPI.Application.Filters;
+using ColdlineAPI.Application.Interfaces;
+using ColdlineAPI.Application.Repositories;
+using ColdlineAPI.Domain.Entities;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using System.Text.RegularExpressions;
 
-namespace ColdlineWeb.Services
+namespace ColdlineAPI.Application.Services
 {
-    public class MonitoringService
+    public class MonitoringService : IMonitoringService
     {
-        private readonly HttpClient _http;
+        private readonly MongoRepository<Monitoring> _monitorings;
 
-        public MonitoringService(HttpClient http)
+        public MonitoringService(RepositoryFactory factory)
         {
-            _http = http;
+            _monitorings = factory.CreateRepository<Monitoring>("Monitorings");
         }
 
-        public async Task<List<MonitoringModel>> GetAllAsync()
-            => await _http.GetFromJsonAsync<List<MonitoringModel>>("api/Monitoring") ?? new();
-
-        public async Task<MonitoringModel?> GetByIdAsync(string id)
-            => await _http.GetFromJsonAsync<MonitoringModel>($"api/Monitoring/{id}");
-
-        // 🔎 Agora paginado via GET /api/Monitoring/search
-        public async Task<ColdlineWeb.Models.Common.PagedResult<MonitoringModel>> FilterAsync(MonitoringFilterModel filter)
+        public async Task<List<Monitoring>> GetAllMonitoringsAsync()
         {
-            var query = new Dictionary<string, string>();
+            var projection = Builders<Monitoring>.Projection
+                .Include(x => x.Id)
+                .Include(x => x.Identificador)
+                .Include(x => x.Unidade)
+                .Include(x => x.Estado)
+                .Include(x => x.Cidade)
+                .Include(x => x.IHM)
+                .Include(x => x.Gateway)
+                .Include(x => x.CLP)
+                .Include(x => x.MACs)
+                .Include(x => x.MASC)
+                .Include(x => x.IdRustdesk)
+                .Include(x => x.IdAnydesk)
+                .Include(x => x.IdTeamViewer)
+                .Include(x => x.MonitoringType);
+
+            var collection = _monitorings.GetCollection();
+            return await collection
+                .Find(_ => true)
+                .Project<Monitoring>(projection)
+                .ToListAsync();
+        }
+
+        public async Task<PagedResult<Monitoring>> SearchMonitoringsAsync(MonitoringFilter filter)
+        {
+            var fb = Builders<Monitoring>.Filter;
+            var filters = new List<FilterDefinition<Monitoring>>();
 
             if (!string.IsNullOrWhiteSpace(filter.Estado))
-                query["Estado"] = filter.Estado;
+                filters.Add(fb.Eq(m => m.Estado, filter.Estado));
 
             if (!string.IsNullOrWhiteSpace(filter.Cidade))
-                query["Cidade"] = filter.Cidade;
+                filters.Add(fb.Eq(m => m.Cidade, filter.Cidade));
 
             if (!string.IsNullOrWhiteSpace(filter.Identificador))
-                query["Identificador"] = filter.Identificador;
+            {
+                var pattern = $"^{Regex.Escape(filter.Identificador)}";
+                filters.Add(fb.Regex(m => m.Identificador, new BsonRegularExpression(pattern, "i")));
+            }
 
             if (!string.IsNullOrWhiteSpace(filter.Unidade))
-                query["Unidade"] = filter.Unidade;
+            {
+                var pattern = $"^{Regex.Escape(filter.Unidade)}";
+                filters.Add(fb.Regex(m => m.Unidade, new BsonRegularExpression(pattern, "i")));
+            }
 
             if (!string.IsNullOrWhiteSpace(filter.MonitoringTypeId))
-                query["MonitoringTypeId"] = filter.MonitoringTypeId;
+                filters.Add(fb.Eq("MonitoringType.Id", filter.MonitoringTypeId));
 
-            // paginação
-            query["Page"] = (filter.Page <= 0 ? 1 : filter.Page).ToString();
-            query["PageSize"] = (filter.PageSize <= 0 ? 20 : filter.PageSize).ToString();
+            var finalFilter = filters.Count > 0 ? fb.And(filters) : FilterDefinition<Monitoring>.Empty;
 
-            var url = QueryHelpers.AddQueryString("api/Monitoring/search", query);
+            // paginação segura
+            var page = Math.Max(1, filter.Page);
+            var pageSize = Math.Clamp(filter.PageSize, 1, 200);
+            var skip = (page - 1) * pageSize;
 
-            var result = await _http.GetFromJsonAsync<ColdlineWeb.Models.Common.PagedResult<MonitoringModel>>(url);
-            return result ?? new ColdlineWeb.Models.Common.PagedResult<MonitoringModel>
+            // ordenação
+            var sort = Builders<Monitoring>.Sort.Ascending(m => m.Identificador);
+
+            // projeção (evita trazer campos gigantes desnecessários)
+            var projection = Builders<Monitoring>.Projection
+                .Include(x => x.Id)
+                .Include(x => x.Identificador)
+                .Include(x => x.Unidade)
+                .Include(x => x.Estado)
+                .Include(x => x.Cidade)
+                .Include(x => x.IHM)
+                .Include(x => x.Gateway)
+                .Include(x => x.CLP)
+                .Include(x => x.MACs)
+                .Include(x => x.MASC)
+                .Include(x => x.IdRustdesk)
+                .Include(x => x.IdAnydesk)
+                .Include(x => x.IdTeamViewer)
+                .Include(x => x.MonitoringType);
+
+            var collection = _monitorings.GetCollection();
+
+            // total de itens do filtro
+            var total = await collection.CountDocumentsAsync(finalFilter);
+
+            // itens da página
+            var items = await collection
+                .Find(finalFilter)
+                .Sort(sort)
+                .Skip(skip)
+                .Limit(pageSize)
+                .Project<Monitoring>(projection)
+                .ToListAsync();
+
+            return new PagedResult<Monitoring>
             {
-                Items = System.Array.Empty<MonitoringModel>(),
-                Page = filter.Page,
-                PageSize = filter.PageSize
+                Items = items,
+                Total = total,
+                Page = page,
+                PageSize = pageSize
             };
         }
 
-        public async Task<MonitoringModel?> CreateAsync(MonitoringModel monitoring)
+        public async Task<Monitoring?> GetMonitoringByIdAsync(string id)
         {
-            var response = await _http.PostAsJsonAsync("api/Monitoring", monitoring);
-            return response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<MonitoringModel>()
-                : null;
+            return await _monitorings.GetByIdAsync(m => m.Id == id);
         }
 
-        public async Task<bool> UpdateAsync(string id, MonitoringModel monitoring)
+        public async Task<Monitoring> CreateMonitoringAsync(Monitoring monitoring)
         {
-            var response = await _http.PutAsJsonAsync($"api/Monitoring/{id}", monitoring);
-            return response.IsSuccessStatusCode;
+            if (string.IsNullOrEmpty(monitoring.Id))
+                monitoring.Id = ObjectId.GenerateNewId().ToString();
+
+            return await _monitorings.CreateAsync(monitoring);
         }
 
-        public async Task<bool> DeleteAsync(string id)
+        public async Task<List<Monitoring>> CreateAllMonitoringsAsync(List<Monitoring> monitorings)
         {
-            var response = await _http.DeleteAsync($"api/Monitoring/{id}");
-            return response.IsSuccessStatusCode;
+            foreach (var m in monitorings)
+            {
+                if (string.IsNullOrEmpty(m.Id))
+                    m.Id = ObjectId.GenerateNewId().ToString();
+            }
+
+            await _monitorings.GetCollection().InsertManyAsync(monitorings);
+            return monitorings;
+        }
+
+        public async Task<bool> UpdateMonitoringAsync(string id, Monitoring monitoring)
+        {
+            var update = Builders<Monitoring>.Update
+                .Set(x => x.Identificador, monitoring.Identificador)
+                .Set(x => x.Unidade, monitoring.Unidade)
+                .Set(x => x.Estado, monitoring.Estado)
+                .Set(x => x.Cidade, monitoring.Cidade)
+                .Set(x => x.IHM, monitoring.IHM)
+                .Set(x => x.Gateway, monitoring.Gateway)
+                .Set(x => x.CLP, monitoring.CLP)
+                .Set(x => x.MACs, monitoring.MACs)
+                .Set(x => x.MASC, monitoring.MASC)
+                .Set(x => x.IdRustdesk, monitoring.IdRustdesk)
+                .Set(x => x.IdAnydesk, monitoring.IdAnydesk)
+                .Set(x => x.IdTeamViewer, monitoring.IdTeamViewer)
+                .Set(x => x.MonitoringType, monitoring.MonitoringType);
+
+            var result = await _monitorings
+                .GetCollection()
+                .UpdateOneAsync(m => m.Id == id, update);
+
+            return result.IsAcknowledged && result.ModifiedCount > 0;
+        }
+
+        public async Task<bool> DeleteMonitoringAsync(string id)
+        {
+            return await _monitorings.DeleteAsync(m => m.Id == id);
         }
     }
 }

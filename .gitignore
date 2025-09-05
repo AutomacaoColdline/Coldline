@@ -1,0 +1,35 @@
+# ===== Coldline (.NET) =====
+
+# Ignorar APENAS estes dois arquivos da API (Presentation)
+#/!\ cuidado: se não estiverem versionados, quem clonar não terá esses arquivos.
+# Se quiser manter o Program.cs do PROD versionado, remova a linha abaixo.
+ColdlineAPI/Presentation/Program.cs
+ColdlineAPI/Presentation/appsettings.json
+
+# bin/ e obj/ (ColdlineAPI e ColdlineWeb — e qualquer subprojeto)
+ColdlineAPI/**/bin/
+ColdlineAPI/**/obj/
+ColdlineWeb/**/bin/
+ColdlineWeb/**/obj/
+**/bin/
+**/obj/
+
+# publicações e artefatos opcionais
+**/out/
+**/publish/
+
+# IDEs
+.vs/
+.vscode/
+.idea/
+
+# Arquivos de usuário/temporários
+*.user
+*.suo
+*.swp
+*.tmp
+*.log
+
+# SO
+.DS_Store
+Thumbs.db

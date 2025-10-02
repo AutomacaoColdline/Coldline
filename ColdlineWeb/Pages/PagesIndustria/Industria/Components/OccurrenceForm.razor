@@ -1,6 +1,7 @@
 @using ColdlineWeb.Models
 @using ColdlineWeb.Models.Filter
 @using ColdlineWeb.Services
+@using ColdlineWeb.Util
 @inject OccurrenceTypeService OccurrenceTypeService
 @inject PartService PartService
 
@@ -9,7 +10,7 @@
     [Parameter] public ReferenceEntity? UserRef { get; set; }
     [Parameter] public EventCallback<StartOccurrenceModel> OnSaveDraft { get; set; }
     [Parameter] public EventCallback OnCancel { get; set; }
-    protected string FixedDepartamentId = "67f41c323a596bf4e95bfe6d";
+    protected string FixedDepartamentId =  EnvironmentHelper.GetDepartmentId();
 
     private StartOccurrenceModel Model = new();
 
@@ -25,8 +26,7 @@
 
     private static readonly HashSet<string> RequiredTypeIds = new(StringComparer.OrdinalIgnoreCase)
     {
-        "689cd4645327afa586ab9dff", 
-        "689cd47a5327afa586ab9e00"  
+        EnvironmentHelper.GetUserTypeId()
     };
 
     private static readonly HashSet<string> RequiredTypeNames = new(StringComparer.OrdinalIgnoreCase)
@@ -36,7 +36,7 @@
     };
 
     private bool RequiresPart =>
-        !string.IsNullOrWhiteSpace(Model.OccurrenceType?.Id) && RequiredTypeIds.Contains(Model.OccurrenceType.Id)
+        (!string.IsNullOrWhiteSpace(Model.OccurrenceType?.Id) && RequiredTypeIds.Contains(Model.OccurrenceType.Id))
         || (!string.IsNullOrWhiteSpace(Model.OccurrenceType?.Name) && RequiredTypeNames.Contains(Model.OccurrenceType.Name));
 
     protected override async Task OnInitializedAsync()
@@ -45,11 +45,15 @@
         {
             var OTFilter = new OccurrenceTypeFilterModel
             {
-                DepartmentId = FixedDepartamentId, 
+                DepartmentId = FixedDepartamentId,
+                Page = 1,
+                PageSize = 1000 // garante que carregue todos
             };
-            occurrenceTypes = await OccurrenceTypeService.SearchAsync(OTFilter) ?? new();
 
-            parts = await PartService.GetAllAsync();
+            var pagedOccurrenceTypes = await OccurrenceTypeService.SearchAsync(OTFilter);
+            occurrenceTypes = pagedOccurrenceTypes?.Items?.ToList() ?? new List<OccurrenceTypeModel>();
+
+            parts = await PartService.GetAllAsync() ?? new List<PartModel>();
 
             Model.Process = ProcessRef;
             Model.User = UserRef ?? new ReferenceEntity();
@@ -75,9 +79,11 @@
         selectedOccurrenceTypeId = e.Value?.ToString();
         var selected = occurrenceTypes.Find(x => x.Id == selectedOccurrenceTypeId);
         
-        var OBJDepartment = new ReferenceEntity();
-        OBJDepartment.Id = "67f41c323a596bf4e95bfe6d";
-        OBJDepartment.Name = "Industria";
+        var OBJDepartment = new ReferenceEntity
+        {
+            Id = FixedDepartamentId,
+            Name = "Industria"
+        };
 
         Model.OccurrenceType = selected is null
             ? new OccurrenceTypeModel()
@@ -88,7 +94,6 @@
                 Description = selected.Description,
                 PendingEvent = selected.PendingEvent,
                 Department = OBJDepartment
-                
             };
 
         if (!RequiresPart)

@@ -1,54 +1,64 @@
 using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
-using ColdlineWeb.Util;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Enum;
 using ColdlineWeb.Models.Filter;
 using ColdlineWeb.Services;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System;
+using ColdlineWeb.Util;
 
-namespace ColdlineWeb.Pages.PagesIndustria
+namespace ColdlineWeb.Pages.PagesIndustria.Machine
 {
     public class MachinesPage : ComponentBase
     {
-        [Inject] protected HttpClient Http { get; set; } = default!;
-        [Inject] protected MachineService machineService { get; set; } = default!;
+        [Inject] protected HttpClient HttpClient { get; set; } = default!;
+        [Inject] protected MachineService MachineService { get; set; } = default!;
 
-        protected List<MachineModel> machines = new();
-        protected MachineModel currentMachine = new();
+        // Listas e objetos de dados
+        protected List<MachineModel> machines { get; set; } = new();
+        protected MachineModel currentMachine { get; set; } = new();
+        protected List<ReferenceEntity> machineTypes { get; set; } = new();
+        protected List<ProcessModel> processes { get; set; } = new();
 
-        protected List<ReferenceEntity> machineTypes = new();
-        protected List<ProcessModel> processes = new();
+        // Controle de UI
+        protected bool isLoading { get; set; } = true;
+        protected bool showModal { get; set; } = false;
+        protected bool isEditing { get; set; } = false;
+        protected string? errorMessage { get; set; }
 
-        protected bool isLoading = true;
-        protected bool showModal = false;
-        protected bool isEditing = false;
-        protected string? errorMessage;
+        // Filtros
+        protected MachineFilterModel filter { get; set; } = new();
 
-        protected MachineFilterModel filter = new();
-
-        protected int pageNumber = 1;
-        protected int totalPages = 1;
-        protected const int defaultPageSize = 8;
+        // Paginação
+        protected int pageNumber { get; set; } = 1;
+        protected int totalPages { get; set; } = 1;
+        protected const int DefaultPageSize = 8;
 
         protected bool CanGoNext => pageNumber < totalPages;
         protected bool CanGoPrevious => pageNumber > 1;
 
-        protected bool showMachineTypeModal = false;
-        protected bool isEditingMachineType = false;
-        protected MachineTypeModel newMachineType = new();
+        // Modal de tipos de máquina
+        protected bool showMachineTypeModal { get; set; } = false;
+        protected bool isEditingMachineType { get; set; } = false;
+        protected MachineTypeModel newMachineType { get; set; } = new();
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadData();
+            await LoadDataAsync();
         }
 
-        protected async Task LoadData()
+        // Carregar dados iniciais
+        protected async Task LoadDataAsync()
         {
             try
             {
                 isLoading = true;
-                processes = await Http.GetFromJsonAsync<List<ProcessModel>>("api/Process") ?? new();
-                machineTypes = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/MachineType") ?? new();
+
+                processes = await HttpClient.GetFromJsonAsync<List<ProcessModel>>("api/Process") ?? new List<ProcessModel>();
+                machineTypes = await HttpClient.GetFromJsonAsync<List<ReferenceEntity>>("api/MachineType") ?? new List<ReferenceEntity>();
+
                 await ApplyFilters();
             }
             catch (Exception ex)
@@ -62,16 +72,20 @@ namespace ColdlineWeb.Pages.PagesIndustria
             }
         }
 
+        // Aplicar filtros e atualizar lista de máquinas
         protected async Task ApplyFilters()
         {
             try
             {
                 filter.Page = pageNumber;
-                filter.PageSize = defaultPageSize;
+                filter.PageSize = DefaultPageSize;
 
-                var result = await machineService.SearchMachinesAsync(filter);
-                machines = result;
-                totalPages = result.Count == defaultPageSize ? pageNumber + 1 : pageNumber;
+                var pagedResult = await MachineService.SearchMachinesAsync(filter);
+
+                machines = pagedResult?.Items != null ? new List<MachineModel>(pagedResult.Items) : new List<MachineModel>();
+                totalPages = pagedResult != null && pagedResult.Total > 0
+                    ? (int)Math.Ceiling((double)pagedResult.Total / DefaultPageSize)
+                    : machines.Count == DefaultPageSize ? pageNumber + 1 : pageNumber;
             }
             catch (Exception ex)
             {
@@ -80,19 +94,22 @@ namespace ColdlineWeb.Pages.PagesIndustria
             }
         }
 
-        protected async Task FinalizeMachine(string machineId)
+        // Resetar filtros
+        protected async Task ResetFilters()
+        {
+            filter = new MachineFilterModel();
+            pageNumber = 1;
+            await ApplyFilters();
+        }
+
+        // Finalizar máquina
+        protected async Task FinalizeMachineAsync(string machineId)
         {
             try
             {
-                var success = await machineService.FinalizeMachineAsync(machineId);
-                if (success)
-                {
-                    await ApplyFilters(); // Atualiza tabela
-                }
-                else
-                {
-                    errorMessage = "Falha ao finalizar máquina.";
-                }
+                var success = await MachineService.FinalizeMachineAsync(machineId);
+                if (success) await ApplyFilters();
+                else errorMessage = "Falha ao finalizar máquina.";
             }
             catch (Exception ex)
             {
@@ -101,23 +118,12 @@ namespace ColdlineWeb.Pages.PagesIndustria
             }
         }
 
-
-
-        protected async Task ResetFilters()
-        {
-            filter = new MachineFilterModel();
-            pageNumber = 1;
-            await ApplyFilters();
-        }
-
+        // Modais
         protected void CloseModal() => showModal = false;
 
         protected void OpenAddMachineModal()
         {
-            currentMachine = new MachineModel
-            {
-                MachineType = new ReferenceEntity()
-            };
+            currentMachine = new MachineModel { MachineType = new ReferenceEntity() };
             isEditing = false;
             showModal = true;
         }
@@ -142,12 +148,16 @@ namespace ColdlineWeb.Pages.PagesIndustria
             showModal = true;
         }
 
+        // Salvar máquina
         protected async Task SaveMachine()
         {
             try
             {
-                var fetchedType = await Http.GetFromJsonAsync<ReferenceEntity>($"api/MachineType/{currentMachine.MachineType.Id}");
-                currentMachine.MachineType.Name = fetchedType?.Name ?? "";
+                if (!string.IsNullOrEmpty(currentMachine.MachineType?.Id))
+                {
+                    var fetchedType = await HttpClient.GetFromJsonAsync<ReferenceEntity>($"api/MachineType/{currentMachine.MachineType.Id}");
+                    currentMachine.MachineType.Name = fetchedType?.Name ?? "";
+                }
 
                 currentMachine.Process = null;
                 currentMachine.Monitoring = null;
@@ -155,9 +165,9 @@ namespace ColdlineWeb.Pages.PagesIndustria
                 currentMachine.Status = MachineStatus.WaitingProduction;
 
                 if (isEditing)
-                    await Http.PutAsJsonAsync($"api/Machine/{currentMachine.Id}", currentMachine);
+                    await HttpClient.PutAsJsonAsync($"api/Machine/{currentMachine.Id}", currentMachine);
                 else
-                    await Http.PostAsJsonAsync("api/Machine", currentMachine);
+                    await HttpClient.PostAsJsonAsync("api/Machine", currentMachine);
 
                 await ApplyFilters();
                 showModal = false;
@@ -169,11 +179,12 @@ namespace ColdlineWeb.Pages.PagesIndustria
             }
         }
 
+        // Excluir máquina
         protected async Task DeleteMachine(string id)
         {
             try
             {
-                await Http.DeleteAsync($"api/Machine/{id}");
+                await HttpClient.DeleteAsync($"api/Machine/{id}");
                 await ApplyFilters();
             }
             catch (Exception ex)
@@ -183,6 +194,7 @@ namespace ColdlineWeb.Pages.PagesIndustria
             }
         }
 
+        // Paginação
         protected async Task GoToNextPage()
         {
             if (CanGoNext)
@@ -201,6 +213,7 @@ namespace ColdlineWeb.Pages.PagesIndustria
             }
         }
 
+        // Modal de tipos de máquina
         protected void OpenMachineTypeModal()
         {
             newMachineType = new MachineTypeModel();
@@ -210,14 +223,14 @@ namespace ColdlineWeb.Pages.PagesIndustria
 
         protected void CloseMachineTypeModal() => showMachineTypeModal = false;
 
-        protected async Task SaveMachineType()
+        protected async Task SaveMachineTypeAsync()
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(newMachineType.Id))
-                    await Http.PostAsJsonAsync("api/MachineType", newMachineType);
+                    await HttpClient.PostAsJsonAsync("api/MachineType", newMachineType);
                 else
-                    await Http.PutAsJsonAsync($"api/MachineType/{newMachineType.Id}", newMachineType);
+                    await HttpClient.PutAsJsonAsync($"api/MachineType/{newMachineType.Id}", newMachineType);
 
                 await ReloadMachineTypes();
                 showMachineTypeModal = false;
@@ -231,7 +244,7 @@ namespace ColdlineWeb.Pages.PagesIndustria
 
         protected async Task ReloadMachineTypes()
         {
-            machineTypes = await Http.GetFromJsonAsync<List<ReferenceEntity>>("api/MachineType") ?? new();
+            machineTypes = await HttpClient.GetFromJsonAsync<List<ReferenceEntity>>("api/MachineType") ?? new List<ReferenceEntity>();
         }
     }
 }

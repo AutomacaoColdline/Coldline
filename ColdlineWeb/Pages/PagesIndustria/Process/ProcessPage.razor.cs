@@ -6,8 +6,10 @@ using System;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Filter;
 using ColdlineWeb.Services;
+using ColdlineWeb.Models.Common;
 using System.Net.Http;
 using System.Net.Http.Json;
+using ColdlineWeb.Util;
 
 namespace ColdlineWeb.Pages.PagesIndustria.Process
 {
@@ -20,34 +22,34 @@ namespace ColdlineWeb.Pages.PagesIndustria.Process
         [Inject] protected OccurrenceService OccurrenceService { get; set; } = default!;
         [Inject] protected HttpClient Http { get; set; } = default!;
 
-        protected List<ProcessModel> ProcessList = new();
+        // Listas de dados
+        protected List<ProcessModel> ProcessList { get; set; } = new List<ProcessModel>();
+        protected List<ReferenceEntity> UsersRef { get; set; } = new List<ReferenceEntity>();
+        protected List<ReferenceEntity> ProcessTypes { get; set; } = new List<ReferenceEntity>();
+        protected List<ReferenceEntity> Departments { get; set; } = new List<ReferenceEntity>();
+        protected List<ReferenceEntity> Machines { get; set; } = new List<ReferenceEntity>();
+        protected List<ReferenceEntity> Occurrences { get; set; } = new List<ReferenceEntity>();
+        protected List<string> SelectedOccurrences { get; set; } = new List<string>();
 
-        protected List<ReferenceEntity> UsersRef = new();
-        protected List<ReferenceEntity> ProcessTypes = new();
-        protected List<ReferenceEntity> Machines = new();
-        protected List<ReferenceEntity> Occurrences = new();
-        protected List<string> SelectedOccurrences = new();
+        protected ProcessModel CurrentProcess { get; set; } = new ProcessModel();
 
-        protected ProcessModel CurrentProcess = new();
-
-        protected bool ShowModal = false;
-        protected bool IsEditing = false;
-        protected string? ErrorMessage;
-        protected bool IsLoading = true;
+        protected bool ShowModal { get; set; } = false;
+        protected bool IsEditing { get; set; } = false;
+        protected string? ErrorMessage { get; set; }
+        protected bool IsLoading { get; set; } = true;
 
         // Filtro e paginação
-        protected ProcessFilterModel Filter = new();
-        protected int PageNumber = 1;
-        protected int TotalPages = 1;
+        protected ProcessFilterModel Filter { get; set; } = new ProcessFilterModel();
+        protected int PageNumber { get; set; } = 1;
+        protected int TotalPages { get; set; } = 1;
         protected const int PageSize = 4;
 
         protected bool CanGoNext => PageNumber < TotalPages;
         protected bool CanGoPrevious => PageNumber > 1;
 
-        protected bool ShowProcessTypeModal = false;
-        protected ProcessTypeModel NewProcessType = new();
-        protected string FixedDepartamentId = "67f41c323a596bf4e95bfe6d";
-        
+        protected bool ShowProcessTypeModal { get; set; } = false;
+        protected ProcessTypeModel NewProcessType { get; set; } = new ProcessTypeModel();
+        protected string FixedDepartmentId { get; set; } = EnvironmentHelper.GetDepartmentId();
 
         protected override async Task OnInitializedAsync()
         {
@@ -59,39 +61,62 @@ namespace ColdlineWeb.Pages.PagesIndustria.Process
         {
             try
             {
-                var usersPage = await UserService.SearchUsersAsync(
-                    name: null,
-                    email: null,
-                    departmentId: FixedDepartamentId,
-                    userTypeId: null,
-                    pageNumber: 1,
-                    pageSize: 5
-                );
-                var users = usersPage.Items ?? new List<UserModel>();
+                // 🔹 Usuários
+                var uFilter = new UserFilterModel
+                {
+                    DepartmentId = FixedDepartmentId,
+                    Page = 1,
+                    PageSize = 50
+                };
+                var usersResult = await UserService.SearchUsersAsync(uFilter);
+                var users = usersResult?.Items != null ? new List<UserModel>(usersResult.Items) : new List<UserModel>();
 
-                
-                UsersRef = users.ConvertAll(u => new ReferenceEntity { Id = u.Id, Name = u.Name });
+                UsersRef = users.Select(u => new ReferenceEntity { Id = u.Id, Name = u.Name }).ToList();
 
+                // 🔹 Tipos de processo
                 var ptFilter = new ProcessTypeFilterModel
                 {
-                    DepartmentId = FixedDepartamentId, 
+                    DepartmentId = FixedDepartmentId
                 };
-                
-                var types = await ProcessTypeService.SearchAsync(ptFilter);
-                ProcessTypes = types.ConvertAll(t => new ReferenceEntity { Id = t.Id, Name = t.Name });
+                var typesResult = await ProcessTypeService.SearchAsync(ptFilter);
+                var types = typesResult?.Items != null ? new List<ProcessTypeModel>(typesResult.Items) : new List<ProcessTypeModel>();
 
-                var machines = await MachineService.GetAllMachinesAsync();
-                Machines = machines.ConvertAll(m => new ReferenceEntity { Id = m.Id, Name = m.IdentificationNumber });
-                var OFilter = new OccurrenceSearchFilter
+                ProcessTypes = types.Select(t => new ReferenceEntity { Id = t.Id, Name = t.Name }).ToList();
+                Departments = new List<ReferenceEntity>
                 {
-                    DepartmentId = FixedDepartamentId,
+                    new ReferenceEntity
+                    {
+                        Id = FixedDepartmentId,
+                        Name = "Industria"
+                    }
                 };
-                var occurrenceModels = await OccurrenceService.SearchAsync(OFilter);
-                Occurrences = occurrenceModels.ConvertAll(o => new ReferenceEntity { Id = o.Id, Name = o.CodeOccurrence });
+
+                // 🔹 Máquinas
+                var machinesResult = await MachineService.SearchMachinesAsync(new MachineFilterModel
+                {
+                    Page = 1,
+                    PageSize = 50
+                });
+                var machines = machinesResult?.Items != null ? new List<MachineModel>(machinesResult.Items) : new List<MachineModel>();
+
+                Machines = machines.Select(m => new ReferenceEntity { Id = m.Id, Name = m.IdentificationNumber }).ToList();
+
+                // 🔹 Ocorrências
+                var oFilter = new OccurrenceSearchFilter
+                {
+                    DepartmentId = FixedDepartmentId,
+                    Page = 1,
+                    PageSize = 50
+                };
+                var occurrencesResult = await OccurrenceService.SearchAsync(oFilter);
+                var occurrences = occurrencesResult?.Items != null ? new List<OccurrenceModel>(occurrencesResult.Items) : new List<OccurrenceModel>();
+
+                Occurrences = occurrences.Select(o => new ReferenceEntity { Id = o.Id, Name = o.CodeOccurrence }).ToList();
             }
             catch (Exception ex)
             {
                 ErrorMessage = "Erro ao carregar dados para dropdowns.";
+                Console.WriteLine(ex.Message);
             }
         }
 
@@ -101,15 +126,21 @@ namespace ColdlineWeb.Pages.PagesIndustria.Process
             {
                 IsLoading = true;
                 ErrorMessage = null;
-                Filter.DepartmentId = "67f41c323a50bfa4e95bfe6d";
+
+                Filter.DepartmentId = FixedDepartmentId;
                 Filter.Page = PageNumber;
                 Filter.PageSize = PageSize;
 
-                ProcessList = await ProcessService.SearchProcessesAsync(Filter);
+                // 🔹 Processos
+                var processesResult = await ProcessService.SearchProcessesAsync(Filter);
+                ProcessList = processesResult?.Items != null ? new List<ProcessModel>(processesResult.Items) : new List<ProcessModel>();
 
-                TotalPages = ProcessList.Count < PageSize && PageNumber > 1
-                    ? PageNumber
-                    : PageNumber + (ProcessList.Count == PageSize ? 1 : 0);
+                // Calcula o total de páginas
+                TotalPages = processesResult != null && processesResult.Total > 0
+                    ? (int)Math.Ceiling((double)processesResult.Total / PageSize)
+                    : ProcessList.Count == PageSize ? PageNumber + 1 : PageNumber;
+
+                if (TotalPages == 0) TotalPages = 1;
             }
             catch (Exception ex)
             {
@@ -124,7 +155,7 @@ namespace ColdlineWeb.Pages.PagesIndustria.Process
 
         protected async Task ResetFilters()
         {
-            Filter = new();
+            Filter = new ProcessFilterModel();
             PageNumber = 1;
             await ApplyFilters();
         }
@@ -150,7 +181,7 @@ namespace ColdlineWeb.Pages.PagesIndustria.Process
         protected void OpenAddProcessModal()
         {
             CurrentProcess = new ProcessModel();
-            SelectedOccurrences = new();
+            SelectedOccurrences = new List<string>();
             ShowModal = true;
             IsEditing = false;
         }
@@ -158,7 +189,7 @@ namespace ColdlineWeb.Pages.PagesIndustria.Process
         protected void OpenEditProcessModal(ProcessModel process)
         {
             CurrentProcess = process;
-            SelectedOccurrences = process.Occurrences?.Select(o => o.Id).ToList() ?? new();
+            SelectedOccurrences = process.Occurrences?.Select(o => o.Id).ToList() ?? new List<string>();
             ShowModal = true;
             IsEditing = true;
         }
@@ -172,10 +203,10 @@ namespace ColdlineWeb.Pages.PagesIndustria.Process
         {
             CurrentProcess.User.Name = UsersRef.FirstOrDefault(u => u.Id == CurrentProcess.User.Id)?.Name ?? "Desconhecido";
             CurrentProcess.Department.Name = "Industria";
-            CurrentProcess.Department.Id = "67f41c323a50bfa4e95bfe6d";
+            CurrentProcess.Department.Id = FixedDepartmentId;
             CurrentProcess.ProcessType.Name = ProcessTypes.FirstOrDefault(pt => pt.Id == CurrentProcess.ProcessType.Id)?.Name ?? "Desconhecido";
             CurrentProcess.Machine.Name = Machines.FirstOrDefault(m => m.Id == CurrentProcess.Machine.Id)?.Name ?? "Desconhecido";
-            
+
             CurrentProcess.Occurrences = Occurrences
                 .Where(o => SelectedOccurrences.Contains(o.Id))
                 .Select(o => new ReferenceEntity { Id = o.Id, Name = o.Name })
@@ -221,7 +252,7 @@ namespace ColdlineWeb.Pages.PagesIndustria.Process
 
         protected void OpenAddProcessTypeModal()
         {
-            NewProcessType = new();
+            NewProcessType = new ProcessTypeModel();
             ShowProcessTypeModal = true;
         }
 
@@ -236,9 +267,16 @@ namespace ColdlineWeb.Pages.PagesIndustria.Process
             {
                 await Http.PostAsJsonAsync("api/ProcessType", NewProcessType);
 
-                // Recarrega os tipos para dropdown
-                var types = await ProcessTypeService.GetAllAsync();
-                ProcessTypes = types.ConvertAll(t => new ReferenceEntity { Id = t.Id, Name = t.Name });
+                var typesResult = await ProcessTypeService.SearchAsync(new ProcessTypeFilterModel
+                {
+                    DepartmentId = FixedDepartmentId,
+                    Page = 1,
+                    PageSize = 50
+                });
+
+                var types = typesResult?.Items != null ? new List<ProcessTypeModel>(typesResult.Items) : new List<ProcessTypeModel>();
+
+                ProcessTypes = types.Select(t => new ReferenceEntity { Id = t.Id, Name = t.Name }).ToList();
 
                 ShowProcessTypeModal = false;
             }
@@ -248,6 +286,5 @@ namespace ColdlineWeb.Pages.PagesIndustria.Process
                 Console.WriteLine(ex.Message);
             }
         }
-        
     }
 }

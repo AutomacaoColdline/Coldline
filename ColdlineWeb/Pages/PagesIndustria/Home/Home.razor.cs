@@ -7,6 +7,7 @@ using ColdlineWeb.Models.Enum;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ColdlineWeb.Util;
 
 namespace ColdlineWeb.Pages.PagesIndustria
 {
@@ -48,8 +49,9 @@ namespace ColdlineWeb.Pages.PagesIndustria
         private bool isDragging;
         private double machineStartX;
         protected string CacheBuster { get; set; } = DateTime.UtcNow.Ticks.ToString();
-        private const string FixedUserTypeId = "67f41bf13a50bfa4e95bfe69";
-        private const string FixedDepartamentId = "67f41c323a50bfa4e95bfe6d";
+        private static readonly string FixedUserTypeId = EnvironmentHelper.GetUserTypeId();
+        private static readonly string FixedDepartamentId = EnvironmentHelper.GetDepartmentId();
+
 
         private Dictionary<string, TimeSpan> runningTimers = new();
         private System.Timers.Timer? timer;
@@ -66,16 +68,19 @@ namespace ColdlineWeb.Pages.PagesIndustria
         {
             try
             {
-                var page = await UserService.SearchUsersAsync(
-                    name: null,
-                    email: null,
-                    departmentId: FixedDepartamentId,
-                    userTypeId: FixedUserTypeId, 
-                    pageNumber: 1,
-                    pageSize: 10                
-                );
+                var filter = new UserFilterModel
+                {
+                    Name = null,
+                    Email = null,
+                    DepartmentId = FixedDepartamentId,
+                    UserTypeId = FixedUserTypeId,
+                    Page = 1,
+                    PageSize = 10
+                };
 
-                users = page.Items ?? new List<UserModel>();
+                var page = await UserService.SearchUsersAsync(filter);
+
+                users = page.Items?.ToList() ?? new List<UserModel>();
             }
             catch
             {
@@ -93,7 +98,9 @@ namespace ColdlineWeb.Pages.PagesIndustria
                     PageSize = machinePageSize
                 };
 
-                machines = await MachineService.SearchMachinesAsync(filter);
+                var pagedMachines = await MachineService.SearchMachinesAsync(filter);
+                machines = pagedMachines.Items?.ToList() ?? new List<MachineModel>();
+
                 machinesCount = await MachineService.GetAllMachinesAsync();
 
                 totalMachines = machinesCount.Count;
@@ -161,9 +168,7 @@ namespace ColdlineWeb.Pages.PagesIndustria
             return new MarkupString($"<div class='indicator {color}' title='{tooltip}'></div>");
         }
 
-        
-
-        // Swipe para usuários
+        // Swipe usuários
         protected void HandlePointerDown(PointerEventArgs e)
         {
             isDragging = true;
@@ -186,18 +191,14 @@ namespace ColdlineWeb.Pages.PagesIndustria
             const double threshold = 50;
 
             if (diff > threshold && !isFirstPage)
-            {
                 currentPage--;
-            }
             else if (diff < -threshold && !isLastPage)
-            {
                 currentPage++;
-            }
 
             StateHasChanged();
         }
 
-        // Swipe para máquinas
+        // Swipe máquinas
         protected void HandleMachinePointerDown(PointerEventArgs e)
         {
             isDraggingMachine = true;
@@ -237,13 +238,9 @@ namespace ColdlineWeb.Pages.PagesIndustria
                 if (!runningTimers.ContainsKey(userId))
                 {
                     if (TimeSpan.TryParseExact(stat.ProcessTime, new[] { @"hh\:mm\:ss", @"mm\:ss" }, null, out var parsedTime))
-                    {
                         runningTimers[userId] = parsedTime;
-                    }
                     else
-                    {
                         runningTimers[userId] = TimeSpan.Zero;
-                    }
                 }
             }
 
@@ -251,29 +248,25 @@ namespace ColdlineWeb.Pages.PagesIndustria
             timer.Elapsed += (s, e) =>
             {
                 foreach (var userId in runningTimers.Keys.ToList())
-                {
                     runningTimers[userId] = runningTimers[userId].Add(TimeSpan.FromSeconds(1));
-                }
 
                 InvokeAsync(StateHasChanged);
             };
             timer.Start();
         }
+
         protected string GetRunningTimeForUser(string userId)
         {
             var user = users.FirstOrDefault(u => u.Id == userId);
             if (user?.CurrentOccurrence != null && !string.IsNullOrEmpty(user.CurrentOccurrence.Id))
             {
                 if (ProcessStatsByUserId.TryGetValue(userId, out var stat))
-                {
                     return stat.ProcessTime;
-                }
+
                 return "00:00:00";
             }
-            return runningTimers.TryGetValue(userId, out var time)
-                ? time.ToString(@"hh\:mm\:ss")
-                : "00:00:00";
-        }
 
+            return runningTimers.TryGetValue(userId, out var time) ? time.ToString(@"hh\:mm\:ss") : "00:00:00";
+        }
     }
 }

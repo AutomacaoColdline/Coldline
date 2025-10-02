@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Filter;
+using ColdlineWeb.Models.Common;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace ColdlineWeb.Services
 {
@@ -42,25 +44,38 @@ namespace ColdlineWeb.Services
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<List<UserTypeModel>> SearchAsync(UserTypeFilterModel? filter = null)
+        public async Task<PagedResult<UserTypeModel>> SearchAsync(UserTypeFilterModel? filter = null)
         {
-            string url = "api/UserType/search";
+            var query = new Dictionary<string, string?>();
 
             if (filter is not null)
             {
-                var qs = new List<string>();
-
                 if (!string.IsNullOrWhiteSpace(filter.Name))
-                    qs.Add($"name={Uri.EscapeDataString(filter.Name)}");
+                    query["name"] = filter.Name;
 
                 if (!string.IsNullOrWhiteSpace(filter.DepartmentId))
-                    qs.Add($"departmentId={Uri.EscapeDataString(filter.DepartmentId)}");
+                    query["departmentId"] = filter.DepartmentId;
 
-                if (qs.Count > 0)
-                    url += "?" + string.Join("&", qs);
+                query["page"] = filter.Page > 0 ? filter.Page.ToString() : "1";
+                query["pageSize"] = filter.PageSize > 0 ? filter.PageSize.ToString() : "10";
+
+                if (!string.IsNullOrWhiteSpace(filter.SortBy))
+                    query["sortBy"] = filter.SortBy;
+
+                query["sortDesc"] = filter.SortDesc.ToString().ToLower();
             }
 
-            return await _http.GetFromJsonAsync<List<UserTypeModel>>(url) ?? new();
+            var url = QueryHelpers.AddQueryString("api/UserType/search", query);
+
+            var result = await _http.GetFromJsonAsync<PagedResult<UserTypeModel>>(url);
+
+            return result ?? new PagedResult<UserTypeModel>
+            {
+                Items = new List<UserTypeModel>(),
+                Page = filter?.Page ?? 1,
+                PageSize = filter?.PageSize ?? 10,
+                Total = 0
+            };
         }
     }
 }

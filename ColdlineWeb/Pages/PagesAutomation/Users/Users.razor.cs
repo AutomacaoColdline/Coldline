@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Components.Forms;
 using System.Net.Http.Json;
 using ColdlineWeb.Services;
 using ColdlineWeb.Models;
+using ColdlineWeb.Models.Filter;
+using ColdlineWeb.Models.Common;
 
 namespace ColdlineWeb.Pages.PagesAutomation.Users
 {
@@ -78,18 +80,24 @@ namespace ColdlineWeb.Pages.PagesAutomation.Users
                 isLoading = true;
                 errorMessage = null;
 
-                var result = await UserService.SearchUsersAsync(
-                    filterName,
-                    filterEmail,
-                    filterDepartmentId,
-                    filterUserTypeId,
-                    pageNumber,
-                    pageSize
-                );
+                var filter = new UserFilterModel
+                {
+                    Name = filterName,
+                    Email = filterEmail,
+                    DepartmentId = filterDepartmentId,
+                    UserTypeId = filterUserTypeId,
+                    Page = pageNumber,
+                    PageSize = pageSize
+                };
 
-                users = result.Items;
+                var result = await UserService.SearchUsersAsync(filter);
+
+                // Ajuste de conversão
+                users = result.Items?.ToList() ?? new List<UserModel>();
+
+                // Ajuste de contadores conforme PagedResult
                 totalPages = result.TotalPages;
-                totalCount = result.TotalCount;
+                totalCount = result.Total; // ✅ uso correto da propriedade
             }
             catch
             {
@@ -129,13 +137,13 @@ namespace ColdlineWeb.Pages.PagesAutomation.Users
             try
             {
                 currentUser.Id = null;
-                currentUser.UserType.Name = userTypes.Find(ut => ut.Id == currentUser.UserType.Id)?.Name ?? "";
-                currentUser.Department.Name = departments.Find(d => d.Id == currentUser.Department.Id)?.Name ?? "";
+                currentUser.UserType.Name = userTypes.Find(ut => ut.Id == currentUser.UserType.Id)?.Name ?? string.Empty;
+                currentUser.Department.Name = departments.Find(d => d.Id == currentUser.Department.Id)?.Name ?? string.Empty;
                 currentUser.UrlPhoto = $"{currentUser.Name}.png";
 
                 if (selectedFile != null)
                 {
-                    string? uploadedFileName = await UserService.UploadImageAsync(selectedFile, "", currentUser.Name);
+                    string? uploadedFileName = await UserService.UploadImageAsync(selectedFile, string.Empty, currentUser.Name);
                     if (uploadedFileName == null)
                     {
                         errorMessage = "Erro ao enviar a imagem. Usuário não foi salvo.";
@@ -171,8 +179,8 @@ namespace ColdlineWeb.Pages.PagesAutomation.Users
             {
                 errorMessage = null;
 
-                currentUser.UserType.Name = userTypes.Find(ut => ut.Id == currentUser.UserType.Id)?.Name ?? "";
-                currentUser.Department.Name = departments.Find(d => d.Id == currentUser.Department.Id)?.Name ?? "";
+                currentUser.UserType.Name = userTypes.Find(ut => ut.Id == currentUser.UserType.Id)?.Name ?? string.Empty;
+                currentUser.Department.Name = departments.Find(d => d.Id == currentUser.Department.Id)?.Name ?? string.Empty;
 
                 var oldUser = users.Find(u => u.Id == currentUser.Id);
                 string oldFileName = oldUser?.Name ?? currentUser.Name;
@@ -275,7 +283,7 @@ namespace ColdlineWeb.Pages.PagesAutomation.Users
             }
         }
 
-        // Departamento (se usar)
+        // Departamento
         protected void OpenDepartmentModal()
         {
             newDepartment = new DepartmentModel();

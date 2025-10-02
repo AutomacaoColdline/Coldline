@@ -6,6 +6,8 @@
 ColdlineAPI/Presentation/Program.cs
 ColdlineAPI/Presentation/appsettings.json
 
+ColdlineAPI/Dockerfile
+ColdlineWeb/Dockerfile
 # bin/ e obj/ (ColdlineAPI e ColdlineWeb — e qualquer subprojeto)
 ColdlineAPI/**/bin/
 ColdlineAPI/**/obj/

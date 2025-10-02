@@ -1,5 +1,6 @@
 @using ColdlineWeb.Models
 @using ColdlineWeb.Services
+@using ColdlineWeb.Util
 @inject OccurrenceTypeService OccurrenceTypeService
 
 @if (Visible)
@@ -46,7 +47,7 @@
     private async Task Save()
     {
         OccurrenceType.Department = new ReferenceEntity();
-        OccurrenceType.Department.Id = "67f41c323a596bf4e95bfe6d";
+        OccurrenceType.Department.Id = EnvironmentHelper.GetDepartmentId();
         OccurrenceType.Department.Name = "Industria";
         if (string.IsNullOrWhiteSpace(OccurrenceType.Name))
             return;

@@ -5,8 +5,12 @@ namespace ColdlineAPI.Application.Filters
 {
     public class OccurrenceTypeFilter
     {
-        public string? name { get; set; }
-        public string? departmentId { get; set; } 
+        public string? Name { get; set; }
+        public string? DepartmentId { get; set; } 
+        public int? Page { get; set; }
+        public int? PageSize { get; set; }
+        public string? SortBy { get; set; }      
+        public bool? SortDesc { get; set; }
 
     }
 }

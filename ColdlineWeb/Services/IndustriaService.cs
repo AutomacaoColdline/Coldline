@@ -2,6 +2,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.WebUtilities;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Filter;
 
@@ -53,12 +54,6 @@ namespace ColdlineWeb.Services
             {
                 return null;
             }
-        }
-        public async Task<List<MachineModel>> GetStoppedMachinesByUserAsync(string userId, int page = 1, int pageSize = 10)
-        {
-            var url = $"api/Machine/search?status=6&userId={Uri.EscapeDataString(userId)}&page={page}&pageSize={pageSize}";
-            var result = await _http.GetFromJsonAsync<PagedResult<MachineModel>>(url);
-            return result?.Items ?? new List<MachineModel>();
         }
 
         // 🔹 Listar tipos de processos

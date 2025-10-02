@@ -2,9 +2,12 @@ using Microsoft.AspNetCore.Components;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Filter;
 using ColdlineWeb.Services;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using ColdlineWeb.Models.Enum; 
+using ColdlineWeb.Models.Enum;
+using ColdlineWeb.Util;
 
 namespace ColdlineWeb.Pages.PagesIndustria.Industria
 {
@@ -16,15 +19,16 @@ namespace ColdlineWeb.Pages.PagesIndustria.Industria
         [Inject] private MachineService MachineService { get; set; } = default!;
         [Inject] private ProcessTypeService ProcessTypeService { get; set; } = default!;
         [Inject] private OccurrenceService OccurrenceService { get; set; } = default!;
-        private UserModel? user;
-        private List<ReferenceEntity> processTypes = new();
-        private List<MachineModel> machines = new();
-        private List<MachineModel> stoppedMachines = new();
-        private ProcessModel? processDetails;
-        private string errorMessage = "";
 
-        protected string FixedDepartamentId = "67f41c323a596bf4e95bfe6d";
-        private bool isLoading = true; // 🔹 Estado para evitar carregamento precoce
+        private UserModel? user;
+        private List<ReferenceEntity> processTypes = new List<ReferenceEntity>();
+        private List<MachineModel> machines = new List<MachineModel>();
+        private List<MachineModel> stoppedMachines = new List<MachineModel>();
+        private ProcessModel? processDetails;
+        private string errorMessage = string.Empty;
+
+        protected string FixedDepartamentId = EnvironmentHelper.GetDepartmentId();
+        private bool isLoading = true;
 
         protected override async Task OnInitializedAsync()
         {
@@ -62,8 +66,18 @@ namespace ColdlineWeb.Pages.PagesIndustria.Industria
             {
                 await LoadProcessDetails(user.CurrentProcess.Id);
             }
+
             if (!string.IsNullOrWhiteSpace(user?.Id))
-                stoppedMachines = await IndustriaService.GetStoppedMachinesByUserAsync(user.Id);
+            {
+                var filterMachine = new MachineFilterModel
+                {
+                    Status = (int)MachineStatus.Stop, // ✅ corrigido
+                    Page = 1,
+                    PageSize = 10
+                };
+                var stoppedPaged = await MachineService.SearchMachinesAsync(filterMachine);
+                stoppedMachines = stoppedPaged?.Items.ToList() ?? new List<MachineModel>();
+            }
         }
 
         private async Task HandleResumeMachine(string machineId)
@@ -76,7 +90,6 @@ namespace ColdlineWeb.Pages.PagesIndustria.Industria
                     return;
                 }
 
-                // 🔎 Busca a ocorrência aberta (Finished=false) para ESTA máquina e ESTE usuário
                 var filter = new OccurrenceSearchFilter
                 {
                     UserId = user.Id,
@@ -84,28 +97,32 @@ namespace ColdlineWeb.Pages.PagesIndustria.Industria
                     Finished = false
                 };
 
-                var occurrences = await OccurrenceService.SearchAsync(filter);
-
-                // pega a mais recente (se a API já ordenar por StartDate desc, o First já serve)
-                var occ = occurrences?.FirstOrDefault();
-                if (occ == null || string.IsNullOrWhiteSpace(occ.Id))
+                var occurrencesPaged = await OccurrenceService.SearchAsync(filter);
+                var occ = occurrencesPaged?.Items.FirstOrDefault();
+                if (occ == null)
                 {
                     errorMessage = "Nenhuma ocorrência aberta encontrada para esta máquina.";
                     return;
                 }
 
-                var ok = await OccurrenceService.FinalizeOccurrenceAsync(occ.Id);
+                bool ok = await OccurrenceService.FinalizeOccurrenceAsync(occ.Id);
                 if (!ok)
                 {
                     errorMessage = "Falha ao finalizar ocorrência/reativar máquina.";
                     return;
                 }
 
-                // 🔄 Recarrega a lista de máquinas paradas
-                if (!string.IsNullOrWhiteSpace(user.Id))
-                    stoppedMachines = await IndustriaService.GetStoppedMachinesByUserAsync(user.Id);
+                // Atualiza lista de máquinas paradas
+                var filterMachine = new MachineFilterModel
+                {
+                    Status = (int)MachineStatus.Stop, // ✅ corrigido
+                    Page = 1,
+                    PageSize = 10
+                };
+                var stoppedPaged = await MachineService.SearchMachinesAsync(filterMachine);
+                stoppedMachines = stoppedPaged?.Items.ToList() ?? new List<MachineModel>();
 
-                // (opcional) Atualiza o usuário (limpar CurrentOccurrence caso backend o faça)
+                // Atualiza usuário
                 if (!string.IsNullOrWhiteSpace(user.IdentificationNumber))
                     user = await UserService.GetUserByIdentificationAsync(user.IdentificationNumber);
             }
@@ -128,43 +145,46 @@ namespace ColdlineWeb.Pages.PagesIndustria.Industria
             }
         }
 
-       private async Task LoadProcessTypes()
+        private async Task LoadProcessTypes()
         {
-
             var ptFilter = new ProcessTypeFilterModel
             {
-                DepartmentId = FixedDepartamentId, 
+                DepartmentId = FixedDepartamentId,
+                Page = 1,
+                PageSize = 50
             };
-            
-            var types = await ProcessTypeService.SearchAsync(ptFilter); // List<ProcessTypeModel>
-            processTypes = types
+
+            var typesPaged = await ProcessTypeService.SearchAsync(ptFilter);
+            processTypes = typesPaged?.Items
                 .Select(t => new ReferenceEntity { Id = t.Id, Name = t.Name })
-                .ToList(); // List<ReferenceEntity>
+                .ToList() ?? new List<ReferenceEntity>();
         }
+
         private async Task LoadMachines()
         {
             // Busca Em Progresso
-            var inProgress = await MachineService.SearchMachinesAsync(new MachineFilterModel
+            var inProgressPaged = await MachineService.SearchMachinesAsync(new MachineFilterModel
             {
                 Status = (int)MachineStatus.InProgress,
                 Page = 1,
-                PageSize = 50 // ajuste se precisar
+                PageSize = 50
             });
 
             // Busca Aguardando Produção
-            var waiting = await MachineService.SearchMachinesAsync(new MachineFilterModel
+            var waitingPaged = await MachineService.SearchMachinesAsync(new MachineFilterModel
             {
                 Status = (int)MachineStatus.WaitingProduction,
                 Page = 1,
-                PageSize = 50 // ajuste se precisar
+                PageSize = 50
             });
 
             // Combina e remove duplicatas por Id
             var seen = new HashSet<string>();
             var combined = new List<MachineModel>();
 
-            void AddUnique(IEnumerable<MachineModel> list)
+            void AddUnique(IEnumerable<MachineModel>? list)
             {
+                if (list == null) return;
                 foreach (var m in list)
                 {
                     if (!string.IsNullOrWhiteSpace(m.Id) && seen.Add(m.Id))
@@ -172,12 +192,11 @@ namespace ColdlineWeb.Pages.PagesIndustria.Industria
                 }
             }
 
-            AddUnique(inProgress);
-            AddUnique(waiting);
+            AddUnique(inProgressPaged?.Items);
+            AddUnique(waitingPaged?.Items);
 
             machines = combined;
         }
-
 
         private async Task StartProcess(StartProcessModel processModel)
         {
@@ -188,11 +207,11 @@ namespace ColdlineWeb.Pages.PagesIndustria.Industria
             }
 
             bool success = await IndustriaService.StartProcessAsync(
-                user.IdentificationNumber, 
-                processModel.ProcessTypeId, 
-                processModel.PreIndustrialization, 
+                user.IdentificationNumber,
+                processModel.ProcessTypeId,
+                processModel.PreIndustrialization,
                 processModel.Prototype,
-                processModel.MachineId // Pode ser null se for pré-industrialização
+                processModel.MachineId
             );
 
             if (success)
@@ -212,7 +231,7 @@ namespace ColdlineWeb.Pages.PagesIndustria.Industria
             bool success = await ProcessService.EndProcessAsync(processDetails.Id, true, null);
             if (success)
             {
-                processDetails = null; // 🔹 Reseta os detalhes do processo após finalizá-lo
+                processDetails = null;
             }
             else
             {
@@ -220,6 +239,9 @@ namespace ColdlineWeb.Pages.PagesIndustria.Industria
             }
         }
 
-        private void Logout() => Navigation.NavigateTo("/industria/login");
+        private void Logout()
+        {
+            Navigation.NavigateTo("/industria/login");
+        }
     }
 }

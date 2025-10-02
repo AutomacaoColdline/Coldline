@@ -88,9 +88,9 @@ namespace ColdlineAPI.Application.Services
 
             var finalFilter = filters.Count > 0 ? builder.And(filters) : builder.Empty;
 
-            int page = filter.Page <= 0 ? 1 : filter.Page;
-            int pageSize = filter.PageSize <= 0 ? 10 : filter.PageSize;
-            int skip = (page - 1) * pageSize;
+            int Page = filter.Page.Value <= 0 ? 1 : filter.Page.Value;
+            int PageSize = filter.PageSize.Value <= 0 ? 10 : filter.PageSize.Value;
+            int skip = (Page - 1) * PageSize;
 
             var collection = _qualities.GetCollection();
             var totalCount = await collection.CountDocumentsAsync(finalFilter);
@@ -107,7 +107,7 @@ namespace ColdlineAPI.Application.Services
                 .Project<Quality>(projection)
                 .SortBy(q => q.TotalPartValue)
                 .Skip(skip)
-                .Limit(pageSize)
+                .Limit(PageSize)
                 .ToListAsync();
 
             return (items, (int)totalCount);

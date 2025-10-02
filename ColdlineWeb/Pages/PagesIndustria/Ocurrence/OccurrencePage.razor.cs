@@ -1,7 +1,13 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Filter;
 using ColdlineWeb.Services;
+using ColdlineWeb.Util;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ColdlineWeb.Pages.PagesIndustria
 {
@@ -11,77 +17,99 @@ namespace ColdlineWeb.Pages.PagesIndustria
         [Inject] protected OccurrenceTypeService OccurrenceTypeService { get; set; } = default!;
         [Inject] protected PartService PartService { get; set; } = default!;
         [Inject] protected UserService UserService { get; set; } = default!;
+        [Inject] protected ProcessService ProcessService { get; set; } = default!;
 
+        // ===== Dados para Tabela e Dropdowns =====
         protected List<OccurrenceModel> items = new();
         protected List<OccurrenceTypeModel> occurrenceTypes = new();
         protected List<PartModel> parts = new();
         protected List<UserModel> users = new();
+        protected List<ProcessModel> processes = new();
 
         protected bool isLoading = true;
         protected string? errorMessage;
 
-        // filtros de busca
+        // ===== Filtros =====
         protected OccurrenceSearchFilter filter = new();
-        protected DateTime? startDate;   // datas do <InputDate>
+        protected DateTime? startDate;
         protected DateTime? endDate;
-        protected string? finishedStr;   // "", "true", "false"
+        protected string? finishedStr;
 
-        // modal
+        // ===== Modal =====
         protected bool showModal = false;
         protected bool isEditing = false;
         protected OccurrenceModel current = new();
         protected string? selectedOccurrenceTypeId;
         protected string? selectedPartId;
+        protected string? selectedUserId;
+        protected string? selectedProcessId;
         protected string? formError;
 
-        // paginação (client-side)
+        // ===== Paginação =====
         protected int pageNumber = 1;
         protected int pageSize = 8;
         protected int totalPages = 1;
+        protected string FixedDepartamentId = EnvironmentHelper.GetDepartmentId();
+        protected List<OccurrenceModel> PagedItems => items.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
 
-        protected string FixedDepartamentId = "67f41c323a596bf4e95bfe6d";
-
-        protected List<OccurrenceModel> PagedItems =>
-            items.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-
+        // ===== Inicialização =====
         protected override async Task OnInitializedAsync()
         {
+            await LoadDropdowns();
             await LoadAll();
         }
 
+        // ===== Carregar Dropdowns =====
+        protected async Task LoadDropdowns()
+        {
+            try
+            {
+                // Usuários
+                var userFilter = new UserFilterModel
+                {
+                    DepartmentId = FixedDepartamentId,
+                    Page = 1,
+                    PageSize = 50
+                };
+                users = (await UserService.SearchUsersAsync(userFilter))?.Items?.ToList() ?? new List<UserModel>();
+
+                // Processos
+                var processFilter = new ProcessFilterModel
+                {
+                    DepartmentId = FixedDepartamentId,
+                    Page = 1,
+                    PageSize = 50
+                };
+                processes = (await ProcessService.SearchProcessesAsync(processFilter))?.Items?.ToList() ?? new List<ProcessModel>();
+
+                // Tipos de Ocorrência
+                var OTFilter = new OccurrenceTypeFilterModel
+                {
+                    DepartmentId = FixedDepartamentId
+                };
+                occurrenceTypes = (await OccurrenceTypeService.SearchAsync(OTFilter))?.Items?.ToList() ?? new List<OccurrenceTypeModel>();
+
+                // Peças
+                parts = await PartService.GetAllAsync() ?? new List<PartModel>();
+            }
+            catch (Exception ex)
+            {
+                errorMessage = "Erro ao carregar dropdowns (Usuários, Processos, Tipos, Peças).";
+                Console.WriteLine(ex);
+            }
+        }
+
+        // ===== Carregar Ocorrências =====
         protected async Task LoadAll()
         {
             try
             {
                 isLoading = true;
-                errorMessage = null;
-                var OTFilter = new OccurrenceTypeFilterModel
+                var oFilter = new OccurrenceSearchFilter
                 {
-                    DepartmentId = FixedDepartamentId,
+                    DepartmentId = FixedDepartamentId
                 };
-                occurrenceTypes = await OccurrenceTypeService.SearchAsync(OTFilter);
-                //occurrenceTypes = await OccurrenceTypeService.GetAllAsync();
-               
-                var usersPage = await UserService.SearchUsersAsync(
-                    name: null,
-                    email: null,
-                    departmentId: FixedDepartamentId,
-                    userTypeId: null,
-                    pageNumber: 1,
-                    pageSize: 5
-                );
-                users = usersPage.Items ?? new List<UserModel>();
-
-                //users = await UserService.GetUsersAsync();
-                parts = await PartService.GetAllAsync();
-
-                var OFilter = new OccurrenceSearchFilter
-                {
-                    DepartmentId = FixedDepartamentId,
-                };
-
-                items = await OccurrenceService.SearchAsync(OFilter);
-
+                items = (await OccurrenceService.SearchAsync(oFilter))?.Items?.ToList() ?? new List<OccurrenceModel>();
                 RecomputePages();
             }
             catch (Exception ex)
@@ -95,47 +123,33 @@ namespace ColdlineWeb.Pages.PagesIndustria
             }
         }
 
-        // ====== BUSCA ======
+        // ===== Aplicar e Resetar Filtros =====
         protected async Task ApplyFilters()
         {
             try
             {
                 filter.StartDate = startDate?.Date;
-                filter.EndDate   = endDate?.Date;
-                filter.Finished  = ParseBool(finishedStr);
+                filter.EndDate = endDate?.Date;
+                filter.Finished = string.IsNullOrEmpty(finishedStr) ? null : finishedStr.Equals("true", StringComparison.OrdinalIgnoreCase);
                 filter.DepartmentId = FixedDepartamentId;
 
-                items = await OccurrenceService.SearchAsync(filter);
-
+                items = (await OccurrenceService.SearchAsync(filter))?.Items?.ToList() ?? new List<OccurrenceModel>();
                 pageNumber = 1;
                 RecomputePages();
             }
             catch (Exception ex)
             {
-                errorMessage = "Erro ao buscar ocorrências.";
+                errorMessage = "Erro ao aplicar filtros.";
                 Console.WriteLine(ex);
             }
         }
 
         protected async Task ResetFilters()
         {
-            filter = new OccurrenceSearchFilter();
-            filter.DepartmentId = FixedDepartamentId;
+            filter = new OccurrenceSearchFilter { DepartmentId = FixedDepartamentId };
             startDate = endDate = null;
             finishedStr = null;
-
-            items = await OccurrenceService.SearchAsync(filter);
-
-            pageNumber = 1;
-            RecomputePages();
-        }
-
-        private static bool? ParseBool(string? s)
-        {
-            if (string.IsNullOrWhiteSpace(s)) return null;
-            return s.Equals("true", StringComparison.OrdinalIgnoreCase) ? true
-                 : s.Equals("false", StringComparison.OrdinalIgnoreCase) ? false
-                 : (bool?)null;
+            await LoadAll();
         }
 
         private void RecomputePages()
@@ -144,7 +158,7 @@ namespace ColdlineWeb.Pages.PagesIndustria
             if (pageNumber > totalPages) pageNumber = totalPages;
         }
 
-        // ====== MODAL ======
+        // ===== Modal Add / Edit =====
         protected void OpenAddModal()
         {
             formError = null;
@@ -154,10 +168,11 @@ namespace ColdlineWeb.Pages.PagesIndustria
                 Process = new ReferenceEntity(),
                 User = new ReferenceEntity(),
                 OccurrenceType = new OccurrenceTypeModel(),
-                Part = new ReferenceEntity()
+                Part = new ReferenceEntity(),
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now
             };
-            selectedOccurrenceTypeId = string.Empty;
-            selectedPartId = string.Empty;
+            selectedUserId = selectedProcessId = selectedOccurrenceTypeId = selectedPartId = string.Empty;
             showModal = true;
         }
 
@@ -177,49 +192,46 @@ namespace ColdlineWeb.Pages.PagesIndustria
                 User = new ReferenceEntity { Id = o.User?.Id ?? "", Name = o.User?.Name ?? "" },
                 Description = o.Description,
                 Finished = o.Finished,
-                OccurrenceType = o.OccurrenceType is null ? new OccurrenceTypeModel() : new OccurrenceTypeModel
-                {
-                    Id = o.OccurrenceType.Id,
-                    Name = o.OccurrenceType.Name,
-                    Description = o.OccurrenceType.Description,
-                    PendingEvent = o.OccurrenceType.PendingEvent
-                },
-                Part = new ReferenceEntity { Id = o.Part?.Id ?? "", Name = o.Part?.Name ?? "" }
+                OccurrenceType = o.OccurrenceType ?? new OccurrenceTypeModel(),
+                Part = o.Part ?? new ReferenceEntity()
             };
 
-            selectedOccurrenceTypeId = current.OccurrenceType?.Id ?? "";
-            selectedPartId = current.Part?.Id ?? "";
+            selectedUserId = current.User?.Id;
+            selectedProcessId = current.Process?.Id;
+            selectedOccurrenceTypeId = current.OccurrenceType?.Id;
+            selectedPartId = current.Part?.Id;
+
             showModal = true;
         }
 
         protected void CloseModal() => showModal = false;
 
+        // ===== Dropdown Changes =====
+        protected void OnUserChanged()
+        {
+            var user = users.FirstOrDefault(u => u.Id == selectedUserId);
+            current.User = user != null ? new ReferenceEntity { Id = user.Id, Name = user.Name } : new ReferenceEntity();
+        }
+
+        protected void OnProcessChanged()
+        {
+            var process = processes.FirstOrDefault(p => p.Id == selectedProcessId);
+            current.Process = process != null ? new ReferenceEntity { Id = process.Id, Name = process.IdentificationNumber } : new ReferenceEntity();
+        }
+
         protected void OnTypeChanged()
         {
-            var found = occurrenceTypes.FirstOrDefault(t => t.Id == selectedOccurrenceTypeId);
-            current.OccurrenceType = found is null
-                ? new OccurrenceTypeModel()
-                : new OccurrenceTypeModel
-                {
-                    Id = found.Id,
-                    Name = found.Name,
-                    Description = found.Description,
-                    PendingEvent = found.PendingEvent
-                };
+            var type = occurrenceTypes.FirstOrDefault(t => t.Id == selectedOccurrenceTypeId);
+            current.OccurrenceType = type ?? new OccurrenceTypeModel();
         }
 
         protected void OnPartChanged()
         {
-            if (string.IsNullOrWhiteSpace(selectedPartId))
-            {
-                current.Part = new ReferenceEntity();
-                return;
-            }
-
-            var p = parts.FirstOrDefault(x => x.Id == selectedPartId);
-            current.Part = p is null ? new ReferenceEntity() : new ReferenceEntity { Id = p.Id, Name = p.Name };
+            var part = parts.FirstOrDefault(p => p.Id == selectedPartId);
+            current.Part = part != null ? new ReferenceEntity { Id = part.Id, Name = part.Name } : new ReferenceEntity();
         }
 
+        // ===== Salvar =====
         protected async Task Save()
         {
             formError = null;
@@ -227,6 +239,16 @@ namespace ColdlineWeb.Pages.PagesIndustria
             if (string.IsNullOrWhiteSpace(current.OccurrenceType?.Id))
             {
                 formError = "Selecione o Tipo de Ocorrência.";
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(current.User?.Id))
+            {
+                formError = "Selecione o Usuário.";
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(current.Process?.Id))
+            {
+                formError = "Selecione o Processo.";
                 return;
             }
 
@@ -240,7 +262,7 @@ namespace ColdlineWeb.Pages.PagesIndustria
                 else
                 {
                     var created = await OccurrenceService.CreateAsync(current);
-                    if (created is null) throw new InvalidOperationException("Falha ao criar ocorrência.");
+                    if (created == null) throw new InvalidOperationException("Falha ao criar ocorrência.");
                 }
 
                 showModal = false;
@@ -253,13 +275,13 @@ namespace ColdlineWeb.Pages.PagesIndustria
             }
         }
 
-        // ====== Ações da tabela ======
+        // ===== Ações Tabela =====
         protected async Task Delete(string id)
         {
             try
             {
                 var ok = await OccurrenceService.DeleteAsync(id);
-                if (!ok) throw new InvalidOperationException("Falha ao excluir.");
+                if (!ok) throw new InvalidOperationException("Falha ao excluir ocorrência.");
                 await LoadAll();
             }
             catch (Exception ex)
@@ -275,8 +297,6 @@ namespace ColdlineWeb.Pages.PagesIndustria
             {
                 var ok = await OccurrenceService.FinalizeOccurrenceAsync(id);
                 if (!ok) throw new InvalidOperationException("Falha ao finalizar ocorrência.");
-
-                // Recarrega a lista para refletir Finished = true e EndDate preenchido
                 await LoadAll();
             }
             catch (Exception ex)
@@ -286,8 +306,7 @@ namespace ColdlineWeb.Pages.PagesIndustria
             }
         }
 
-
-        // ====== Paginação ======
+        // ===== Paginação =====
         protected async Task GoNext()
         {
             if (pageNumber < totalPages)

@@ -3,9 +3,13 @@ using Microsoft.AspNetCore.Components.Forms;
 using System.Net.Http.Json;
 using ColdlineWeb.Services;
 using ColdlineWeb.Models;
+using ColdlineWeb.Models.Filter;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
+using System.Linq;
+using ColdlineWeb.Util;
+
 
 namespace ColdlineWeb.Pages.PagesIndustria.User
 {
@@ -13,20 +17,19 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
     {
         [Inject] private UserService UserService { get; set; } = default!;
 
-        private List<UserModel> users = new();
-
-        private List<ReferenceEntity> userTypes = new();
-        private List<ReferenceEntity> departments = new();
+        private List<UserModel> users = new List<UserModel>();
+        private List<ReferenceEntity> userTypes = new List<ReferenceEntity>();
+        private List<ReferenceEntity> departments = new List<ReferenceEntity>();
 
         // Filtros
         private string? filterName;
         private string? filterEmail;
-        private string? filterDepartmentId = "67f41c323a50bfa4e95bfe6d";
+        private string? filterDepartmentId = EnvironmentHelper.GetDepartmentId();
         private string? filterUserTypeId;
 
         // Paginação
         private int pageNumber = 1;
-        private int pageSize = 5; // Exemplo de tamanho de página
+        private int pageSize = 5;
         private int totalPages;
         private long totalCount;
 
@@ -38,7 +41,7 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
         private IBrowserFile? selectedFile;
 
         // Usuário corrente para Add/Edit
-        private UserModel currentUser = new();
+        private UserModel currentUser = new UserModel();
 
         // Controle do modal de Tipo de Usuário
         private bool showUserTypeModal = false; 
@@ -50,24 +53,22 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
 
         protected override async Task OnInitializedAsync()
         {
-            // Carrega dropdowns (faz a conversão para departamentos)
             await LoadFilterData();
-
-            // Carrega usuários (página 1, sem filtros iniciais)
             await LoadData();
         }
 
         /// <summary>
-        /// Carrega dados para popular departamentos e tipos de usuário.
+        /// Carrega dados para popular dropdowns de tipos de usuário e departamentos.
         /// </summary>
         private async Task LoadFilterData()
         {
             try
             {
                 userTypes = await UserService.GetUserTypesAsync();
-                // Obtém os departamentos como DepartmentModel e converte para ReferenceEntity
-                var deptModels = await Http.GetFromJsonAsync<List<DepartmentModel>>("api/Department") 
+
+                var deptModels = await Http.GetFromJsonAsync<List<DepartmentModel>>("api/Department")
                                  ?? new List<DepartmentModel>();
+
                 departments = deptModels.ConvertAll(d => new ReferenceEntity { Id = d.Id, Name = d.Name });
             }
             catch
@@ -77,7 +78,7 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
         }
 
         /// <summary>
-        /// Aplica filtros: redefine página para 1 e busca novamente.
+        /// Aplica filtros e redefine página para 1.
         /// </summary>
         private async Task ApplyFilters()
         {
@@ -86,7 +87,7 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
         }
 
         /// <summary>
-        /// Busca usuários usando o método paginado SearchUsersAsync.
+        /// Carrega usuários utilizando UserFilterModel.
         /// </summary>
         private async Task LoadData()
         {
@@ -95,18 +96,21 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
                 isLoading = true;
                 errorMessage = null;
 
-                var result = await UserService.SearchUsersAsync(
-                    filterName,
-                    filterEmail,
-                    filterDepartmentId,
-                    filterUserTypeId,
-                    pageNumber,
-                    pageSize
-                );
+                var filter = new UserFilterModel
+                {
+                    Name = filterName,
+                    Email = filterEmail,
+                    DepartmentId = filterDepartmentId,
+                    UserTypeId = filterUserTypeId,
+                    Page = pageNumber,
+                    PageSize = pageSize
+                };
 
-                users = result.Items;
-                totalPages = result.TotalPages;
-                totalCount = result.TotalCount;
+                var result = await UserService.SearchUsersAsync(filter);
+
+                users = result?.Items?.ToList() ?? new List<UserModel>();
+                totalCount = result?.Total ?? 0;
+                totalPages = result != null ? (int)Math.Ceiling((double)result.Total / pageSize) : 0;
             }
             catch
             {
@@ -118,7 +122,7 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
             }
         }
 
-        // ================ Métodos de Paginação =================
+        // ================= Paginação =================
         private bool CanGoPrevious => pageNumber > 1;
         private bool CanGoNext => pageNumber < totalPages;
 
@@ -140,14 +144,13 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
             }
         }
 
-        // ================ CRUD (Add/Edit/Delete) ================
+        // ================= CRUD Usuário =================
         private async Task SaveUser()
         {
             try
             {
                 currentUser.Id = null;
                 currentUser.UserType.Name = userTypes.Find(ut => ut.Id == currentUser.UserType.Id)?.Name ?? "";
-                // Como o departamento em UserModel é uma ReferenceEntity, fazemos a busca na lista "departments"
                 currentUser.Department.Name = departments.Find(d => d.Id == currentUser.Department.Id)?.Name ?? "";
                 currentUser.UrlPhoto = $"{currentUser.Name}.png";
 
@@ -272,7 +275,7 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
             Console.WriteLine($"Arquivo selecionado: {selectedFile.Name}, Tamanho: {selectedFile.Size} bytes");
         }
 
-        // Métodos para o modal de Tipo de Usuário
+        // ================= Modal Tipo de Usuário =================
         private void OpenUserTypeModal()
         {
             newUserType = new UserTypeModel();
@@ -299,7 +302,7 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
             }
         }
 
-        // Métodos para o modal de Departamento
+        // ================= Modal Departamento =================
         private void OpenDepartmentModal()
         {
             newDepartment = new DepartmentModel();
@@ -316,7 +319,6 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
             try
             {
                 await Http.PostAsJsonAsync("api/Department", newDepartment);
-                // Recarrega os departamentos e converte para ReferenceEntity
                 var deptModels = await Http.GetFromJsonAsync<List<DepartmentModel>>("api/Department")
                                  ?? new List<DepartmentModel>();
                 departments = deptModels.ConvertAll(d => new ReferenceEntity { Id = d.Id, Name = d.Name });

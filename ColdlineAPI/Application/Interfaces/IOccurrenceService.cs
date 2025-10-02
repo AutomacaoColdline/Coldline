@@ -1,5 +1,6 @@
 using ColdlineAPI.Domain.Entities;
 using ColdlineAPI.Application.DTOs;
+using ColdlineAPI.Application.Common;
 using ColdlineAPI.Application.Filters;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace ColdlineAPI.Application.Interfaces
         Task<Occurrence> CreateOccurrenceAsync(Occurrence Occurrence);
         Task<bool> UpdateOccurrenceAsync(string id, Occurrence Occurrence);
         Task<bool> DeleteOccurrenceAsync(string id);
-        Task<List<Occurrence>> SearchOccurrencesAsync(OccurrenceSearchFilter filter);
+        Task<PagedResult<Occurrence>> SearchOccurrencesAsync(OccurrenceSearchFilter f);
         Task<bool> FinalizeOccurrenceAsync(string id);
     }
 }

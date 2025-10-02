@@ -1,6 +1,7 @@
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Domain.Entities;
+using ColdlineAPI.Application.Common;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -54,7 +55,7 @@ namespace ColdlineAPI.Presentation.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<ActionResult<List<ProcessType>>> Search([FromQuery] ProcessTypeFilter filter)
+        public async Task<ActionResult<PagedResult<ProcessType>>> SearchProcess([FromQuery] ProcessTypeFilter filter)
         {
             var result = await _processTypeService.SearchProcessTypesAsync(filter);
             return Ok(result);

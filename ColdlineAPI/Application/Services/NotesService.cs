@@ -27,15 +27,15 @@ namespace ColdlineAPI.Application.Services
             var fb = Builders<Note>.Filter;
             var filters = new List<FilterDefinition<Note>>();
 
-            if (!string.IsNullOrWhiteSpace(filter.name))
+            if (!string.IsNullOrWhiteSpace(filter.Name))
             {
-                var pattern = Regex.Escape(filter.name);
+                var pattern = Regex.Escape(filter.Name);
                 filters.Add(fb.Regex(n => n.Name, new BsonRegularExpression(pattern, "i")));
             }
 
-            if (!string.IsNullOrWhiteSpace(filter.element))
+            if (!string.IsNullOrWhiteSpace(filter.Element))
             {
-                var pattern = Regex.Escape(filter.element);
+                var pattern = Regex.Escape(filter.Element);
                 // Regex direto no caminho "element" (array de string)
                 filters.Add(fb.Regex(nameof(Note.Element), new BsonRegularExpression(pattern, "i")));
                 // Alternativa com ElemMatch (comentado):
@@ -43,33 +43,33 @@ namespace ColdlineAPI.Application.Services
                 // filters.Add(fb.ElemMatch(n => n.Element, stringFilter));
             }
 
-            if (filter.noteType.HasValue)
+            if (filter.NoteType.HasValue)
             {
-                filters.Add(fb.Eq(n => n.NoteType, filter.noteType.Value));
+                filters.Add(fb.Eq(n => n.NoteType, filter.NoteType.Value));
             }
 
             var finalFilter = filters.Count > 0 ? fb.And(filters) : FilterDefinition<Note>.Empty;
 
             // paginação (com saneamento)
-            var page = Math.Max(1, filter.page ?? 1);
-            var pageSizeRaw = filter.pageSize ?? 20;
-            var pageSize = Math.Clamp(pageSizeRaw, 1, 200); // evite pageSize gigantes
+            var Page = Math.Max(1, filter.Page ?? 1);
+            var PageSizeRaw = filter.PageSize ?? 20;
+            var PageSize = Math.Clamp(PageSizeRaw, 1, 200); // evite PageSize gigantes
 
-            var skip = (page - 1) * pageSize;
+            var skip = (Page - 1) * PageSize;
 
             // ordenação
-            SortDefinition<Note> sort = Builders<Note>.Sort.Ascending(n => n.Name);
-            if (!string.IsNullOrWhiteSpace(filter.sortBy))
+            SortDefinition<Note> Sort = Builders<Note>.Sort.Ascending(n => n.Name);
+            if (!string.IsNullOrWhiteSpace(filter.SortBy))
             {
-                var by = filter.sortBy.Trim().ToLowerInvariant();
-                var desc = filter.sortDesc ?? false;
+                var by = filter.SortBy.Trim().ToLowerInvariant();
+                var desc = filter.SortDesc ?? false;
 
-                sort = by switch
+                Sort = by switch
                 {
                     "name"     => desc ? Builders<Note>.Sort.Descending(n => n.Name)     : Builders<Note>.Sort.Ascending(n => n.Name),
                     "notetype" => desc ? Builders<Note>.Sort.Descending(n => n.NoteType) : Builders<Note>.Sort.Ascending(n => n.NoteType),
                     // adicione mais campos se necessário
-                    _ => sort
+                    _ => Sort
                 };
             }
 
@@ -87,9 +87,9 @@ namespace ColdlineAPI.Application.Services
             // página de dados
             var items = await collection
                 .Find(finalFilter)
-                .Sort(sort)
+                .Sort(Sort)
                 .Skip(skip)
-                .Limit(pageSize)
+                .Limit(PageSize)
                 .Project<Note>(projection)
                 .ToListAsync();
 
@@ -97,8 +97,8 @@ namespace ColdlineAPI.Application.Services
             {
                 Items = items,
                 Total = total,
-                Page = page,
-                PageSize = pageSize
+                Page = Page,
+                PageSize = PageSize
             };
         }
 

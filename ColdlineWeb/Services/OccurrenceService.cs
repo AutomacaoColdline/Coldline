@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Filter;
+using ColdlineWeb.Models.Common;
+using Microsoft.AspNetCore.WebUtilities; // necessário para QueryHelpers
 
 namespace ColdlineWeb.Services
 {
@@ -21,30 +23,46 @@ namespace ColdlineWeb.Services
             return await _http.GetFromJsonAsync<List<OccurrenceModel>>("api/Occurrence") ?? new();
         }
 
-        public async Task<List<OccurrenceModel>> SearchAsync(OccurrenceSearchFilter filter)
+        public async Task<PagedResult<OccurrenceModel>> SearchAsync(OccurrenceSearchFilter filter)
         {
-            var qs = new List<string>();
+            var query = new Dictionary<string, string?>();
 
             if (!string.IsNullOrWhiteSpace(filter.UserId))
-                qs.Add($"UserId={Uri.EscapeDataString(filter.UserId)}");
-            
+                query["userId"] = filter.UserId;
+
             if (!string.IsNullOrWhiteSpace(filter.MachineID))
-                qs.Add($"MachineID={Uri.EscapeDataString(filter.MachineID)}");
+                query["machineId"] = filter.MachineID;
 
             if (filter.Finished.HasValue)
-                qs.Add($"Finished={(filter.Finished.Value ? "true" : "false")}");
+                query["finished"] = filter.Finished.Value.ToString().ToLowerInvariant();
 
             if (!string.IsNullOrWhiteSpace(filter.OccurrenceTypeId))
-                qs.Add($"OccurrenceTypeId={Uri.EscapeDataString(filter.OccurrenceTypeId)}");
+                query["occurrenceTypeId"] = filter.OccurrenceTypeId;
 
             if (filter.StartDate.HasValue)
-                qs.Add($"StartDate={Uri.EscapeDataString(filter.StartDate.Value.ToString("o"))}");
+                query["startDate"] = filter.StartDate.Value.ToString("o");
 
             if (filter.EndDate.HasValue)
-                qs.Add($"EndDate={Uri.EscapeDataString(filter.EndDate.Value.ToString("o"))}");
+                query["endDate"] = filter.EndDate.Value.ToString("o");
 
-            var url = "api/Occurrence/search" + (qs.Count > 0 ? "?" + string.Join("&", qs) : "");
-            return await _http.GetFromJsonAsync<List<OccurrenceModel>>(url) ?? new();
+            // paginação
+            query["page"] = (filter.Page ?? 1).ToString();
+            query["pageSize"] = (filter.PageSize ?? 10).ToString();
+
+            // ordenação
+            if (!string.IsNullOrWhiteSpace(filter.SortBy))
+                query["sortBy"] = filter.SortBy;
+            query["sortDesc"] = (filter.SortDesc ?? false).ToString().ToLowerInvariant();
+
+            var url = QueryHelpers.AddQueryString("api/Occurrence/search", query);
+
+            var result = await _http.GetFromJsonAsync<PagedResult<OccurrenceModel>>(url);
+            return result ?? new PagedResult<OccurrenceModel>
+            {
+                Items = Array.Empty<OccurrenceModel>(),
+                Page = filter.Page ?? 1,
+                PageSize = filter.PageSize ?? 10
+            };
         }
 
         public async Task<OccurrenceModel?> GetByIdAsync(string id)
@@ -85,8 +103,8 @@ namespace ColdlineWeb.Services
             var response = await _http.PostAsync($"api/Occurrence/end-occurrence/{id}", null);
             return response.IsSuccessStatusCode;
         }
+
         public async Task<bool> FinalizeOccurrenceAsync(string id)
             => (await _http.PostAsync($"api/Occurrence/finalize/{id}", null)).IsSuccessStatusCode;
-    
     }
 }

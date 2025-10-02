@@ -3,7 +3,10 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.WebUtilities;
 using ColdlineWeb.Models;
+using ColdlineWeb.Models.Common; 
+using ColdlineWeb.Models.Filter;
 
 namespace ColdlineWeb.Services
 {
@@ -102,29 +105,41 @@ namespace ColdlineWeb.Services
         /// <summary>
         /// Faz busca paginada de usuários com filtros opcionais de nome, email, departamento e tipo de usuário.
         /// </summary>
-        public async Task<PagedResult<UserModel>> SearchUsersAsync(
-            string? name,
-            string? email,
-            string? departmentId,
-            string? userTypeId,
-            int pageNumber,
-            int pageSize)
+        public async Task<PagedResult<UserModel>> SearchUsersAsync(UserFilterModel filter)
         {
-            // Monta a query string
-            // Observação: se algum parâmetro estiver vazio, não colocar na URL (ou colocar vazio).
-            var url = "api/User/search?" +
-                      $"name={name}&" +
-                      $"email={email}&" +
-                      $"departmentId={departmentId}&" +
-                      $"userTypeId={userTypeId}&" +
-                      $"pageNumber={pageNumber}&" +
-                      $"pageSize={pageSize}";
+            var query = new Dictionary<string, string>();
 
-            // Faz a requisição GET
+            if (!string.IsNullOrWhiteSpace(filter.Name))
+                query["name"] = filter.Name;
+
+            if (!string.IsNullOrWhiteSpace(filter.Email))
+                query["email"] = filter.Email;
+
+            if (!string.IsNullOrWhiteSpace(filter.DepartmentId))
+                query["departmentId"] = filter.DepartmentId;
+
+            if (!string.IsNullOrWhiteSpace(filter.UserTypeId))
+                query["userTypeId"] = filter.UserTypeId;
+
+            // paginação
+            query["page"] = (filter.Page.HasValue && filter.Page.Value > 0 ? filter.Page.Value : 1).ToString();
+            query["pageSize"] = (filter.PageSize.HasValue && filter.PageSize.Value > 0 ? filter.PageSize.Value : 10).ToString();
+
+            // ordenação
+            if (!string.IsNullOrWhiteSpace(filter.SortBy))
+                query["sortBy"] = filter.SortBy!;
+            if (filter.SortDesc.HasValue)
+                query["sortDesc"] = filter.SortDesc.Value.ToString().ToLowerInvariant();
+
+            var url = QueryHelpers.AddQueryString("api/User/search", query);
+
             var result = await _http.GetFromJsonAsync<PagedResult<UserModel>>(url);
-
-            // Retorna o objeto ou um PagedResult vazio
-            return result ?? new PagedResult<UserModel>();
+            return result ?? new PagedResult<UserModel>
+            {
+                Items = Array.Empty<UserModel>(),
+                Page = filter.Page ?? 1,
+                PageSize = filter.PageSize ?? 10
+            };
         }
 
 

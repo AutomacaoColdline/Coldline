@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Filter;
+using ColdlineWeb.Models.Common;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace ColdlineWeb.Services
 {
@@ -16,15 +18,11 @@ namespace ColdlineWeb.Services
             _http = http;
         }
 
-        public async Task<List<OccurrenceTypeModel>> GetAllAsync()
-        {
-            return await _http.GetFromJsonAsync<List<OccurrenceTypeModel>>("api/OccurrenceType") ?? new();
-        }
+        public async Task<List<OccurrenceTypeModel>> GetAllAsync() =>
+            await _http.GetFromJsonAsync<List<OccurrenceTypeModel>>("api/OccurrenceType") ?? new();
 
-        public async Task<OccurrenceTypeModel?> GetByIdAsync(string id)
-        {
-            return await _http.GetFromJsonAsync<OccurrenceTypeModel>($"api/OccurrenceType/{id}");
-        }
+        public async Task<OccurrenceTypeModel?> GetByIdAsync(string id) =>
+            await _http.GetFromJsonAsync<OccurrenceTypeModel>($"api/OccurrenceType/{id}");
 
         public async Task<OccurrenceTypeModel?> CreateAsync(OccurrenceTypeModel occurrenceType)
         {
@@ -45,25 +43,39 @@ namespace ColdlineWeb.Services
             var response = await _http.DeleteAsync($"api/OccurrenceType/{id}");
             return response.IsSuccessStatusCode;
         }
-        public async Task<List<OccurrenceTypeModel>> SearchAsync(OccurrenceTypeFilterModel? filter = null)
+
+        // Versão paginada, seguindo padrão do UserTypeService
+        public async Task<PagedResult<OccurrenceTypeModel>> SearchAsync(OccurrenceTypeFilterModel? filter = null)
         {
-            string url = "api/OccurrenceType/search";
+            var query = new Dictionary<string, string?>();
 
             if (filter is not null)
             {
-                var qs = new List<string>();
-
                 if (!string.IsNullOrWhiteSpace(filter.Name))
-                    qs.Add($"name={Uri.EscapeDataString(filter.Name)}");
+                    query["name"] = filter.Name;
 
                 if (!string.IsNullOrWhiteSpace(filter.DepartmentId))
-                    qs.Add($"departmentId={Uri.EscapeDataString(filter.DepartmentId)}");
+                    query["departmentId"] = filter.DepartmentId;
 
-                if (qs.Count > 0)
-                    url += "?" + string.Join("&", qs);
+                query["page"] = filter.Page > 0 ? filter.Page.ToString() : "1";
+                query["pageSize"] = filter.PageSize > 0 ? filter.PageSize.ToString() : "10";
+
+                if (!string.IsNullOrWhiteSpace(filter.SortBy))
+                    query["sortBy"] = filter.SortBy;
+
+                query["sortDesc"] = filter.SortDesc.ToString().ToLower();
             }
 
-            return await _http.GetFromJsonAsync<List<OccurrenceTypeModel>>(url) ?? new();
+            var url = QueryHelpers.AddQueryString("api/OccurrenceType/search", query);
+
+            var result = await _http.GetFromJsonAsync<PagedResult<OccurrenceTypeModel>>(url);
+
+            return result ?? new PagedResult<OccurrenceTypeModel>
+            {
+                Items = Array.Empty<OccurrenceTypeModel>(),
+                Page = filter?.Page ?? 1,
+                PageSize = filter?.PageSize ?? 10
+            };
         }
     }
 }

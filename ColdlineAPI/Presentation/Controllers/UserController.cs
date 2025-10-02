@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Application.DTOs;
 using ColdlineAPI.Domain.Entities;
+using ColdlineAPI.Application.Filters;
+using ColdlineAPI.Application.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.StaticFiles;
@@ -74,20 +76,10 @@ namespace ColdlineAPI.Presentation.Controllers
 
         [HttpGet("search")]
         [AllowAnonymous]
-        public async Task<IActionResult> SearchUsers([FromQuery] string? name, [FromQuery] string? email, [FromQuery] string? departmentId, [FromQuery] string? userTypeId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<ActionResult<PagedResult<User>>> SearchUsers([FromQuery] UserFilter filter)
         {
-            var (items, totalCount) = await _userService.SearchUsersAsync(name, email, departmentId, userTypeId, pageNumber, pageSize);
-
-            var response = new
-            {
-                totalCount = totalCount,
-                pageNumber = pageNumber,
-                pageSize = pageSize,
-                totalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
-                items = items
-            };
-
-            return Ok(response);
+            var result = await _userService.SearchUsersAsync(filter);
+            return Ok(result);
         }
 
         [HttpPost("login")]

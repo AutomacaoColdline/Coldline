@@ -1,5 +1,6 @@
 using ColdlineAPI.Domain.Entities;
 using ColdlineAPI.Application.Filters;
+using ColdlineAPI.Application.Common;   
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ColdlineAPI.Application.DTOs;
@@ -18,7 +19,7 @@ namespace ColdlineAPI.Application.Interfaces
         Task<Machine> CreateMachineAsync(Machine machine);
         Task<bool> UpdateMachineAsync(string id, Machine machine);
         Task<bool> DeleteMachineAsync(string id);
-        Task<List<Machine>> SearchMachinesAsync(MachineFilter filter);
+        Task<PagedResult<Machine>> SearchMachinesAsync(MachineFilter filter); 
         Task<int> UpdateMachinesCreatedAtAsync();
         Task<bool> FinalizeMachineAsync(string id);
     }

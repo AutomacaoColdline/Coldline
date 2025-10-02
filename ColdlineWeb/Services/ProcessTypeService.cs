@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Filter;
+using ColdlineWeb.Models.Common;
 
 namespace ColdlineWeb.Services
 {
@@ -42,25 +43,38 @@ namespace ColdlineWeb.Services
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<List<ProcessTypeModel>> SearchAsync(ProcessTypeFilterModel? filter = null)
+        // 🔹 Corrigido para retornar PagedResult<ProcessTypeModel>
+        public async Task<PagedResult<ProcessTypeModel>> SearchAsync(ProcessTypeFilterModel filter)
         {
-            string url = "api/ProcessType/search";
+            // montar query string manualmente (adicione as propriedades que precisar)
+            var queryParams = new List<string>();
+            if (!string.IsNullOrWhiteSpace(filter.Name))
+                queryParams.Add($"name={Uri.EscapeDataString(filter.Name)}");
+            // exemplo: queryParams.Add($"status={Uri.EscapeDataString(filter.Status)}");
+            queryParams.Add($"page={filter.Page}");
+            queryParams.Add($"pageSize={filter.PageSize}");
 
-            if (filter is not null)
+            var url = "api/ProcessType/search" + (queryParams.Any() ? "?" + string.Join("&", queryParams) : string.Empty);
+
+            var response = await _http.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
             {
-                var qs = new List<string>();
-
-                if (!string.IsNullOrWhiteSpace(filter.Name))
-                    qs.Add($"name={Uri.EscapeDataString(filter.Name)}");
-
-                if (!string.IsNullOrWhiteSpace(filter.DepartmentId))
-                    qs.Add($"departmentId={Uri.EscapeDataString(filter.DepartmentId)}");
-
-                if (qs.Count > 0)
-                    url += "?" + string.Join("&", qs);
+                return new PagedResult<ProcessTypeModel>
+                {
+                    Items = new List<ProcessTypeModel>(),
+                    Page = filter.Page,
+                    PageSize = filter.PageSize
+                };
             }
 
-            return await _http.GetFromJsonAsync<List<ProcessTypeModel>>(url) ?? new();
+            var result = await response.Content.ReadFromJsonAsync<PagedResult<ProcessTypeModel>>();
+            return result ?? new PagedResult<ProcessTypeModel>
+            {
+                Items = new List<ProcessTypeModel>(),
+                Page = filter.Page,
+                PageSize = filter.PageSize
+            };
         }
     }
 }

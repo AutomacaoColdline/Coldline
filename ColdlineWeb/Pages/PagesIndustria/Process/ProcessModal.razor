@@ -22,14 +22,6 @@
                         }
                     </select>
                     
-                    <label>Departamento:</label>
-                    <select class="form-control" @bind="CurrentProcess.Department.Id">
-                        @foreach (var dept in Departments)
-                        {
-                            <option value="@dept.Id">@dept.Name</option>
-                        }
-                    </select>
-                    
                     <label>Tipo de Processo:</label>
                     <select class="form-control" @bind="CurrentProcess.ProcessType.Id">
                         @foreach (var pt in ProcessTypes)

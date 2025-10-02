@@ -1,5 +1,6 @@
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Application.Filters;
+using ColdlineAPI.Application.Common;
 using ColdlineAPI.Application.DTOs;
 using ColdlineAPI.Domain.Entities;
 using ColdlineAPI.Application.DTOs;
@@ -59,11 +60,11 @@ namespace ColdlineAPI.Presentation.Controllers
             return deleted ? NoContent() : NotFound();
         }
 
-        [HttpPost("search")]
-        public async Task<ActionResult<IEnumerable<Process>>> SearchProcesses([FromBody] ProcessFilter filter)
+        [HttpGet("search")]
+        public async Task<ActionResult<PagedResult<Process>>> SearchProcess([FromQuery] ProcessFilter filter)
         {
-            var processes = await _processService.SearchProcessAsync(filter);
-            return Ok(processes);
+            var result = await _processService.SearchProcessAsync(filter);
+            return Ok(result);
         }
         [HttpPost("start-process")]
         public async Task<IActionResult> StartProcess([FromBody] StartProcessRequest request)

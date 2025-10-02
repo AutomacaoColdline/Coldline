@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Filter;
+using ColdlineWeb.Models.Common;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace ColdlineWeb.Services
 {
@@ -49,13 +51,43 @@ namespace ColdlineWeb.Services
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<List<ProcessModel>> SearchProcessesAsync(ProcessFilterModel filter)
+        public async Task<PagedResult<ProcessModel>> SearchProcessesAsync(ProcessFilterModel filter)
         {
-            var response = await _http.PostAsJsonAsync("api/Process/search", filter);
-            return response.IsSuccessStatusCode
-                ? await response.Content.ReadFromJsonAsync<List<ProcessModel>>() ?? new List<ProcessModel>()
-                : new List<ProcessModel>();
+            // Converte o filtro em um dicionário de query string
+            var query = new Dictionary<string, string?>
+            {
+                ["IdentificationNumber"] = filter.IdentificationNumber,
+                ["ProcessTypeId"] = filter.ProcessTypeId,
+                ["DepartmentId"] = filter.DepartmentId,
+                ["StartDate"] = filter.StartDate?.ToString("yyyy-MM-dd"),
+                ["EndDate"] = filter.EndDate?.ToString("yyyy-MM-dd"),
+                ["Page"] = filter.Page.ToString(),
+                ["PageSize"] = filter.PageSize.ToString()
+            };
+
+            var url = QueryHelpers.AddQueryString("api/Process/search", query);
+
+            var response = await _http.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new PagedResult<ProcessModel>
+                {
+                    Items = Array.Empty<ProcessModel>(),
+                    Page = filter.Page,
+                    PageSize = filter.PageSize
+                };
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<PagedResult<ProcessModel>>();
+            return result ?? new PagedResult<ProcessModel>
+            {
+                Items = Array.Empty<ProcessModel>(),
+                Page = filter.Page,
+                PageSize = filter.PageSize
+            };
         }
+
 
         public async Task<ProcessModel?> StartProcessAsync(StartProcessRequest request)
         {

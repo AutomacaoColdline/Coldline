@@ -10,8 +10,6 @@
 @using ColdlineWeb.Helpers
 @using ColdlineWeb.Models.Enum
 
-
-
 <link rel="stylesheet" href="css/MachineViewer.css" />
 
 @if (isLoading)
@@ -42,7 +40,7 @@ else if (machine != null)
             <div><strong>Voltagem:</strong> @machine.Voltage</div>
             <div><strong>Status:</strong> @(machine.Status?.GetDisplayName() ?? "Desconhecido")</div>
             <div><strong>Tipo de Máquina:</strong> @machine.MachineType?.Name</div>
-            <div><strong>Qualidade:</strong> @(machine.Quality?.Name ?? "Não disponivel")</div>
+            <div><strong>Qualidade:</strong> @(machine.Quality?.Name ?? "Não disponível")</div>
             <div><strong>Monitoramento:</strong> @(machine.Monitoring?.Name ?? "Nenhum")</div>
             <div><strong>Tempo:</strong> @machine.Time</div>
         </div>
@@ -81,7 +79,7 @@ else if (machine != null)
     [Parameter] public string Id { get; set; } = string.Empty;
 
     private MachineModel? machine;
-    private List<ProcessModel> processes = new();
+    private List<ProcessModel> processes = new List<ProcessModel>();
     private bool isLoading = true;
     private string? errorMessage;
 
@@ -103,7 +101,8 @@ else if (machine != null)
                 PageSize = 100
             };
 
-            processes = await ProcessService.SearchProcessesAsync(filter);
+            var pagedProcesses = await ProcessService.SearchProcessesAsync(filter);
+            processes = pagedProcesses?.Items != null ? new List<ProcessModel>(pagedProcesses.Items) : new List<ProcessModel>();
         }
         catch (Exception ex)
         {
@@ -115,6 +114,7 @@ else if (machine != null)
             isLoading = false;
         }
     }
+
     private async Task FinalizeMachine(string id)
     {
         try
@@ -122,7 +122,6 @@ else if (machine != null)
             var success = await MachineService.FinalizeMachineAsync(id);
             if (success)
             {
-                // Recarrega os dados atualizados da máquina
                 machine = await MachineService.GetMachineByIdAsync(id);
                 StateHasChanged();
             }
@@ -137,8 +136,6 @@ else if (machine != null)
             Console.WriteLine(ex.Message);
         }
     }
-
-    
 
     private void GoBack() => Navigation.NavigateTo("/home");
 }

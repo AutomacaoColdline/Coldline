@@ -2,9 +2,11 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.WebUtilities;
 using ColdlineWeb.Util;
 using ColdlineWeb.Models;
 using ColdlineWeb.Models.Filter;
+using ColdlineWeb.Models.Common; 
 using ColdlineWeb.Models.Enum;
 
 using System.Text.Json;
@@ -67,26 +69,56 @@ namespace ColdlineWeb.Services
         /// <summary>
         /// Busca máquinas com base em filtros.
         /// </summary>
-        public async Task<List<MachineModel>> SearchMachinesAsync(MachineFilterModel filter)
+        public async Task<PagedResult<MachineModel>> SearchMachinesAsync(MachineFilterModel filter)
         {
-            var query = filter.ToQueryString();
-            var response = await _http.GetAsync($"api/Machine/search?{query}");
+            var query = new Dictionary<string, string>();
 
-            if (!response.IsSuccessStatusCode)
-                return new List<MachineModel>();
+            if (!string.IsNullOrWhiteSpace(filter.CustomerName))
+                query["customerName"] = filter.CustomerName;
 
-            var json = await response.Content.ReadAsStringAsync();
-            using var doc = JsonDocument.Parse(json);
+            if (!string.IsNullOrWhiteSpace(filter.IdentificationNumber))
+                query["identificationNumber"] = filter.IdentificationNumber;
 
-            var itemsElement = doc.RootElement.GetProperty("items");
+            if (!string.IsNullOrWhiteSpace(filter.Phase))
+                query["phase"] = filter.Phase;
 
-            var items = JsonSerializer.Deserialize<List<MachineModel>>(itemsElement.GetRawText(), new JsonSerializerOptions
+            if (!string.IsNullOrWhiteSpace(filter.Voltage))
+                query["voltage"] = filter.Voltage;
+
+            if (!string.IsNullOrWhiteSpace(filter.ProcessId))
+                query["processId"] = filter.ProcessId;
+
+            if (!string.IsNullOrWhiteSpace(filter.QualityId))
+                query["qualityId"] = filter.QualityId;
+
+            if (!string.IsNullOrWhiteSpace(filter.MonitoringId))
+                query["monitoringId"] = filter.MonitoringId;
+
+            if (!string.IsNullOrWhiteSpace(filter.MachineTypeId))
+                query["machineTypeId"] = filter.MachineTypeId;
+
+            if (filter.Status.HasValue)
+                query["status"] = filter.Status.Value.ToString();
+
+            query["page"] = (filter.Page <= 0 ? 1 : filter.Page).ToString();
+            query["pageSize"] = (filter.PageSize <= 0 ? 10 : filter.PageSize).ToString();
+
+            if (!string.IsNullOrWhiteSpace(filter.SortBy))
+                query["sortBy"] = filter.SortBy!;
+            query["sortDesc"] = filter.SortDesc.ToString().ToLowerInvariant();
+
+            var url = QueryHelpers.AddQueryString("api/Machine/search", query);
+
+            var result = await _http.GetFromJsonAsync<PagedResult<MachineModel>>(url);
+ 
+            return result ?? new PagedResult<MachineModel>
             {
-                PropertyNameCaseInsensitive = true
-            });
-
-            return items ?? new List<MachineModel>();
+                Items = System.Array.Empty<MachineModel>(),
+                Page = filter.Page,
+                PageSize = filter.PageSize
+            };
         }
+        
         public async Task<bool> FinalizeMachineAsync(string id)
         {
             if (string.IsNullOrWhiteSpace(id))

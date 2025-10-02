@@ -1,16 +1,20 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text.RegularExpressions;
 
 using ColdlineAPI.Domain.Entities;
 using ColdlineAPI.Infrastructure.Utils;
 using ColdlineAPI.Application.Interfaces;
 using ColdlineAPI.Application.Repositories;
 using ColdlineAPI.Application.Factories;
+using ColdlineAPI.Application.Filters;
+using ColdlineAPI.Application.Common;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -61,55 +65,104 @@ namespace ColdlineAPI.Application.Services
 
         public async Task<User?> GetUserByIdAsync(string id) => await _users.GetByIdAsync(u => u.Id == id);
 
-        public async Task<(List<User> Items, long TotalCount)> SearchUsersAsync(
-            string? name, string? email, string? departmentId, string? userTypeId,
-            int pageNumber, int pageSize)
+        public async Task<PagedResult<User>> SearchUsersAsync(UserFilter filter)
         {
-            var builder = Builders<User>.Filter;
+            var fb = Builders<User>.Filter;
             var filters = new List<FilterDefinition<User>>();
 
-            if (!string.IsNullOrEmpty(name))
-                filters.Add(builder.Regex(u => u.Name, new BsonRegularExpression(name, "i")));
+            // name / email: contains (case-insensitive) com Regex.Escape
+            if (!string.IsNullOrWhiteSpace(filter?.Name))
+            {
+                var pattern = Regex.Escape(filter.Name.Trim());
+                filters.Add(fb.Regex(u => u.Name, new BsonRegularExpression(pattern, "i")));
+            }
 
-            if (!string.IsNullOrEmpty(email))
-                filters.Add(builder.Regex(u => u.Email, new BsonRegularExpression(email, "i")));
+            if (!string.IsNullOrWhiteSpace(filter?.Email))
+            {
+                var pattern = Regex.Escape(filter.Email.Trim());
+                filters.Add(fb.Regex(u => u.Email, new BsonRegularExpression(pattern, "i")));
+            }
 
-            if (!string.IsNullOrEmpty(departmentId))
-                filters.Add(builder.Eq(u => u.Department!.Id, departmentId));
+            if (!string.IsNullOrWhiteSpace(filter?.DepartmentId))
+                filters.Add(fb.Eq(u => u.Department!.Id, filter.DepartmentId));
 
-            if (!string.IsNullOrEmpty(userTypeId))
-                filters.Add(builder.Eq(u => u.UserType!.Id, userTypeId));
+            if (!string.IsNullOrWhiteSpace(filter?.UserTypeId))
+                filters.Add(fb.Eq(u => u.UserType!.Id, filter.UserTypeId));
 
-            var finalFilter = filters.Count > 0 ? builder.And(filters) : builder.Empty;
+            var finalFilter = filters.Count > 0 ? fb.And(filters) : FilterDefinition<User>.Empty;
 
-            var collection = _users.GetCollection();
+            // paginação (1-based) com limites
+            var Page     = Math.Max(1, filter?.Page ?? 1);
+            var PageSize = Math.Clamp(filter?.PageSize ?? 20, 1, 200);
+            var skip     = (Page - 1) * PageSize;
 
-            // ✅ Projeção incluindo os campos usados no front
+            // ordenação
+            SortDefinition<User> Sort = Builders<User>.Sort.Ascending(u => u.Name);
+            if (!string.IsNullOrWhiteSpace(filter?.SortBy))
+            {
+                var by   = filter.SortBy.Trim().ToLowerInvariant();
+                var desc = filter.SortDesc ?? false;
+
+                Sort = by switch
+                {
+                    "name"       => desc ? Builders<User>.Sort.Descending(u => u.Name)
+                                        : Builders<User>.Sort.Ascending(u => u.Name),
+                    "email"      => desc ? Builders<User>.Sort.Descending(u => u.Email)
+                                        : Builders<User>.Sort.Ascending(u => u.Email),
+                    "department" => desc ? Builders<User>.Sort.Descending(u => u.Department!.Name)
+                                        : Builders<User>.Sort.Ascending(u => u.Department!.Name),
+                    "usertype"   => desc ? Builders<User>.Sort.Descending(u => u.UserType!.Name)
+                                        : Builders<User>.Sort.Ascending(u => u.UserType!.Name),
+                    _ => Sort
+                };
+            }
+
+            // projeção com campos usados no front
             var projection = Builders<User>.Projection
                 .Include(u => u.Id)
                 .Include(u => u.Name)
                 .Include(u => u.Email)
                 .Include(u => u.UserType)
                 .Include(u => u.Department)
-                .Include(u => u.CurrentProcess)       // <-- necessário
-                .Include(u => u.CurrentOccurrence)    // <-- se o front usa
+                .Include(u => u.CurrentProcess)
+                .Include(u => u.CurrentOccurrence)
                 .Include(u => u.IdentificationNumber)
                 .Include(u => u.UrlPhoto)
                 .Include(u => u.WorkHourCost);
 
-            var sort = Builders<User>.Sort.Ascending(u => u.Name);
+            var collection = _users.GetCollection();
 
-            var items = await collection.Find(finalFilter)
-                .Project<User>(projection)
-                .Sort(sort)
-                .Skip((pageNumber - 1) * pageSize)
-                .Limit(pageSize)
-                .ToListAsync();
-
+            // total antes da paginação
             var total = await collection.CountDocumentsAsync(finalFilter);
 
-            return (items, total);
-}
+            // ajusta página se passou do fim
+            var totalPages = PageSize > 0 ? (int)Math.Ceiling(total / (double)PageSize) : 0;
+            if (Page > totalPages && totalPages > 0)
+            {
+                Page = totalPages;
+                skip = (Page - 1) * PageSize;
+            }
+
+            // (Opcional) collation pt-BR; se seu driver não suportar, remova findOptions/Collation.
+            var collation   = new Collation("pt", strength: CollationStrength.Secondary);
+            var findOptions = new FindOptions { Collation = collation };
+
+            var items = await collection
+                .Find(finalFilter, findOptions)   // se der erro de compilação, troque para .Find(finalFilter)
+                .Sort(Sort)
+                .Skip(skip)
+                .Limit(PageSize)
+                .Project<User>(projection)
+                .ToListAsync();
+
+            return new PagedResult<User>
+            {
+                Items    = items,
+                Total    = total,
+                Page     = Page,
+                PageSize = PageSize
+            };
+        }
 
         public async Task<User> CreateUserAsync(User user)
         {
@@ -267,15 +320,15 @@ namespace ColdlineAPI.Application.Services
 
             Document.Create(container =>
             {
-                container.Page(page =>
+                container.Page(Page =>
                 {
-                    page.Size(PageSizes.A4);
-                    page.Margin(40);
-                    page.DefaultTextStyle(x => x.FontSize(12));
+                    Page.Size(PageSizes.A4);
+                    Page.Margin(40);
+                    Page.DefaultTextStyle(x => x.FontSize(12));
 
-                    page.Header().AlignCenter().Text("idade").Bold().FontSize(18);
+                    Page.Header().AlignCenter().Text("idade").Bold().FontSize(18);
 
-                    page.Content().PaddingTop(30).Row(mainRow =>
+                    Page.Content().PaddingTop(30).Row(mainRow =>
                     {
                         mainRow.ConstantColumn(50).Column(yCol =>
                         {

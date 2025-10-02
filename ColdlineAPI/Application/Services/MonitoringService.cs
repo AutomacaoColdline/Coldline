@@ -73,9 +73,9 @@ namespace ColdlineAPI.Application.Services
             var finalFilter = filters.Count > 0 ? fb.And(filters) : FilterDefinition<Monitoring>.Empty;
 
             // paginação segura
-            var page = Math.Max(1, filter.Page);
-            var pageSize = Math.Clamp(filter.PageSize, 1, 200);
-            var skip = (page - 1) * pageSize;
+            var Page = Math.Max(1, filter.Page.Value);
+            var PageSize = Math.Clamp(filter.PageSize.Value, 1, 200);
+            var skip = (Page - 1) * PageSize;
 
             // ordenação
             var sort = Builders<Monitoring>.Sort.Ascending(m => m.Identificador);
@@ -107,7 +107,7 @@ namespace ColdlineAPI.Application.Services
                 .Find(finalFilter)
                 .Sort(sort)
                 .Skip(skip)
-                .Limit(pageSize)
+                .Limit(PageSize)
                 .Project<Monitoring>(projection)
                 .ToListAsync();
 
@@ -115,8 +115,8 @@ namespace ColdlineAPI.Application.Services
             {
                 Items = items,
                 Total = total,
-                Page = page,
-                PageSize = pageSize
+                Page = Page,
+                PageSize = PageSize
             };
         }
 

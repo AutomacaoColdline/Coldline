@@ -1,8 +1,11 @@
 using ColdlineWeb.Services;
 using ColdlineWeb.Models;
+using ColdlineWeb.Models.Filter;
 using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using ColdlineWeb.Util;
 
 namespace ColdlineWeb.Pages.PagesIndustria
 {
@@ -13,8 +16,9 @@ namespace ColdlineWeb.Pages.PagesIndustria
 
         public Dictionary<string, ProcessStats> ProcessStatsByUserId = new();
 
-        private const string FixedUserTypeId = "67f41bf13a50bfa4e95bfe69";
-        private const string FixedDepartamentId = "67f41c323a50bfa4e95bfe6d";
+        private static readonly string FixedUserTypeId = EnvironmentHelper.GetUserTypeId();
+        private static readonly string FixedDepartamentId = EnvironmentHelper.GetDepartmentId();
+
 
         protected List<UserModel> users = new();
         protected bool isLoading = true;
@@ -36,7 +40,7 @@ namespace ColdlineWeb.Pages.PagesIndustria
             {
                 await RefreshDataAsync();
                 StateHasChanged();
-                await Task.Delay(5000); // atualiza a cada 5 segundos
+                await Task.Delay(5000); // Atualiza a cada 5 segundos
             }
         }
 
@@ -44,16 +48,24 @@ namespace ColdlineWeb.Pages.PagesIndustria
         {
             try
             {
-                var page = await UserService.SearchUsersAsync(
-                    name: null,
-                    email: null,
-                    departmentId: FixedDepartamentId,
-                    userTypeId: FixedUserTypeId, 
-                    pageNumber: 1,
-                    pageSize: 10                
-                );
+                // Cria o filtro conforme a assinatura atual do serviço
+                var filter = new UserFilterModel
+                {
+                    Name = null,
+                    Email = null,
+                    DepartmentId = FixedDepartamentId,
+                    UserTypeId = FixedUserTypeId,
+                    Page = 1,
+                    PageSize = 10
+                };
 
-                users = page.Items ?? new List<UserModel>();
+                // Chamada correta usando o filtro
+                var page = await UserService.SearchUsersAsync(filter);
+
+                // Extrai os usuários do PagedResult
+                users = page.Items?.ToList() ?? new List<UserModel>();
+
+                // Calcula estatísticas de cada usuário
                 await CalculateAverageTimeForEachUser();
             }
             catch

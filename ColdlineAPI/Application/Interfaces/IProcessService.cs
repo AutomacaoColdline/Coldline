@@ -1,8 +1,11 @@
 using ColdlineAPI.Application.Filters;
 using ColdlineAPI.Application.DTOs;
+using ColdlineAPI.Application.Common;
+using ColdlineAPI.Domain.Common;
 using ColdlineAPI.Domain.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System; 
 using ColdlineAPI.Infrastructure.Utilities; 
 
 namespace ColdlineAPI.Application.Interfaces
@@ -14,7 +17,7 @@ namespace ColdlineAPI.Application.Interfaces
         Task<Process> CreateProcessAsync(Process process);
         Task<bool> UpdateProcessAsync(string id, Process process);
         Task<bool> DeleteProcessAsync(string id);
-        Task<List<Process>> SearchProcessAsync(ProcessFilter filter);
+        Task<PagedResult<Process>> SearchProcessAsync(ProcessFilter filter);
         Task<Process?> StartProcessAsync(string identificationNumber, string processTypeId, string? machineId, bool preIndustrialization, bool reWork, bool prototype);
         Task<bool> UpdateProcessTimeInDatabase(string processId, string processTime);
         Task<bool> EndProcessAsync(string processId, bool Finished, StartOccurrenceRequest requestOccurrence);

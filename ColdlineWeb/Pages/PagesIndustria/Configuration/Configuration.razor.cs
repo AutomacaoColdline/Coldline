@@ -7,6 +7,7 @@ using Microsoft.JSInterop;
 using ColdlineWeb.Models;
 using ColdlineWeb.Services;
 using ColdlineWeb.Models.Filter;
+using ColdlineWeb.Util;
 
 namespace ColdlineWeb.Pages.PagesIndustria
 {
@@ -21,11 +22,8 @@ namespace ColdlineWeb.Pages.PagesIndustria
         [Inject] protected ProcessTypeService ProcessTypeService { get; set; } = default!;
         [Inject] protected TypeDefectService TypeDefectService { get; set; } = default!;
         [Inject] protected OccurrenceTypeService OccurrenceTypeService { get; set; } = default!;
-
-
         [Inject] protected HttpClient Http { get; set; } = default!;
         [Inject] protected IJSRuntime JS { get; set; } = default!;
-
 
         protected string SelectedTab = "Defects";
 
@@ -38,51 +36,77 @@ namespace ColdlineWeb.Pages.PagesIndustria
         protected List<DefectModel> Defects = new();
         protected List<DepartmentModel> Departments = new();
         protected List<OccurrenceTypeModel> OccurrenceTypes = new();
-        protected string FixedDepartamentId = "67f41c323a596bf4e95bfe6d";
+        protected string FixedDepartamentId = EnvironmentHelper.GetDepartmentId();
         protected bool isLoadingTab = true;
 
         protected override async Task OnInitializedAsync()
         {
             isLoadingTab = true;
-            await LoadAll();
-            isLoadingTab = false;
+            try
+            {
+                await LoadAll();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao carregar dados da configuração: {ex}");
+            }
+            finally
+            {
+                isLoadingTab = false;
+            }
         }
 
         protected async Task LoadAll()
         {
             isLoadingTab = true;
-            Parts = await PartService.GetAllAsync();
-            var UTFilter = new UserTypeFilterModel
+            try
             {
-                DepartmentId = FixedDepartamentId,
-            };
-            UserTypes = await UserTypeService.SearchAsync(UTFilter);
-            TypeDefects = await TypeDefectService.GetAllAsync();
-            
-            var ptFilter = new ProcessTypeFilterModel
-            {
-                DepartmentId = FixedDepartamentId, 
-            };
-            
-            ProcessTypes = await ProcessTypeService.SearchAsync(ptFilter);
+                // Carrega listas simples
+                Parts = await PartService.GetAllAsync() ?? new();
+                TypeDefects = await TypeDefectService.GetAllAsync() ?? new();
+                MachineTypes = await MachineTypeService.GetAllAsync() ?? new();
+                PauseTypes = await PauseTypeService.GetAllAsync() ?? new();
+                Defects = await DefectService.GetAllAsync() ?? new();
+                Departments = await DepartmentService.GetAllAsync() ?? new();
 
-            MachineTypes = await MachineTypeService.GetAllAsync();
-            PauseTypes = await PauseTypeService.GetAllAsync();
-            Defects = await DefectService.GetAllAsync();
-            Departments = await DepartmentService.GetAllAsync();
+                // Carrega listas paginadas via PagedResult
+                var pagedUserTypes = await UserTypeService.SearchAsync(new UserTypeFilterModel
+                {
+                    DepartmentId = FixedDepartamentId,
+                    Page = 1,
+                    PageSize = 1000 // ajustável conforme necessidade
+                });
+                UserTypes = pagedUserTypes?.Items?.ToList() ?? new();
 
-            var OTFilter = new OccurrenceTypeFilterModel
+                var pagedProcessTypes = await ProcessTypeService.SearchAsync(new ProcessTypeFilterModel
+                {
+                    DepartmentId = FixedDepartamentId,
+                    Page = 1,
+                    PageSize = 1000
+                });
+                ProcessTypes = pagedProcessTypes?.Items?.ToList() ?? new();
+
+                var pagedOccurrenceTypes = await OccurrenceTypeService.SearchAsync(new OccurrenceTypeFilterModel
+                {
+                    DepartmentId = FixedDepartamentId,
+                    Page = 1,
+                    PageSize = 1000
+                });
+                OccurrenceTypes = pagedOccurrenceTypes?.Items?.ToList() ?? new();
+            }
+            catch (Exception ex)
             {
-                DepartmentId = FixedDepartamentId, 
-            };
-            OccurrenceTypes = await OccurrenceTypeService.SearchAsync(OTFilter);
-            isLoadingTab = false;
+                Console.WriteLine($"Erro ao carregar listas da configuração: {ex}");
+            }
+            finally
+            {
+                isLoadingTab = false;
+            }
         }
 
         protected void SelectTab(string tab)
         {
             SelectedTab = tab;
         }
-
     }
 }

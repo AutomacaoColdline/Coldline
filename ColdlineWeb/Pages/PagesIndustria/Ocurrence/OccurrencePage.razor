@@ -19,10 +19,9 @@ else if (!string.IsNullOrWhiteSpace(errorMessage))
 }
 else
 {
-    <!-- 🔎 BARRA DE BUSCA -->
+    <!-- Barra de busca -->
     <div class="filter-card">
         <div class="search-filters">
-            <!-- Usuário -->
             <select class="form-control filter-medium" @bind="filter.UserId">
                 <option value="">Todos os Usuários</option>
                 @foreach (var u in users)
@@ -31,7 +30,6 @@ else
                 }
             </select>
 
-            <!-- Tipo de Ocorrência -->
             <select class="form-control filter-medium" @bind="filter.OccurrenceTypeId">
                 <option value="">Todos os Tipos</option>
                 @foreach (var t in occurrenceTypes)
@@ -40,20 +38,15 @@ else
                 }
             </select>
 
-            <!-- Data Início -->
-            <InputDate @bind-Value="startDate" class="form-control filter-medium" />
+            <input type="datetime-local" class="form-control filter-medium" @bind="startDate" />
+            <input type="datetime-local" class="form-control filter-medium" @bind="endDate" />
 
-            <!-- Data Fim -->
-            <InputDate @bind-Value="endDate" class="form-control filter-medium" />
-
-            <!-- Finalizada? -->
             <select class="form-control filter-small" @bind="finishedStr">
                 <option value="">Finalizada?</option>
                 <option value="true">Sim</option>
                 <option value="false">Não</option>
             </select>
 
-            <!-- Ações -->
             <button class="btn btn-filter" title="Buscar" @onclick="ApplyFilters">
                 <img src="img/lupa.png" alt="Buscar" class="btn-icon" />
             </button>
@@ -107,7 +100,7 @@ else
                                     <img src="img/lixeira.png" alt="Excluir" style="width: 20px;" />
                                 </button>
                                 <button class="btn btn-sm btn-outline-success" title="Finalizar"
-                                    disabled="@o.Finished" @onclick="() => End(o.Id)">
+                                        disabled="@o.Finished" @onclick="() => End(o.Id)">
                                     ✔
                                 </button>
                             </td>
@@ -118,17 +111,13 @@ else
         </div>
 
         <div class="pagination-wrapper">
-            <button class="btn btn-pagination"
-                    @onclick="GoPrev"
-                    disabled="@(pageNumber == 1)">
+            <button class="btn btn-pagination" @onclick="GoPrev" disabled="@(pageNumber == 1)">
                 <img src="img/seta-esquerda.png" class="pagination-icon" />
             </button>
 
             <span class="page-indicator">@pageNumber de @totalPages</span>
 
-            <button class="btn btn-pagination"
-                    @onclick="GoNext"
-                    disabled="@(pageNumber == totalPages)">
+            <button class="btn btn-pagination" @onclick="GoNext" disabled="@(pageNumber == totalPages)">
                 <img src="img/seta-direita.png" class="pagination-icon" />
             </button>
         </div>
@@ -140,21 +129,42 @@ else
     <div class="modal d-block">
         <div class="modal-dialog">
             <div class="modal-content">
-
                 <div class="modal-header">
-                    <h5 class="modal-title">
-                        @(isEditing ? "Editar Ocorrência" : "Nova Ocorrência")
-                    </h5>
+                    <h5 class="modal-title">@((isEditing ? "Editar" : "Nova") + " Ocorrência")</h5>
                 </div>
 
                 <div class="modal-body">
                     <div class="row g-2">
+                        <!-- Usuário -->
+                        <div class="col-md-6">
+                            <label class="form-label">Usuário</label>
+                            <select class="form-select" @bind="selectedUserId" @bind:after="OnUserChanged">
+                                <option value="">-- selecione --</option>
+                                @foreach (var u in users)
+                                {
+                                    <option value="@u.Id">@u.Name</option>
+                                }
+                            </select>
+                        </div>
 
+                        <!-- Processo -->
+                        <div class="col-md-6">
+                            <label class="form-label">Processo</label>
+                            <select class="form-select" @bind="selectedProcessId" @bind:after="OnProcessChanged">
+                                <option value="">-- selecione --</option>
+                                @foreach (var p in processes)
+                                {
+                                    <option value="@p.Id">@p.IdentificationNumber</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mt-2">
+                        <!-- Tipo de Ocorrência -->
                         <div class="col-md-6">
                             <label class="form-label">Tipo de Ocorrência</label>
-                            <select class="form-select"
-                                    @bind="selectedOccurrenceTypeId"
-                                    @bind:after="OnTypeChanged">
+                            <select class="form-select" @bind="selectedOccurrenceTypeId" @bind:after="OnTypeChanged">
                                 <option value="">-- selecione --</option>
                                 @foreach (var t in occurrenceTypes)
                                 {
@@ -162,15 +172,11 @@ else
                                 }
                             </select>
                         </div>
-                    </div>
 
-                    <!-- Peça -->
-                    <div class="row g-2 mt-2">
-                        <div class="col-md-12">
+                        <!-- Peça -->
+                        <div class="col-md-6">
                             <label class="form-label">Peça</label>
-                            <select class="form-select"
-                                    @bind="selectedPartId"
-                                    @bind:after="OnPartChanged">
+                            <select class="form-select" @bind="selectedPartId" @bind:after="OnPartChanged">
                                 <option value="">-- selecione --</option>
                                 @foreach (var p in parts)
                                 {
@@ -180,14 +186,25 @@ else
                         </div>
                     </div>
 
+                    <div class="row g-2 mt-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Data Início</label>
+                            <input type="datetime-local" class="form-control" @bind="current.StartDate" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Data Fim</label>
+                            <input type="datetime-local" class="form-control" @bind="current.EndDate" />
+                        </div>
+                    </div>
+
                     <div class="mt-2">
                         <label class="form-label">Descrição</label>
                         <textarea class="form-control" rows="3" @bind="current.Description"></textarea>
                     </div>
 
                     <div class="form-check mt-2">
-                        <input class="form-check-input" id="chkFinished" type="checkbox" @bind="current.Finished" />
-                        <label class="form-check-label" for="chkFinished">Finalizada</label>
+                        <input class="form-check-input" type="checkbox" @bind="current.Finished" />
+                        <label class="form-check-label">Finalizada</label>
                     </div>
 
                     @if (!string.IsNullOrEmpty(formError))
@@ -200,7 +217,6 @@ else
                     <button class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
                     <button class="btn btn-success" @onclick="Save">Salvar</button>
                 </div>
-
             </div>
         </div>
     </div>

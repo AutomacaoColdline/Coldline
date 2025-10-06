@@ -8,14 +8,14 @@ namespace ColdlineWeb.Util
     /// </summary>
     public static class EnvironmentHelper
     {
-        private const string FixedDepartmentId = "68bb3ba7852c9b2a93bd75b7";
-        private const string FixedUserTypeId   = "68dc2a1e6407ff079542f8e1";
+        private const string FixedDepartmentId = "67f41c323a50bfa4e95bfe6d";
+        private const string FixedUserTypeId   = "67f41bf13a50bfa4e95bfe69";
 
         /// <summary>
         /// Obtém o ID fixo do departamento a partir da variável de ambiente COLDLINE_FILTER_DEPARTMENT_ID.
         /// Se não existir, usa o valor padrão definido em código.
         /// </summary>
-        public static string GetDepartmentId()
+        public static string GetDepartmentIdIndustria()
         {
             var departmentId = Environment.GetEnvironmentVariable("COLDLINE_FILTER_DEPARTMENT_ID");
             return string.IsNullOrWhiteSpace(departmentId) ? FixedDepartmentId : departmentId;
@@ -25,7 +25,7 @@ namespace ColdlineWeb.Util
         /// Obtém o ID fixo do tipo de usuário a partir da variável de ambiente COLDLINE_FILTER_USER_TYPE_ID.
         /// Se não existir, usa o valor padrão definido em código.
         /// </summary>
-        public static string GetUserTypeId()
+        public static string GetUserTypeIdIndustria()
         {
             var userTypeId = Environment.GetEnvironmentVariable("COLDLINE_FILTER_USER_TYPE_ID");
             return string.IsNullOrWhiteSpace(userTypeId) ? FixedUserTypeId : userTypeId;

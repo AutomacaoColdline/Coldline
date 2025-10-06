@@ -1,0 +1,120 @@
+/* ===== Modal ===== */
+.modal-dialog.modal-lg {
+    max-width: 900px;
+}
+
+.modal-content {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+    background-color: #007bff;
+    color: #fff;
+    padding: 12px 20px;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.btn-close {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    color: #fff;
+}
+
+/* ===== Loading ===== */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+}
+
+.loading-text {
+    color: #666;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* ===== Calendário ===== */
+.calendar {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.calendar-day-header {
+    font-weight: bold;
+    background-color: #f0f0f0;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+.calendar-cell {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 5px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.calendar-cell:hover {
+    background-color: #f9f9f9;
+    border-color: #007bff;
+    cursor: pointer;
+}
+
+.calendar-cell span:first-child {
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Contador de processos */
+.process-count {
+    margin-top: auto;
+    font-size: 12px;
+    background-color: #007bff;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+.process-time {
+    font-size: 10px;
+    color: #666;
+    margin-top: 2px;
+}

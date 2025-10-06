@@ -47,7 +47,7 @@
     private async Task Save()
     {
         OccurrenceType.Department = new ReferenceEntity();
-        OccurrenceType.Department.Id = EnvironmentHelper.GetDepartmentId();
+        OccurrenceType.Department.Id = EnvironmentHelper.GetDepartmentIdIndustria();
         OccurrenceType.Department.Name = "Industria";
         if (string.IsNullOrWhiteSpace(OccurrenceType.Name))
             return;

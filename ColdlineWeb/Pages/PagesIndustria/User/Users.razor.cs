@@ -10,12 +10,12 @@ using System;
 using System.Linq;
 using ColdlineWeb.Util;
 
-
 namespace ColdlineWeb.Pages.PagesIndustria.User
 {
     public partial class Users : ComponentBase
     {
         [Inject] private UserService UserService { get; set; } = default!;
+        [Inject] private HttpClient Http { get; set; } = default!;
 
         private List<UserModel> users = new List<UserModel>();
         private List<ReferenceEntity> userTypes = new List<ReferenceEntity>();
@@ -24,7 +24,7 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
         // Filtros
         private string? filterName;
         private string? filterEmail;
-        private string? filterDepartmentId = EnvironmentHelper.GetDepartmentId();
+        private string? filterDepartmentId = EnvironmentHelper.GetDepartmentIdIndustria();
         private string? filterUserTypeId;
 
         // Paginação
@@ -44,12 +44,17 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
         private UserModel currentUser = new UserModel();
 
         // Controle do modal de Tipo de Usuário
-        private bool showUserTypeModal = false; 
+        private bool showUserTypeModal = false;
         private UserTypeModel newUserType = new UserTypeModel();
 
         // Controle do modal de Departamento
         private bool showDepartmentModal = false;
         private DepartmentModel newDepartment = new DepartmentModel();
+
+        // Controle do modal de Calendário
+        private bool showCalendarModal = false;
+        private UserModel currentCalendarUser = new UserModel();
+        private string? selectedCalendarUserId;
 
         protected override async Task OnInitializedAsync()
         {
@@ -57,9 +62,6 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
             await LoadData();
         }
 
-        /// <summary>
-        /// Carrega dados para popular dropdowns de tipos de usuário e departamentos.
-        /// </summary>
         private async Task LoadFilterData()
         {
             try
@@ -77,18 +79,12 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
             }
         }
 
-        /// <summary>
-        /// Aplica filtros e redefine página para 1.
-        /// </summary>
         private async Task ApplyFilters()
         {
             pageNumber = 1;
             await LoadData();
         }
 
-        /// <summary>
-        /// Carrega usuários utilizando UserFilterModel.
-        /// </summary>
         private async Task LoadData()
         {
             try
@@ -122,7 +118,7 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
             }
         }
 
-        // ================= Paginação =================
+        // Paginação
         private bool CanGoPrevious => pageNumber > 1;
         private bool CanGoNext => pageNumber < totalPages;
 
@@ -144,14 +140,20 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
             }
         }
 
-        // ================= CRUD Usuário =================
+        // CRUD Usuário
         private async Task SaveUser()
         {
             try
             {
                 currentUser.Id = null;
-                currentUser.UserType.Name = userTypes.Find(ut => ut.Id == currentUser.UserType.Id)?.Name ?? "";
-                currentUser.Department.Name = departments.Find(d => d.Id == currentUser.Department.Id)?.Name ?? "";
+
+                // Correção: criar objetos do tipo ReferenceEntity
+                currentUser.UserType ??= new ReferenceEntity();
+                currentUser.Department ??= new ReferenceEntity();
+
+                currentUser.UserType.Name = userTypes.FirstOrDefault(ut => ut.Id == currentUser.UserType.Id)?.Name ?? "";
+                currentUser.Department.Name = departments.FirstOrDefault(d => d.Id == currentUser.Department.Id)?.Name ?? "";
+
                 currentUser.UrlPhoto = $"{currentUser.Name}.png";
 
                 if (selectedFile != null)
@@ -173,6 +175,7 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
                 if (success)
                 {
                     showModal = false;
+                    selectedFile = null;
                     await LoadData();
                 }
                 else
@@ -192,10 +195,13 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
             {
                 errorMessage = null;
 
-                currentUser.UserType.Name = userTypes.Find(ut => ut.Id == currentUser.UserType.Id)?.Name ?? "";
-                currentUser.Department.Name = departments.Find(d => d.Id == currentUser.Department.Id)?.Name ?? "";
+                currentUser.UserType ??= new ReferenceEntity();
+                currentUser.Department ??= new ReferenceEntity();
 
-                var oldUser = users.Find(u => u.Id == currentUser.Id);
+                currentUser.UserType.Name = userTypes.FirstOrDefault(ut => ut.Id == currentUser.UserType.Id)?.Name ?? "";
+                currentUser.Department.Name = departments.FirstOrDefault(d => d.Id == currentUser.Department.Id)?.Name ?? "";
+
+                var oldUser = users.FirstOrDefault(u => u.Id == currentUser.Id);
                 string oldFileName = oldUser?.Name ?? currentUser.Name;
                 string newFileName = currentUser.Name;
 
@@ -203,9 +209,7 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
                 {
                     string? uploadedFileName = await UserService.UploadImageAsync(selectedFile, oldFileName, newFileName);
                     if (!string.IsNullOrEmpty(uploadedFileName))
-                    {
                         currentUser.UrlPhoto = $"{currentUser.Name}.png";
-                    }
                 }
                 else if (oldFileName != newFileName)
                 {
@@ -232,6 +236,12 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
 
         private async Task DeleteUser(string id)
         {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                errorMessage = "Id do usuário inválido.";
+                return;
+            }
+
             bool success = await UserService.DeleteUserAsync(id);
             if (success)
             {
@@ -253,16 +263,19 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
 
         private void OpenEditUserModal(UserModel user)
         {
+            if (user == null || string.IsNullOrWhiteSpace(user.Id))
+            {
+                errorMessage = "Usuário inválido para edição.";
+                return;
+            }
+
             currentUser = user;
             showModal = true;
             isEditing = true;
             selectedFile = null;
         }
 
-        private void CloseModal()
-        {
-            showModal = false;
-        }
+        private void CloseModal() => showModal = false;
 
         private async Task UploadImage(InputFileChangeEventArgs e)
         {
@@ -275,17 +288,14 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
             Console.WriteLine($"Arquivo selecionado: {selectedFile.Name}, Tamanho: {selectedFile.Size} bytes");
         }
 
-        // ================= Modal Tipo de Usuário =================
+        // Modal Tipo de Usuário
         private void OpenUserTypeModal()
         {
             newUserType = new UserTypeModel();
             showUserTypeModal = true;
         }
 
-        private void CloseUserTypeModal()
-        {
-            showUserTypeModal = false;
-        }
+        private void CloseUserTypeModal() => showUserTypeModal = false;
 
         private async Task SaveUserType()
         {
@@ -302,25 +312,21 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
             }
         }
 
-        // ================= Modal Departamento =================
+        // Modal Departamento
         private void OpenDepartmentModal()
         {
             newDepartment = new DepartmentModel();
             showDepartmentModal = true;
         }
 
-        private void CloseDepartmentModal()
-        {
-            showDepartmentModal = false;
-        }
+        private void CloseDepartmentModal() => showDepartmentModal = false;
 
         private async Task SaveDepartment()
         {
             try
             {
                 await Http.PostAsJsonAsync("api/Department", newDepartment);
-                var deptModels = await Http.GetFromJsonAsync<List<DepartmentModel>>("api/Department")
-                                 ?? new List<DepartmentModel>();
+                var deptModels = await Http.GetFromJsonAsync<List<DepartmentModel>>("api/Department") ?? new List<DepartmentModel>();
                 departments = deptModels.ConvertAll(d => new ReferenceEntity { Id = d.Id, Name = d.Name });
                 showDepartmentModal = false;
             }
@@ -329,6 +335,27 @@ namespace ColdlineWeb.Pages.PagesIndustria.User
                 errorMessage = "Erro ao salvar o departamento.";
                 Console.WriteLine(ex.Message);
             }
+        }
+
+        // Modal Calendário
+        private void OpenCalendarModal(UserModel user)
+        {
+            if (user == null || string.IsNullOrWhiteSpace(user.Id))
+            {
+                errorMessage = "Id do usuário inválido para o calendário.";
+                return;
+            }
+
+            currentCalendarUser = user;
+            selectedCalendarUserId = user.Id;
+            showCalendarModal = true;
+        }
+
+        private void CloseCalendarModal()
+        {
+            showCalendarModal = false;
+            selectedCalendarUserId = null;
+            currentCalendarUser = new UserModel();
         }
     }
 }

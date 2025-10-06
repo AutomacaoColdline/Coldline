@@ -57,15 +57,35 @@ namespace ColdlineWeb.Services
             var query = new Dictionary<string, string?>
             {
                 ["IdentificationNumber"] = filter.IdentificationNumber,
-                ["ProcessTypeId"] = filter.ProcessTypeId,
-                ["DepartmentId"] = filter.DepartmentId,
+                ["ProcessTime"] = filter.ProcessTime,
                 ["StartDate"] = filter.StartDate?.ToString("yyyy-MM-dd"),
                 ["EndDate"] = filter.EndDate?.ToString("yyyy-MM-dd"),
+                ["UserId"] = filter.UserId,
+                ["DepartmentId"] = filter.DepartmentId,
+                ["ProcessTypeId"] = filter.ProcessTypeId,
+                ["PauseTypesId"] = filter.PauseTypesId,
+                ["MachineId"] = filter.MachineId,
+                ["Finished"] = filter.Finished.HasValue ? filter.Finished.Value.ToString().ToLower() : null,
+                ["PreIndustrialization"] = filter.PreIndustrialization.HasValue ? filter.PreIndustrialization.Value.ToString().ToLower() : null,
                 ["Page"] = filter.Page.ToString(),
-                ["PageSize"] = filter.PageSize.ToString()
+                ["PageSize"] = filter.PageSize.ToString(),
+                ["SortBy"] = filter.SortBy,
+                ["SortDesc"] = filter.SortDesc.ToString().ToLower()
             };
 
+            // Adiciona as ocorrências como múltiplos parâmetros se existirem
+            if (filter.OccurrencesIds != null && filter.OccurrencesIds.Count > 0)
+            {
+                for (int i = 0; i < filter.OccurrencesIds.Count; i++)
+                {
+                    query[$"OccurrencesIds[{i}]"] = filter.OccurrencesIds[i];
+                }
+            }
+
             var url = QueryHelpers.AddQueryString("api/Process/search", query);
+
+            // Log para debug
+            Console.WriteLine($"[ProcessService] URL gerada: {url}");
 
             var response = await _http.GetAsync(url);
 
@@ -87,6 +107,7 @@ namespace ColdlineWeb.Services
                 PageSize = filter.PageSize
             };
         }
+
 
 
         public async Task<ProcessModel?> StartProcessAsync(StartProcessRequest request)

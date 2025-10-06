@@ -1,5 +1,6 @@
 @using ColdlineWeb.Models
 @using ColdlineWeb.Services
+@using ColdlineWeb.Util
 @inject ProcessTypeService ProcessTypeService
 
 @if (Visible)
@@ -36,7 +37,7 @@
     private async Task Save()
     {
         ProcessType.Department = new ReferenceEntity();
-        ProcessType.Department.Id = "67f41c323a596bf4e95bfe6d";
+        ProcessType.Department.Id = EnvironmentHelper.GetDepartmentIdIndustria();
         ProcessType.Department.Name = "Industria";
         if (IsEdit)
             await ProcessTypeService.UpdateAsync(ProcessType.Id, ProcessType);

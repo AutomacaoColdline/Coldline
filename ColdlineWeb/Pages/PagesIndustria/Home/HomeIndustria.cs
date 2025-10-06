@@ -16,8 +16,8 @@ namespace ColdlineWeb.Pages.PagesIndustria
 
         public Dictionary<string, ProcessStats> ProcessStatsByUserId = new();
 
-        private static readonly string FixedUserTypeId = EnvironmentHelper.GetUserTypeId();
-        private static readonly string FixedDepartamentId = EnvironmentHelper.GetDepartmentId();
+        private static readonly string FixedUserTypeId = EnvironmentHelper.GetUserTypeIdIndustria();
+        private static readonly string FixedDepartamentId = EnvironmentHelper.GetDepartmentIdIndustria();
 
 
         protected List<UserModel> users = new();

@@ -27,7 +27,7 @@ namespace ColdlineWeb.Pages.PagesIndustria.Industria
         private ProcessModel? processDetails;
         private string errorMessage = string.Empty;
 
-        protected string FixedDepartamentId = EnvironmentHelper.GetDepartmentId();
+        protected string FixedDepartamentId = EnvironmentHelper.GetDepartmentIdIndustria();
         private bool isLoading = true;
 
         protected override async Task OnInitializedAsync()

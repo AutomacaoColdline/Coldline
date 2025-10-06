@@ -49,7 +49,7 @@ namespace ColdlineWeb.Pages.PagesIndustria.Process
 
         protected bool ShowProcessTypeModal { get; set; } = false;
         protected ProcessTypeModel NewProcessType { get; set; } = new ProcessTypeModel();
-        protected string FixedDepartmentId { get; set; } = EnvironmentHelper.GetDepartmentId();
+        protected string FixedDepartmentId { get; set; } = EnvironmentHelper.GetDepartmentIdIndustria();
 
         protected override async Task OnInitializedAsync()
         {

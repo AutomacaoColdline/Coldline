@@ -1,7 +1,6 @@
 @page "/users"
 @using ColdlineWeb.Models
 @using ColdlineWeb.Services
-@inject HttpClient Http
 @inject NavigationManager Navigation
 
 <link rel="stylesheet" href="css/User.css" />
@@ -83,6 +82,9 @@ else
                             <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(user.Id)">
                                 <img src="img/lixeira.png" alt="Excluir" style="width: 16px; height: 16px;" />
                             </button>
+                            <button class="btn btn-info btn-sm" @onclick="() => OpenCalendarModal(user)">
+                                <img src="img/calendar.png" alt="Calendar" style="width: 16px; height: 16px;" />
+                            </button>
                         </td>
                     </tr>
                 }
@@ -126,3 +128,11 @@ else
     UserTypeModel="@newUserType"
     CloseModal="CloseUserTypeModal"
     OnValidSubmit="SaveUserType" />
+
+<Calendar
+    ShowModal="@showCalendarModal"
+    User="@currentCalendarUser"
+    UserId="@currentCalendarUser.Id"
+    DepartmentId="@currentCalendarUser.Department?.Id"
+    CloseModal="CloseCalendarModal"
+/>

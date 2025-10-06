@@ -49,7 +49,7 @@ namespace ColdlineWeb.Pages.PagesIndustria
         protected int pageNumber = 1;
         protected int pageSize = 8;
         protected int totalPages = 1;
-        protected string FixedDepartamentId = EnvironmentHelper.GetDepartmentId();
+        protected string FixedDepartamentId = EnvironmentHelper.GetDepartmentIdIndustria();
         protected List<OccurrenceModel> PagedItems => items.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
 
         // ===== Inicialização =====

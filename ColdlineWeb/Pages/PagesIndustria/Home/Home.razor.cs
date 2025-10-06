@@ -49,8 +49,8 @@ namespace ColdlineWeb.Pages.PagesIndustria
         private bool isDragging;
         private double machineStartX;
         protected string CacheBuster { get; set; } = DateTime.UtcNow.Ticks.ToString();
-        private static readonly string FixedUserTypeId = EnvironmentHelper.GetUserTypeId();
-        private static readonly string FixedDepartamentId = EnvironmentHelper.GetDepartmentId();
+        private static readonly string FixedUserTypeId = EnvironmentHelper.GetUserTypeIdIndustria();
+        private static readonly string FixedDepartamentId = EnvironmentHelper.GetDepartmentIdIndustria();
 
 
         private Dictionary<string, TimeSpan> runningTimers = new();

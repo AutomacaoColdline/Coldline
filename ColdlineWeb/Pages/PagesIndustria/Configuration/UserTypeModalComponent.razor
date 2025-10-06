@@ -1,5 +1,6 @@
 @using ColdlineWeb.Models
 @using ColdlineWeb.Services
+@using ColdlineWeb.Util
 @inject UserTypeService UserTypeService
 
 @if (Visible)
@@ -36,7 +37,7 @@
     private async Task Save()
     {
         UserType.Department = new ReferenceEntity();
-        UserType.Department.Id = "67f41c323a596bf4e95bfe6d";
+        UserType.Department.Id = EnvironmentHelper.GetDepartmentIdIndustria();
         UserType.Department.Name = "Industria";
         if (IsEdit)
             await UserTypeService.UpdateAsync(UserType.Id, UserType);

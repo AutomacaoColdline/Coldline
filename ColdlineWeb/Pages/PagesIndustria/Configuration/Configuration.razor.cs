@@ -36,7 +36,7 @@ namespace ColdlineWeb.Pages.PagesIndustria
         protected List<DefectModel> Defects = new();
         protected List<DepartmentModel> Departments = new();
         protected List<OccurrenceTypeModel> OccurrenceTypes = new();
-        protected string FixedDepartamentId = EnvironmentHelper.GetDepartmentId();
+        protected string FixedDepartamentId = EnvironmentHelper.GetDepartmentIdIndustria();
         protected bool isLoadingTab = true;
 
         protected override async Task OnInitializedAsync()

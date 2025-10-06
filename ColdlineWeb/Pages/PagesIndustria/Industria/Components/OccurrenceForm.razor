@@ -10,7 +10,7 @@
     [Parameter] public ReferenceEntity? UserRef { get; set; }
     [Parameter] public EventCallback<StartOccurrenceModel> OnSaveDraft { get; set; }
     [Parameter] public EventCallback OnCancel { get; set; }
-    protected string FixedDepartamentId =  EnvironmentHelper.GetDepartmentId();
+    protected string FixedDepartamentId =  EnvironmentHelper.GetDepartmentIdIndustria();
 
     private StartOccurrenceModel Model = new();
 
@@ -26,7 +26,7 @@
 
     private static readonly HashSet<string> RequiredTypeIds = new(StringComparer.OrdinalIgnoreCase)
     {
-        EnvironmentHelper.GetUserTypeId()
+        EnvironmentHelper.GetUserTypeIdIndustria()
     };
 
     private static readonly HashSet<string> RequiredTypeNames = new(StringComparer.OrdinalIgnoreCase)

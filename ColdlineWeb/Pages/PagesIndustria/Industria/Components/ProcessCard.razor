@@ -1,32 +1,116 @@
 @using ColdlineWeb.Models
+@using ColdlineWeb.Models.Filter
+@using ColdlineWeb.Models.Enum
+@using ColdlineWeb.Services
+
+@inject MachineService MachineService
+@inject MachineTypeService MachineTypeService
 
 @code {
-    [Parameter] public List<ReferenceEntity> ProcessTypes { get; set; } = new();
-    [Parameter] public List<MachineModel> Machines { get; set; } = new();
-    [Parameter] public EventCallback<StartProcessModel> OnStartProcess { get; set; }
+    [Parameter]
+    public List<ReferenceEntity> ProcessTypes { get; set; } = new();
 
-    private string selectedProcessTypeId = "";
-    private string selectedMachineId = "";
+    // Mantido para compatibilidade com o componente pai
+    // (por exemplo: <ProcessCard ProcessTypes="processTypes" Machines="machines" OnStartProcess="..."/>).
+    // Se vier preenchido, usamos como lista inicial antes de aplicar filtros.
+    [Parameter]
+    public List<MachineModel> Machines { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<StartProcessModel> OnStartProcess { get; set; }
+
+    private string selectedProcessTypeId = string.Empty;
+    private string selectedMachineId = string.Empty;
     private bool preIndustrialization = false;
     private bool reWork = false;
-    public bool prototype = false;
+    private bool prototype = false;
 
     private bool CanStartProcess =>
         !string.IsNullOrWhiteSpace(selectedProcessTypeId) &&
         (preIndustrialization || prototype || !string.IsNullOrWhiteSpace(selectedMachineId));
 
+    // Dados e filtros para o dropdown de máquinas
+    private List<MachineModel> internalMachines = new();
+    private List<MachineTypeModel> machineTypes = new();
+
+    private string filterIdentificationNumber = string.Empty;
+    private string selectedMachineTypeId = string.Empty;
+
+    private bool isLoadingMachines = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Carrega tipos de máquina para o filtro
+        machineTypes = await MachineTypeService.GetAllAsync();
+
+        // Se o pai já forneceu Machines, usamos como base inicial (removendo finalizadas).
+        if (Machines != null && Machines.Count > 0)
+        {
+            internalMachines = Machines
+                .Where(m => m.Status != MachineStatus.Finished)
+                .OrderBy(m => m.MachineType?.Name)
+                .ThenBy(m => m.IdentificationNumber)
+                .ToList();
+        }
+        else
+        {
+            await LoadMachinesAsync();
+        }
+    }
+
+    private async Task LoadMachinesAsync()
+    {
+        isLoadingMachines = true;
+
+        var filter = new MachineFilterModel
+        {
+            IdentificationNumber = string.IsNullOrWhiteSpace(filterIdentificationNumber) ? null : filterIdentificationNumber,
+            MachineTypeId = string.IsNullOrWhiteSpace(selectedMachineTypeId) ? null : selectedMachineTypeId,
+            Page = 1,
+            PageSize = 50,
+            SortDesc = false
+        };
+
+        var paged = await MachineService.SearchMachinesAsync(filter);
+        var allMachines = paged.Items?.ToList() ?? new List<MachineModel>();
+
+        // Filtra no cliente para não exibir máquinas finalizadas
+        internalMachines = allMachines
+            .Where(m => m.Status != MachineStatus.Finished)
+            .OrderBy(m => m.MachineType?.Name)
+            .ThenBy(m => m.IdentificationNumber)
+            .ToList();
+
+        isLoadingMachines = false;
+    }
+
+    private async Task ApplyFilters()
+    {
+        // Recarrega a lista a partir dos filtros aplicados
+        await LoadMachinesAsync();
+
+        // Se a máquina anteriormente selecionada não está mais na lista filtrada, limpamos a seleção
+        if (!string.IsNullOrWhiteSpace(selectedMachineId) &&
+            !internalMachines.Any(m => m.Id == selectedMachineId))
+        {
+            selectedMachineId = string.Empty;
+        }
+    }
+
     private async Task HandleStartProcess()
     {
-        if (!CanStartProcess) return;
+        if (!CanStartProcess)
+        {
+            return;
+        }
 
         var processModel = new StartProcessModel
         {
             ProcessTypeId = selectedProcessTypeId,
             PreIndustrialization = preIndustrialization,
             Prototype = prototype,
-
             ReWork = reWork,
-            MachineId = preIndustrialization || prototype ? null : selectedMachineId 
+            MachineId = (preIndustrialization || prototype) ? null : selectedMachineId
         };
 
         await OnStartProcess.InvokeAsync(processModel);
@@ -34,26 +118,28 @@
 
     private void TogglePreIndustrialization()
     {
-        if (preIndustrialization||prototype)
+        if (preIndustrialization || prototype)
         {
-            selectedMachineId = ""; // Limpa a seleção da máquina ao ativar pré-industrialização
+            selectedMachineId = string.Empty;
         }
     }
+
     private void TogglePrototype()
     {
         if (prototype || preIndustrialization)
         {
-            selectedMachineId = ""; // Limpa a seleção da máquina ao ativar protótipo
+            selectedMachineId = string.Empty;
         }
     }
 }
 
-<div class="process-card">
-    <h5>Iniciar Novo Processo</h5>
+<div class="process-card p-3 shadow-sm rounded bg-light">
+    <h5 class="mb-4 text-primary fw-bold">Iniciar Novo Processo</h5>
 
-    <div class="form-group">
-        <label>Tipo de Processo</label>
-        <select @bind="selectedProcessTypeId" class="form-control">
+    <!-- Tipo de Processo -->
+    <div class="form-group mb-3">
+        <label class="fw-semibold">Tipo de Processo</label>
+        <select @bind="selectedProcessTypeId" class="form-select">
             <option value="">Selecione um tipo</option>
             @foreach (var processType in ProcessTypes)
             {
@@ -62,34 +148,103 @@
         </select>
     </div>
 
-    @if (!preIndustrialization||!prototype)  
+    <!-- Filtros e Dropdown de Máquina (visível apenas quando não é pré-industrialização nem protótipo) -->
+    @if (!preIndustrialization && !prototype)
     {
-        <div class="form-group">
-            <label>Máquina</label>
-            <select @bind="selectedMachineId" class="form-control">
-                <option value="">Selecione uma máquina</option>
-                @foreach (var machine in Machines)
-                {
-                    <option value="@machine.Id">@($"{machine.MachineType.Name} - {machine.IdentificationNumber}")</option>
-                }
-            </select>
+        <div class="filter-card border rounded p-3 mb-3 bg-white shadow-sm">
+            <h6 class="fw-bold text-secondary mb-3">Filtros de Máquina</h6>
+
+            <div class="row g-3">
+                
+
+                <div class="col-md-4">
+                    <label class="form-label">Identificação</label>
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Filtrar por identificação"
+                           @bind="filterIdentificationNumber"
+                           @bind:event="oninput" />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Tipo de Máquina</label>
+                    <select class="form-select"
+                            @bind="selectedMachineTypeId"
+                            @bind:event="onchange">
+                        <option value="">Todos os tipos</option>
+                        @foreach (var type in machineTypes)
+                        {
+                            <option value="@type.Id">@type.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="text-end mt-3">
+                <button class="btn btn-outline-primary" @onclick="ApplyFilters">
+                    Aplicar filtros
+                </button>
+            </div>
+        </div>
+
+        <div class="form-group mb-3">
+            <label class="fw-semibold">Máquina</label>
+
+            @if (isLoadingMachines)
+            {
+                <div class="form-text text-muted">Carregando máquinas...</div>
+            }
+            else if (internalMachines.Count == 0)
+            {
+                <div class="form-text text-danger">Nenhuma máquina encontrada (máquinas finalizadas não são exibidas).</div>
+            }
+            else
+            {
+                <select @bind="selectedMachineId" class="form-select">
+                    <option value="">Selecione uma máquina</option>
+                    @foreach (var machine in internalMachines)
+                    {
+                        <option value="@machine.Id">
+                            @($"{machine.MachineType?.Name ?? "Máquina"} - {machine.IdentificationNumber}")
+                        </option>
+                    }
+                </select>
+            }
         </div>
     }
 
-    <div class="form-group checkbox-group">
-        <input type="checkbox" id="preIndustrialization" @bind="preIndustrialization" @bind:after="TogglePreIndustrialization" />
-        <label for="preIndustrialization">Pré-industrialização</label>
-    </div>
-    <div class="form-group checkbox-group">
-        <input type="checkbox" id="prototype" @bind="prototype" @bind:after="TogglePrototype" />
-        <label for="prototype">Protótipo</label>
-    </div>
-    <div class="form-group checkbox-group">
-        <input type="checkbox" id="reWork" @bind="reWork"/>
-        <label for="reWork">Re-Trabalho</label>
+    <!-- Opções adicionais -->
+    <div class="form-group checkbox-group mt-3">
+        <div class="form-check">
+            <input class="form-check-input"
+                   type="checkbox"
+                   id="preIndustrialization"
+                   @bind="preIndustrialization"
+                   @bind:after="TogglePreIndustrialization" />
+            <label class="form-check-label" for="preIndustrialization">Pré-industrialização</label>
+        </div>
+
+        <div class="form-check">
+            <input class="form-check-input"
+                   type="checkbox"
+                   id="prototype"
+                   @bind="prototype"
+                   @bind:after="TogglePrototype" />
+            <label class="form-check-label" for="prototype">Protótipo</label>
+        </div>
+
+        <div class="form-check">
+            <input class="form-check-input"
+                   type="checkbox"
+                   id="reWork"
+                   @bind="reWork" />
+            <label class="form-check-label" for="reWork">Re-trabalho</label>
+        </div>
     </div>
 
-    <button class="btn btn-primary mt-2" @onclick="HandleStartProcess" disabled="@(!CanStartProcess)">
-        Iniciar Processo
+    <button class="btn btn-primary w-100 mt-4 py-2 fw-semibold"
+            @onclick="HandleStartProcess"
+            disabled="@(!CanStartProcess)">
+        Iniciar processo
     </button>
 </div>

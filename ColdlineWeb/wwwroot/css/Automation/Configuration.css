@@ -1,0 +1,303 @@
+/* =====================================================================
+   Configuration.css — Padrão unificado Automação / Users
+   ===================================================================== */
+
+:root {
+  --cfg-bg: #eaf1fb;
+  --cfg-surface: #ffffff;
+  --cfg-text: #1b2430;
+  --cfg-muted: #6b7280;
+  --cfg-primary: #2C67D7;
+  --cfg-border: #e6ebf2;
+  --cfg-shadow: 0 10px 24px rgba(16,24,40,.06);
+  --cfg-radius: 14px;
+}
+
+/* =====================================================================
+   ESTRUTURA GERAL
+   ===================================================================== */
+.config-page {
+  flex: 1;
+  min-height: 100vh;
+  padding: 40px 24px;
+  background: var(--cfg-bg);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  color: var(--cfg-text);
+  transition: background-color .3s ease, color .3s ease, border-color .3s ease;
+}
+
+/* Layout duplo */
+.dual-config-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 32px;
+  width: 100%;
+  max-width: 1600px;
+}
+
+/* =====================================================================
+   BLOCO PRINCIPAL (cada seção)
+   ===================================================================== */
+.config-section {
+  flex: 1 1 48%;
+  max-width: 48%;
+  background: var(--cfg-surface);
+  border-radius: var(--cfg-radius);
+  box-shadow: var(--cfg-shadow);
+  padding: 20px;
+  transition: transform .2s ease, box-shadow .2s ease, background-color .3s ease;
+}
+.config-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(16,24,40,.12);
+}
+
+/* =====================================================================
+   BARRA DE BUSCA
+   ===================================================================== */
+.search-bar {
+  background: var(--cfg-surface);
+  border: 1px solid var(--cfg-border);
+  border-radius: var(--cfg-radius);
+  box-shadow: var(--cfg-shadow);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-bar .form-control {
+  height: 42px;
+  border: 1px solid var(--cfg-border);
+  border-radius: 10px;
+  background: var(--cfg-surface);
+  color: var(--cfg-text);
+  flex: 1;
+}
+.search-bar .form-control::placeholder {
+  color: var(--cfg-muted);
+}
+
+/* =====================================================================
+   BOTÕES
+   ===================================================================== */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 8px;
+}
+.btn-icon-img {
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+.btn-icon-plus {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* Botões clarinhos */
+.btn-success.btn-icon {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+  font-weight: 600;
+  transition: background-color .2s ease, border-color .2s ease;
+}
+.btn-success.btn-icon:hover {
+  background-color: #c3e6cb;
+  border-color: #b1dfbb;
+}
+
+.btn-primary.btn-icon {
+  background-color: #cce5ff;
+  border-color: #b8daff;
+  color: #004085;
+  font-weight: 600;
+  transition: background-color .2s ease, border-color .2s ease;
+}
+.btn-primary.btn-icon:hover {
+  background-color: #b8daff;
+  border-color: #99cfff;
+}
+
+/* =====================================================================
+   TABELAS
+   ===================================================================== */
+.table-card {
+  border: 1px solid var(--cfg-border);
+  border-radius: var(--cfg-radius);
+  box-shadow: var(--cfg-shadow);
+  margin-top: 16px;
+  overflow: hidden;
+  background: var(--cfg-surface);
+  transition: background-color .3s ease, border-color .3s ease;
+}
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: .95rem;
+  background: var(--cfg-surface);
+}
+.table thead {
+  background: linear-gradient(180deg, #162032 0%, #2C67D7 100%);
+  color: #fff;
+}
+.table th, .table td {
+  text-align: center;
+  padding: 12px;
+  border-color: var(--cfg-border);
+  color: var(--cfg-text);
+}
+.table tbody tr {
+  background: var(--cfg-surface);
+  transition: background .15s ease;
+}
+.table tbody tr:hover {
+  background: #f8fbff;
+}
+
+/* =====================================================================
+   BOTÕES DE AÇÃO NA TABELA
+   ===================================================================== */
+.btn-warning.btn-sm {
+  background: #fff6cf;
+  border: 1px solid #ffe89a;
+  color: #6b5d00;
+  border-radius: 10px;
+}
+.btn-danger.btn-sm {
+  background: #ffe1e4;
+  border: 1px solid #ffb6be;
+  color: #7a1e25;
+  border-radius: 10px;
+}
+
+/* =====================================================================
+   PAGINAÇÃO
+   ===================================================================== */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0 22px;
+}
+.pagination-container .btn.btn-secondary {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--cfg-surface);
+  border: 1px solid var(--cfg-border);
+  color: var(--cfg-text);
+  box-shadow: var(--cfg-shadow);
+  transition: background-color .2s ease, color .2s ease;
+}
+.pagination-container .btn.btn-secondary:hover:not([disabled]) {
+  background: rgba(44,103,215,0.1);
+}
+.pagination-container .btn.btn-secondary[disabled] {
+  opacity: .5;
+  box-shadow: none;
+}
+.pagination-container span {
+  color: var(--cfg-muted);
+  font-weight: 600;
+}
+
+/* =====================================================================
+   LOADER
+   ===================================================================== */
+.loader-wrapper { 
+  display: grid; 
+  place-items: center; 
+  padding: 60px 0; 
+}
+.custom-loader {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid var(--cfg-primary);
+  border-radius: 50%;
+  width: 50px; 
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+@keyframes spin { 
+  to { transform: rotate(360deg); } 
+}
+
+/* =====================================================================
+   RESPONSIVIDADE
+   ===================================================================== */
+@media (max-width: 1100px) {
+  .config-section { flex: 1 1 100%; max-width: 95%; }
+}
+
+/* =====================================================================
+   🌙 MODO ESCURO AUTOMÁTICO (herdado de body.dark-mode)
+   ===================================================================== */
+body.dark-mode .config-page {
+  background: var(--auto-bg) !important;
+  color: var(--auto-text) !important;
+}
+body.dark-mode .config-section {
+  background: var(--auto-card-bg) !important;
+  border-color: var(--auto-border) !important;
+  color: var(--auto-text) !important;
+}
+body.dark-mode .search-bar,
+body.dark-mode .table-card {
+  background: var(--auto-card-bg) !important;
+  border-color: var(--auto-border) !important;
+  color: var(--auto-text) !important;
+}
+body.dark-mode .form-control {
+  background: #0f172a !important;
+  color: var(--auto-text) !important;
+  border-color: var(--auto-border) !important;
+}
+body.dark-mode .form-control::placeholder {
+  color: var(--auto-muted) !important;
+}
+
+/* Tabela escura */
+body.dark-mode .table,
+body.dark-mode .table thead,
+body.dark-mode .table tbody,
+body.dark-mode .table tr,
+body.dark-mode .table th,
+body.dark-mode .table td {
+  background: var(--auto-card-bg) !important;
+  color: var(--auto-text) !important;
+  border-color: var(--auto-border) !important;
+}
+body.dark-mode .table thead {
+  background: linear-gradient(180deg, #1e293b 0%, #334155 100%) !important;
+}
+body.dark-mode .table tbody tr:hover {
+  background: rgba(255,255,255,0.05) !important;
+}
+
+/* Paginação escura */
+body.dark-mode .pagination-container .btn.btn-secondary {
+  background: var(--auto-card-bg) !important;
+  border-color: var(--auto-border) !important;
+  color: var(--auto-text) !important;
+}
+body.dark-mode .pagination-container .btn.btn-secondary:hover:not([disabled]) {
+  background-color: rgba(255,255,255,0.08) !important;
+}
+body.dark-mode .pagination-container span {
+  color: var(--auto-muted) !important;
+}
+
+/* Transições */
+html, body, .config-section, .table-card, .btn.btn-secondary {
+  transition: background-color .3s ease, color .3s ease, border-color .3s ease;
+}

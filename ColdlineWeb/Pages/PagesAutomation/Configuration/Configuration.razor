@@ -1,0 +1,186 @@
+@inherits ConfigurationPage
+<link rel="stylesheet" href="css/Automation/Configuration.css" />
+
+<div class="config-page">
+    @if (isLoading)
+    {
+        <div class="loader-wrapper">
+            <div class="custom-loader"></div>
+            <span class="loading-text">Carregando...</span>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+    else
+    {
+        <!-- LAYOUT PRINCIPAL EM DUAS COLUNAS -->
+        <div class="dual-config-container">
+            <!-- 🔧 TIPOS DE PROCESSO -->
+            <div class="config-section">
+                <!-- Barra de busca -->
+                <div class="card filter-card">
+                    <div class="card-body d-flex align-items-center gap-2 search-bar">
+                        <button class="btn btn-success btn-icon" title="Novo tipo" @onclick="OpenAddProcessType">
+                            <span class="btn-icon-plus">+</span>
+                            <img src="img/automation/adicionar.png" alt="Novo" class="btn-icon-img" />
+                        </button>
+
+                        <div class="flex-grow-1">
+                            <input class="form-control"
+                                   placeholder="Nome do Tipo de Processo"
+                                   @bind="filterProcessName" />
+                        </div>
+
+                        <button class="btn btn-primary btn-icon" title="Buscar" @onclick="ApplyProcessFilters">
+                            <img src="img/lupa.png" alt="Buscar" class="btn-icon-img" />
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabela -->
+                <div class="card table-card mt-3">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Descrição</th>
+                                <th>Departamento</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (processTypes.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">Nenhum tipo de processo encontrado.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var pt in processTypes)
+                                {
+                                    <tr>
+                                        <td>@pt.Name</td>
+                                        <td>@pt.Description</td>
+                                        <td>@(pt.Department?.Name ?? "-")</td>
+                                        <td>
+                                            <button class="btn btn-warning btn-sm" title="Editar"
+                                                    @onclick="() => OpenEditProcessType(pt)">
+                                                <img src="img/editar.png" alt="Editar" width="16" height="16" />
+                                            </button>
+                                            <button class="btn btn-danger btn-sm" title="Excluir"
+                                                    @onclick="() => DeleteProcessType(pt.Id)">
+                                                <img src="img/lixeira.png" alt="Excluir" width="16" height="16" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginação -->
+                <div class="pagination-container">
+                    <button class="btn btn-secondary" @onclick="PrevProcessPage" disabled="@(!CanGoPreviousProcess)">
+                        <img src="img/seta-esquerda.png" width="16" height="16" />
+                    </button>
+                    <span>@pageNumberProcess de @totalPagesProcess</span>
+                    <button class="btn btn-secondary" @onclick="NextProcessPage" disabled="@(!CanGoNextProcess)">
+                        <img src="img/seta-direita.png" width="16" height="16" />
+                    </button>
+                </div>
+            </div>
+
+            <!-- ⚙️ TIPOS DE OCORRÊNCIA -->
+            <div class="config-section">
+                <div class="card filter-card">
+                    <div class="card-body d-flex align-items-center gap-2 search-bar">
+                        <button class="btn btn-success btn-icon" title="Novo tipo" @onclick="OpenAddOccurrenceType">
+                            <span class="btn-icon-plus">+</span>
+                            <img src="img/automation/adicionar.png" alt="Novo" class="btn-icon-img" />
+                        </button>
+
+                        <div class="flex-grow-1">
+                            <input class="form-control"
+                                   placeholder="Nome do Tipo de Ocorrência"
+                                   @bind="filterOccurrenceName" />
+                        </div>
+
+                        <button class="btn btn-primary btn-icon" title="Buscar" @onclick="ApplyOccurrenceFilters">
+                            <img src="img/lupa.png" alt="Buscar" class="btn-icon-img" />
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card table-card mt-3">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Descrição</th>
+                                <th>Departamento</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (occurrenceTypes.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">Nenhum tipo de ocorrência encontrado.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var o in occurrenceTypes)
+                                {
+                                    <tr>
+                                        <td>@o.Name</td>
+                                        <td>@o.Description</td>
+                                        <td>@(o.Department?.Name ?? "-")</td>
+                                        <td>
+                                            <button class="btn btn-warning btn-sm" title="Editar"
+                                                    @onclick="() => OpenEditOccurrenceType(o)">
+                                                <img src="img/editar.png" alt="Editar" width="16" height="16" />
+                                            </button>
+                                            <button class="btn btn-danger btn-sm" title="Excluir"
+                                                    @onclick="() => DeleteOccurrenceType(o.Id)">
+                                                <img src="img/lixeira.png" alt="Excluir" width="16" height="16" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination-container">
+                    <button class="btn btn-secondary" @onclick="PrevOccurrencePage" disabled="@(!CanGoPreviousOccurrence)">
+                        <img src="img/seta-esquerda.png" width="16" height="16" />
+                    </button>
+                    <span>@pageNumberOccurrence de @totalPagesOccurrence</span>
+                    <button class="btn btn-secondary" @onclick="NextOccurrencePage" disabled="@(!CanGoNextOccurrence)">
+                        <img src="img/seta-direita.png" width="16" height="16" />
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Modal compartilhado -->
+    <ConfigurationModal
+        ShowModal="@showModal"
+        IsEditing="@isEditing"
+        IsProcessType="@isProcessTypeModal"
+        CurrentProcessType="@currentProcessType"
+        CurrentOccurrenceType="@currentOccurrenceType"
+        Departments="@departments"
+        CloseModal="CloseModal"
+        SaveProcessType="SaveProcessType"
+        UpdateProcessType="UpdateProcessType"
+        SaveOccurrenceType="SaveOccurrenceType"
+        UpdateOccurrenceType="UpdateOccurrenceType" />
+</div>

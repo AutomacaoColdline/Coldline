@@ -1,0 +1,104 @@
+@using ColdlineWeb.Models
+@using Microsoft.AspNetCore.Components
+
+@if (ShowModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @(
+                            IsProcessType
+                            ? (IsEditing ? "Editar Tipo de Processo" : "Novo Tipo de Processo")
+                            : (IsEditing ? "Editar Tipo de Ocorrência" : "Novo Tipo de Ocorrência")
+                        )
+                    </h5>
+                </div>
+
+                <div class="modal-body">
+
+                    @if (IsProcessType)
+                    {
+                        <!-- ======= FORMULÁRIO: TIPO DE PROCESSO ======= -->
+                        <label>Nome:</label>
+                        <input class="form-control" @bind="CurrentProcessType.Name" />
+
+                        <label>Descrição:</label>
+                        <textarea class="form-control" @bind="CurrentProcessType.Description"></textarea>
+
+                        <label>Departamento:</label>
+                        <select class="form-control" @bind="CurrentProcessType.Department.Id">
+                            <option value="">Selecione...</option>
+                            @foreach (var dept in Departments)
+                            {
+                                <option value="@dept.Id">@dept.Name</option>
+                            }
+                        </select>
+                    }
+                    else
+                    {
+                        <!-- ======= FORMULÁRIO: TIPO DE OCORRÊNCIA ======= -->
+                        <label>Nome:</label>
+                        <input class="form-control" @bind="CurrentOccurrenceType.Name" />
+
+                        <label>Descrição:</label>
+                        <textarea class="form-control" @bind="CurrentOccurrenceType.Description"></textarea>
+
+                        <label>Departamento:</label>
+                        <select class="form-control" @bind="CurrentOccurrenceType.Department.Id">
+                            <option value="">Selecione...</option>
+                            @foreach (var dept in Departments)
+                            {
+                                <option value="@dept.Id">@dept.Name</option>
+                            }
+                        </select>
+                    }
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModalInternal">Cancelar</button>
+                    <button class="btn btn-success" @onclick="SaveChanges">
+                        @((IsEditing) ? "Salvar" : "Criar")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool ShowModal { get; set; }
+    [Parameter] public bool IsEditing { get; set; }
+    [Parameter] public bool IsProcessType { get; set; }
+
+    [Parameter] public ProcessTypeModel CurrentProcessType { get; set; } = new();
+    [Parameter] public OccurrenceTypeModel CurrentOccurrenceType { get; set; } = new();
+    [Parameter] public List<ReferenceEntity> Departments { get; set; } = new();
+
+    [Parameter] public EventCallback CloseModal { get; set; }
+    [Parameter] public EventCallback SaveProcessType { get; set; }
+    [Parameter] public EventCallback UpdateProcessType { get; set; }
+    [Parameter] public EventCallback SaveOccurrenceType { get; set; }
+    [Parameter] public EventCallback UpdateOccurrenceType { get; set; }
+
+    private async Task CloseModalInternal() => await CloseModal.InvokeAsync();
+
+    private async Task SaveChanges()
+    {
+        if (IsProcessType)
+        {
+            if (IsEditing)
+                await UpdateProcessType.InvokeAsync();
+            else
+                await SaveProcessType.InvokeAsync();
+        }
+        else
+        {
+            if (IsEditing)
+                await UpdateOccurrenceType.InvokeAsync();
+            else
+                await SaveOccurrenceType.InvokeAsync();
+        }
+    }
+}

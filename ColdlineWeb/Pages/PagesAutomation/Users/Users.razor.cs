@@ -179,27 +179,55 @@ namespace ColdlineWeb.Pages.PagesAutomation.Users
             {
                 errorMessage = null;
 
-                currentUser.UserType.Name = userTypes.Find(ut => ut.Id == currentUser.UserType.Id)?.Name ?? string.Empty;
-                currentUser.Department.Name = departments.Find(d => d.Id == currentUser.Department.Id)?.Name ?? string.Empty;
+                // 🔹 Garante que referências não sejam nulas
+                currentUser.UserType ??= new ReferenceEntity();
+                currentUser.Department ??= new ReferenceEntity();
 
-                var oldUser = users.Find(u => u.Id == currentUser.Id);
+                // 🔹 Define nomes legíveis nos objetos aninhados
+                currentUser.UserType.Name = userTypes.FirstOrDefault(ut => ut.Id == currentUser.UserType.Id)?.Name ?? "";
+                currentUser.Department.Name = departments.FirstOrDefault(d => d.Id == currentUser.Department.Id)?.Name ?? "";
+
+                // 🔹 Busca o usuário original
+                var oldUser = users.FirstOrDefault(u => u.Id == currentUser.Id);
                 string oldFileName = oldUser?.Name ?? currentUser.Name;
                 string newFileName = currentUser.Name;
 
+                // 🔹 Caso o usuário tenha uma imagem anterior, mantém o nome
+                if (string.IsNullOrWhiteSpace(currentUser.UrlPhoto))
+                    currentUser.UrlPhoto = $"{currentUser.Name}.png";
+
+                // ===============================
+                // 🟢 Cenário 1: Nova imagem enviada
+                // ===============================
                 if (selectedFile != null)
                 {
                     string? uploadedFileName = await UserService.UploadImageAsync(selectedFile, oldFileName, newFileName);
                     if (!string.IsNullOrEmpty(uploadedFileName))
-                    {
                         currentUser.UrlPhoto = $"{currentUser.Name}.png";
-                    }
                 }
+
+                // ===============================
+                // 🟡 Cenário 2: Apenas renomeando usuário
+                // ===============================
                 else if (oldFileName != newFileName)
                 {
+                    // Se não há nova imagem, chama API apenas para renomear
+                    await UserService.UploadImageAsync(null, oldFileName, newFileName);
                     currentUser.UrlPhoto = $"{currentUser.Name}.png";
                 }
 
+                // ===============================
+                // 🔵 Cenário 3: Nenhuma mudança na imagem
+                // ===============================
+                else
+                {
+                    // Mantém a imagem atual
+                    currentUser.UrlPhoto = oldUser?.UrlPhoto ?? $"{currentUser.Name}.png";
+                }
+
+                // 🔹 Atualiza o usuário no banco
                 bool success = await UserService.UpdateUserAsync(currentUser.Id, currentUser);
+
                 if (success)
                 {
                     showModal = false;
@@ -216,6 +244,8 @@ namespace ColdlineWeb.Pages.PagesAutomation.Users
                 errorMessage = $"Erro inesperado ao atualizar usuário: {ex.Message}";
             }
         }
+
+
 
         protected async Task DeleteUser(string id)
         {

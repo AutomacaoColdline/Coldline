@@ -1,12 +1,12 @@
 /* =====================================================================
-   Automation.css  —  Estilos globais da área de Automação
+   Automation.css — Estilos globais da área de Automação
    Importa o CSS específico do Sidebar da automação.
    ===================================================================== */
 @import url('SidebarAutomation.css');
 
-/* ------------------------------
-   Variáveis (opcionais)
---------------------------------*/
+/* =====================================================================
+   VARIÁVEIS DE TEMA (modo claro padrão)
+   ===================================================================== */
 :root {
     --auto-bg: #ecf0f1;
     --auto-card-bg: #ffffff;
@@ -19,9 +19,9 @@
     --auto-radius: 14px;
 }
 
-/* ==============================
+/* =====================================================================
    LAYOUT PRINCIPAL (/automation)
-================================*/
+   ===================================================================== */
 .container-automation {
     display: flex;
     min-height: 100vh;
@@ -37,7 +37,9 @@
     padding: 16px;
 }
 
-/* Imagem de fundo (página principal) */
+/* =====================================================================
+   IMAGEM DE FUNDO
+   ===================================================================== */
 .background-image {
     position: absolute;
     top: 50%;
@@ -45,21 +47,21 @@
     transform: translate(-50%, -50%);
     width: clamp(260px, 50%, 780px);
     height: auto;
-    opacity: .18;
+    opacity: 0.18;
     z-index: 0;
     pointer-events: none;
 }
 
-/* ==============================
+/* =====================================================================
    LOGIN (/automation/login)
-================================*/
+   ===================================================================== */
 .background-image-login {
     position: fixed;
     inset: 0;
     margin: auto;
     width: min(60%, 680px);
     height: auto;
-    opacity: .10;
+    opacity: 0.10;
     z-index: 0;
     pointer-events: none;
 }
@@ -92,21 +94,21 @@
 .login-card .btn.btn-primary {
     height: 48px;
     font-weight: 600;
-    letter-spacing: .2px;
+    letter-spacing: 0.2px;
 }
 
 .alert.alert-danger {
     margin-bottom: 16px;
-    font-size: .95rem;
+    font-size: 0.95rem;
 }
 
-/* ==============================
+/* =====================================================================
    LOADER (overlay)
-================================*/
+   ===================================================================== */
 .loader-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(255,255,255,.55);
+    background: rgba(255,255,255,0.55);
     display: grid;
     place-items: center;
     z-index: 10;
@@ -122,13 +124,16 @@
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-/* ==============================
+/* =====================================================================
    UTILITÁRIOS
-================================*/
-.error-message, .alert-danger {
+   ===================================================================== */
+.error-message, 
+.alert-danger {
     color: #842029;
 }
 
@@ -139,7 +144,7 @@
     display: grid;
     place-items: center;
     border: 1px solid var(--auto-border);
-    background: #fff;
+    background: #ffffff;
     box-shadow: var(--auto-shadow);
     cursor: pointer;
 }
@@ -149,9 +154,9 @@
     color: var(--auto-text);
 }
 
-/* ==============================
+/* =====================================================================
    BOARD DE NOTAS (cards estilo Trello)
-=================================*/
+   ===================================================================== */
 .notes-board {
     display: grid;
     gap: 16px;
@@ -165,14 +170,14 @@
     box-shadow: var(--auto-shadow);
     display: flex;
     flex-direction: column;
-    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
     overflow: hidden;
     position: relative;
 }
 
 .note-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 14px 28px rgba(0,0,0,.10);
+    box-shadow: 0 14px 28px rgba(0,0,0,0.10);
     border-color: #dfe3e6;
 }
 
@@ -208,7 +213,9 @@
     min-height: 48px;
 }
 
-/* Lista de chips */
+/* =====================================================================
+   LISTA DE CHIPS
+   ===================================================================== */
 .chip-list {
     display: flex;
     flex-wrap: wrap;
@@ -218,9 +225,9 @@
     scrollbar-width: thin;
 }
 
-/* ==============================
-   Chips (texto + botão copiar)
-=================================*/
+/* =====================================================================
+   CHIP (texto + botão copiar)
+   ===================================================================== */
 .chip {
     display: inline-flex;
     align-items: center;
@@ -233,7 +240,7 @@
     font-size: 0.84rem;
     line-height: 1;
     max-width: 100%;
-    transition: background .15s ease, border-color .15s ease;
+    transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .chip:hover {
@@ -248,20 +255,20 @@
     max-width: clamp(120px, 22vw, 260px);
 }
 
-/* Botão de copiar no chip */
+/* Botão de copiar dentro do chip */
 .chip-copy-btn {
     border: 1px solid var(--auto-border);
-    background: #fff;
+    background: #ffffff;
     padding: 2px 6px;
     line-height: 1;
     border-radius: 9999px;
     cursor: pointer;
     font-size: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: background .15s ease, border-color .15s ease, transform .05s ease-in;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease-in;
 }
 
 .chip-copy-btn:hover {
@@ -280,9 +287,9 @@
     pointer-events: none;
 }
 
-/* ==============================
-   Botão de lixeira (excluir nota)
-=================================*/
+/* =====================================================================
+   BOTÃO DE LIXEIRA (excluir nota)
+   ===================================================================== */
 .lixeira-icon {
     width: 14px;
     height: 14px;
@@ -307,9 +314,9 @@
     transform: translateY(1px);
 }
 
-/* ==============================
+/* =====================================================================
    OVERLAY: NoteViewer (Card Flutuante)
-=================================*/
+   ===================================================================== */
 .viewer-overlay {
     position: fixed;
     inset: 0;
@@ -326,16 +333,16 @@
     background: var(--auto-card-bg);
     border: 1px solid var(--auto-border);
     border-radius: calc(var(--auto-radius) + 2px);
-    box-shadow: 0 22px 48px rgba(0,0,0,.18);
+    box-shadow: 0 22px 48px rgba(0,0,0,0.18);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    animation: viewer-pop .12s ease-out;
+    animation: viewer-pop 0.12s ease-out;
 }
 
 @keyframes viewer-pop {
-    from { transform: translateY(6px); opacity: .92; }
-    to   { transform: translateY(0);    opacity: 1;   }
+    from { transform: translateY(6px); opacity: 0.92; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
 .viewer-card-header {
@@ -369,21 +376,9 @@
     border-radius: 10px;
 }
 
-/* ==============================
-   Ajustes responsivos
-=================================*/
-@media (max-width: 420px) {
-    .notes-board {
-        grid-template-columns: 1fr;
-    }
-    .note-card__title {
-        max-width: 100%;
-    }
-}
-
-/* ==============================
-   Botões com ícone (header e filtros)
-=================================*/
+/* =====================================================================
+   BOTÕES COM ÍCONE (header e filtros)
+   ===================================================================== */
 .btn-icon {
     display: inline-flex;
     align-items: center;
@@ -405,13 +400,12 @@
     font-size: 14px;
 }
 
-/* ==============================
-   Barra de pesquisa em linha única
-   (inputs + select + botões na mesma linha)
-=================================*/
+/* =====================================================================
+   BARRA DE PESQUISA (inputs + botões)
+   ===================================================================== */
 .filter-row .form-control,
 .filter-row .form-select {
-    height: 38px; /* mesma altura visual dos botões */
+    height: 38px;
 }
 
 .filter-actions .filter-btn {
@@ -420,17 +414,9 @@
     padding: 6px 8px;
 }
 
-@media (max-width: 767.98px) {
-    .filter-actions {
-        margin-top: 6px;
-    }
-}
-
-/* ==============================
-   Botões customizados (clarinhos)
-=================================*/
-
-/* Verde clarinho para botão Adicionar */
+/* =====================================================================
+   BOTÕES CUSTOMIZADOS (clarinhos)
+   ===================================================================== */
 .btn-success.btn-sm {
     background-color: #d4edda;
     border-color: #c3e6cb;
@@ -443,7 +429,6 @@
     border-color: #b1dfbb;
 }
 
-/* Azul clarinho para botão Filtrar */
 .btn-primary {
     background-color: #cce5ff;
     border-color: #b8daff;
@@ -456,7 +441,6 @@
     border-color: #99cfff;
 }
 
-/* Cinza suave para botão Limpar */
 .btn-outline-secondary {
     background-color: #f8f9fa;
     border-color: #d6d8db;
@@ -466,4 +450,163 @@
 .btn-outline-secondary:hover {
     background-color: #e2e6ea;
     border-color: #c6c8ca;
+}
+
+/* =====================================================================
+   LAYOUT HORIZONTAL PARA CONFIGURATION
+   ===================================================================== */
+.container-automation > .main-content.configuration-mode {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: auto !important;
+    padding: 0 !important;
+}
+
+.main-content.configuration-mode .dual-config-container {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+    max-width: 1600px !important;
+    margin: 0 auto !important;
+    gap: 32px !important;
+}
+
+.main-content.configuration-mode .config-section {
+    flex: 1 1 48% !important;
+    width: 48% !important;
+    background: var(--auto-card-bg);
+    border: 1px solid var(--auto-border);
+    border-radius: var(--auto-radius);
+    box-shadow: var(--auto-shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+}
+
+/* =====================================================================
+   RESPONSIVIDADE
+   ===================================================================== */
+@media (max-width: 1100px) {
+    .main-content.configuration-mode .dual-config-container {
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 24px !important;
+    }
+
+    .main-content.configuration-mode .config-section {
+        width: 95% !important;
+    }
+}
+
+/* =====================================================================
+   🌙 MODO ESCURO COMPLETO
+   ===================================================================== */
+body.dark-mode {
+    --auto-bg: #0f172a;
+    --auto-card-bg: #1e293b;
+    --auto-text: #f1f5f9;
+    --auto-primary: #3b82f6;
+    --auto-danger: #ef4444;
+    --auto-muted: #94a3b8;
+    --auto-border: #334155;
+    --auto-shadow: 0 10px 20px rgba(0,0,0,.5);
+}
+
+/* Fundo principal */
+body.dark-mode .container-automation {
+    background: var(--auto-bg);
+}
+
+/* Cards e elementos principais */
+body.dark-mode .card,
+body.dark-mode .table-card,
+body.dark-mode .filter-card,
+body.dark-mode .note-card,
+body.dark-mode .viewer-card {
+    background: var(--auto-card-bg);
+    border-color: var(--auto-border);
+    box-shadow: 0 10px 20px rgba(0,0,0,.6);
+    color: var(--auto-text);
+}
+
+/* Cabeçalhos */
+body.dark-mode .card-header,
+body.dark-mode .note-card__header {
+    background: rgba(255,255,255,0.05);
+    border-bottom: 1px dashed var(--auto-border);
+}
+
+/* Textos */
+body.dark-mode strong,
+body.dark-mode span,
+body.dark-mode label,
+body.dark-mode th,
+body.dark-mode td {
+    color: var(--auto-text) !important;
+}
+
+/* Inputs */
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background: #0f172a;
+    color: var(--auto-text);
+    border: 1px solid var(--auto-border);
+}
+
+body.dark-mode .form-control::placeholder {
+    color: #94a3b8;
+}
+
+/* Botões */
+body.dark-mode .btn-primary {
+    background-color: #1d4ed8;
+    border-color: #1d4ed8;
+    color: #ffffff;
+}
+
+body.dark-mode .btn-outline-secondary {
+    background-color: transparent;
+    border-color: #475569;
+    color: #cbd5e1;
+}
+
+body.dark-mode .btn-success {
+    background-color: #14532d;
+    border-color: #166534;
+    color: #bbf7d0;
+}
+
+/* Tabelas */
+body.dark-mode .table thead {
+    background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
+}
+
+body.dark-mode .table tbody tr:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+/* Chips */
+body.dark-mode .chip {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+body.dark-mode .chip:hover {
+    background: #334155;
+}
+
+/* Fundo do viewer */
+body.dark-mode .viewer-overlay {
+    background: rgba(0,0,0,0.7);
+}
+
+/* Transição suave */
+html, body, .container-automation, .card {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }

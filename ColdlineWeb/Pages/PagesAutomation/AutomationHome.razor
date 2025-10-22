@@ -7,24 +7,37 @@
 @using ColdlineWeb.Pages.PagesAutomation.Components
 @using ColdlineWeb.Pages.PagesAutomation.Users
 @using ColdlineWeb.Pages.PagesAutomation.Monitoring
+@using ColdlineWeb.Pages.PagesAutomation.Configuration
+@using ColdlineWeb.Pages.PagesAutomation.Process
 @inherits AutomationHomePage
 
+<!-- Importa o estilo global da área de automação -->
 <link rel="stylesheet" href="css/Automation/Automation.css" />
 
+<!-- ==============================
+     LAYOUT PRINCIPAL DE AUTOMAÇÃO
+     ============================== -->
 <div class="container-automation">
+
+    <!-- SIDEBAR LATERAL -->
     <Sidebar User="user"
              OnLogout="Logout"
              OnNavigate="HandleNavigate" />
 
-    <div class="main-content">
-        <img src="img/logofundo.png" class="background-image" alt="Logo Fundo">
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="main-content @(Section?.ToLowerInvariant() == "configuration" ? "configuration-mode" : "")">
+        <img src="img/logofundo.png" class="background-image" alt="Logo de fundo" />
 
         @if (isLoading)
         {
-            <div class="loader-overlay"><div class="loader"></div></div>
+            <!-- Loader de carregamento -->
+            <div class="loader-overlay">
+                <div class="loader"></div>
+            </div>
         }
         else if (!string.IsNullOrEmpty(errorMessage))
         {
+            <!-- Mensagem de erro e botão de retorno -->
             <div class="alert alert-danger mt-3">@errorMessage</div>
             <button class="btn btn-secondary mt-2" @onclick="Logout">
                 Voltar ao Login
@@ -32,24 +45,36 @@
         }
         else
         {
+            <!-- Exibe a seção ativa -->
             @switch (Section?.ToLowerInvariant())
             {
                 case "users":
                     <Users />
                     break;
+
                 case "monitoring":
                     <Monitoring />
+                    break;
+
+                case "configuration":
+                    <Configuration />
+                    break;
+
+                case "process":
+                    <Process />
                     break;
 
                 default:
                     <div class="p-4 text-muted">
 
-                        <!-- ===== Card de Pesquisa / Filtros ===== -->
+                        <!-- ==============================
+                             Card de Pesquisa e Filtros
+                             ============================== -->
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <strong>Pesquisar Notas</strong>
 
-                                <!-- Botão Adicionar Nota -->
+                                <!-- Botão para adicionar nova nota -->
                                 <button class="btn btn-success btn-sm btn-icon"
                                         title="Adicionar nova nota"
                                         @onclick="OpenCreateNote">
@@ -59,26 +84,25 @@
                             </div>
 
                             <div class="card-body">
-                                <!-- Linha única: Nome | Element | Tipo | Ações -->
                                 <div class="row g-2 align-items-end filter-row">
 
-                                    <!-- Nome -->
+                                    <!-- Campo Nome -->
                                     <div class="col-12 col-md-4 col-lg-4">
-                                        <label class="form-label mb-1 d-none d-md-block">Name</label>
+                                        <label class="form-label mb-1 d-none d-md-block">Nome</label>
                                         <input class="form-control"
                                                placeholder="Ex.: Senhas banco"
                                                @bind="filterModel.Name" />
                                     </div>
 
-                                    <!-- Element -->
+                                    <!-- Campo Elemento -->
                                     <div class="col-12 col-md-4 col-lg-4">
-                                        <label class="form-label mb-1 d-none d-md-block">Element</label>
+                                        <label class="form-label mb-1 d-none d-md-block">Elemento</label>
                                         <input class="form-control"
                                                placeholder="Ex.: root, docker, apt-get"
                                                @bind="filterModel.Element" />
                                     </div>
 
-                                    <!-- Tipo -->
+                                    <!-- Campo Tipo -->
                                     <div class="col-12 col-md-3 col-lg-3">
                                         <label class="form-label mb-1 d-none d-md-block">Tipo</label>
                                         <select class="form-select" @bind="selectedNoteTypeStr">
@@ -92,7 +116,7 @@
                                         </select>
                                     </div>
 
-                                    <!-- Ações (Buscar e Limpar) -->
+                                    <!-- Botões de ação -->
                                     <div class="col-12 col-md-1 col-lg-1">
                                         <div class="filter-actions d-flex gap-2 justify-content-start justify-content-md-end">
                                             <button class="btn btn-primary btn-icon filter-btn"
@@ -108,13 +132,13 @@
                                             </button>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
-                        <!-- ===== /Card de Pesquisa ===== -->
 
-                        <!-- ===== Lista + Paginação ===== -->
+                        <!-- ==============================
+                             Lista de Notas e Paginação
+                             ============================== -->
                         <div class="card mt-4">
                             <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
                                 <strong>Notas</strong>
@@ -125,7 +149,6 @@
                                         Página @notesPage.Page/@notesPage.TotalPages
                                     </small>
 
-                                    <!-- PageSize -->
                                     <div class="d-flex align-items-center gap-1">
                                         <small class="text-muted">por página</small>
                                         <select class="form-select form-select-sm w-auto"
@@ -138,7 +161,6 @@
                                         </select>
                                     </div>
 
-                                    <!-- Pager -->
                                     <div class="btn-group">
                                         <button class="btn btn-sm btn-outline-secondary"
                                                 disabled="@(!notesPage.HasPrevious)"
@@ -157,7 +179,6 @@
                                 }
                                 else
                                 {
-                                    <!-- Board de Notas (cards estilo Trello) -->
                                     <div class="notes-board">
                                         @foreach (var n in notesPage.Items)
                                         {
@@ -182,7 +203,7 @@
                                                     @if (n.Element == null || n.Element.Count == 0)
                                                     {
                                                         <div class="note-card__empty">
-                                                            <span class="badge bg-secondary">sem elementos</span>
+                                                            <span class="badge bg-secondary">Sem elementos</span>
                                                         </div>
                                                     }
                                                     else
@@ -209,7 +230,6 @@
                                 }
                             </div>
                         </div>
-                        <!-- ===== /Lista + Paginação ===== -->
                     </div>
                     break;
             }
@@ -217,7 +237,10 @@
     </div>
 </div>
 
-<!-- NoteViewer reutilizado para criar / visualizar / editar -->
+<!-- ==============================
+     NOTE VIEWER E CONFIRMAÇÕES
+     ============================== -->
+
 @if (viewerVisible)
 {
     <NoteViewer Visible="viewerVisible"
@@ -229,7 +252,6 @@
                 OnUpdate="HandleUpdateNote" />
 }
 
-<!-- Modal de confirmação de exclusão -->
 @if (showDeleteConfirm)
 {
     <div class="viewer-overlay" @onclick="CloseDeleteNote">

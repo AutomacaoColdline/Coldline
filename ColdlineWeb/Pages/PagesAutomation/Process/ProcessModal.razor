@@ -1,0 +1,88 @@
+@using ColdlineWeb.Models
+
+@if (ShowModal)
+{
+    <div class="modal d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@((IsEditing) ? "Editar Processo" : "Adicionar Processo")</h5>
+                </div>
+
+                <div class="modal-body">
+                    <label>Identificação:</label>
+                    <input class="form-control" @bind="CurrentProcess.IdentificationNumber" />
+
+                    <label>Usuário:</label>
+                    <select class="form-control" @bind="CurrentProcess.User.Id">
+                        <option value="">Selecione...</option>
+                        @foreach (var u in Users)
+                        {
+                            <option value="@u.Id">@u.Name</option>
+                        }
+                    </select>
+
+                    <label>Departamento:</label>
+                    <select class="form-control" @bind="CurrentProcess.Department.Id">
+                        <option value="">Selecione...</option>
+                        @foreach (var d in Departments)
+                        {
+                            <option value="@d.Id">@d.Name</option>
+                        }
+                    </select>
+
+                    <label>Tipo de Processo:</label>
+                    <select class="form-control" @bind="CurrentProcess.ProcessType.Id">
+                        <option value="">Selecione...</option>
+                        @foreach (var t in ProcessTypes)
+                        {
+                            <option value="@t.Id">@t.Name</option>
+                        }
+                    </select>
+
+                    <label>Tempo do Processo:</label>
+                    <input class="form-control" @bind="CurrentProcess.ProcessTime" placeholder="00:00:00" />
+
+                    <label>Data de Início:</label>
+                    <input type="datetime-local" class="form-control"
+                           @bind-value="CurrentProcess.StartDate"
+                           @bind-value:event="oninput" />
+
+                    <label>Data de Término:</label>
+                    <input type="datetime-local" class="form-control"
+                           @bind-value="CurrentProcess.EndDate"
+                           @bind-value:event="oninput" />
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModalInternal">Cancelar</button>
+                    <button class="btn btn-success" @onclick="SaveChanges">
+                        @((IsEditing) ? "Salvar Alterações" : "Criar Processo")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool ShowModal { get; set; }
+    [Parameter] public bool IsEditing { get; set; }
+    [Parameter] public ProcessModel CurrentProcess { get; set; } = new();
+    [Parameter] public List<ReferenceEntity> Users { get; set; } = new();
+    [Parameter] public List<ReferenceEntity> Departments { get; set; } = new();
+    [Parameter] public List<ReferenceEntity> ProcessTypes { get; set; } = new();
+    [Parameter] public EventCallback CloseModal { get; set; }
+    [Parameter] public EventCallback SaveProcess { get; set; }
+    [Parameter] public EventCallback UpdateProcess { get; set; }
+
+    private async Task CloseModalInternal() => await CloseModal.InvokeAsync();
+
+    private async Task SaveChanges()
+    {
+        if (IsEditing)
+            await UpdateProcess.InvokeAsync();
+        else
+            await SaveProcess.InvokeAsync();
+    }
+}

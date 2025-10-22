@@ -78,7 +78,7 @@ namespace ColdlineWeb.Services
             {
                 using var stream = file.OpenReadStream(maxFileSize);
 
-                var uploadUrl = $"http://10.0.0.44:5000/api/User/upload-image?oldFileName={oldFileName}&newFileName={newFileName}";
+                var uploadUrl = $"http://10.0.0.44:4000/api/User/upload-image?oldFileName={oldFileName}&newFileName={newFileName}";
 
                 var content = new MultipartFormDataContent();
                 content.Add(new StreamContent(stream), "file", newFileName);

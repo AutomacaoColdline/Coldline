@@ -1,68 +1,107 @@
 @using ColdlineWeb.Models
-@using ColdlineWeb.Pages.PagesAutomation.Components
+@inject IJSRuntime JS
 
 @code {
     [Parameter] public UserModel? User { get; set; }
     [Parameter] public EventCallback OnLogout { get; set; }
-    // ✅ NÃO-NULLABLE: permite usar HasDelegate e receber método do pai
     [Parameter] public EventCallback<string> OnNavigate { get; set; }
+
+    private bool isCollapsed;
+    private bool isDarkMode;
 
     private Task Go(string key)
         => OnNavigate.HasDelegate ? OnNavigate.InvokeAsync(key) : Task.CompletedTask;
+
+    private void ToggleSidebar() => isCollapsed = !isCollapsed;
+
+    private async Task OnDarkModeChanged(ChangeEventArgs e)
+    {
+        isDarkMode = e?.Value is bool val && val;
+        await JS.InvokeVoidAsync(
+            "eval",
+            $"document.body.classList.toggle('dark-mode', {isDarkMode.ToString().ToLower()});"
+        );
+    }
 }
 
-<div class="sidebar">
+<div class="sidebar @(isCollapsed ? "collapsed" : "")">
+    <!-- Botão abrir/fechar -->
+    <button class="toggle-btn" @onclick="ToggleSidebar">
+        <img src="img/automation/minimizar.png" alt="Toggle" />
+    </button>
+
+    <!-- Logo -->
+    <div class="sidebar-header">
+        <img src="img/automation/logo.png" alt="Logo Coldline" class="logo" />
+    </div>
+
+    <!-- Usuário -->
     @if (User != null)
     {
-        <div class="user-avatar">
-            <img src="@($"http://10.0.0.44:5000/uploads/{User.UrlPhoto}?t={DateTime.UtcNow.Ticks}")"
-                 alt="Foto do Usuário" width="80"
-                 onerror="this.onerror=null; this.src='https://via.placeholder.com/80';">
-        </div>
-
-        <div class="user-info">
-            <h5>@User.Name</h5>
-            <p>@User.Department?.Name</p>
+        <div class="user-section">
+            <img src="@($"http://10.0.0.44:4000/uploads/{User.UrlPhoto}?t={DateTime.UtcNow.Ticks}")"
+                 alt="Foto do Usuário"
+                 onerror="this.onerror=null;this.src='https://via.placeholder.com/60';" />
+            <div class="user-info">
+                <strong>@User.Name</strong>
+                <small>@User.Department?.Name</small>
+            </div>
         </div>
     }
 
-    <!-- Navbar vertical -->
-    <nav class="sidebar-nav" aria-label="Menu principal">
-        <button type="button" class="nav-item" @onclick='() => Go("home")'>
-            <i class="fa-solid fa-house" aria-hidden="true"></i><span>Home</span>
+    <!-- Menu -->
+    <nav class="sidebar-nav">
+        <button class="nav-item" @onclick='() => Go("home")'>
+            <img src="img/automation/notas.png" alt="Home" />
+            <span>Dashboard</span>
         </button>
 
-        <button type="button" class="nav-item" @onclick='() => Go("users")'>
-            <i class="fa-solid fa-users" aria-hidden="true"></i><span>Usuários</span>
+        <button class="nav-item" @onclick='() => Go("users")'>
+            <img src="img/automation/equipe.png" alt="Usuários" />
+            <span>Usuários</span>
         </button>
 
-        <button type="button" class="nav-item" @onclick='() => Go("monitoring")'>
-            <i class="fa-solid fa-chart-line" aria-hidden="true"></i><span>Monitoramento</span>
+        <button class="nav-item" @onclick='() => Go("monitoring")'>
+            <img src="img/automation/monitoramento.png" alt="Monitoramento" />
+            <span>Monitoramento</span>
         </button>
 
-        <button type="button" class="nav-item" @onclick='() => Go("configuracoes")'>
-            <i class="fa-solid fa-gear" aria-hidden="true"></i><span>Configurações</span>
+        <button class="nav-item" @onclick='() => Go("configuration")'>
+            <img src="img/automation/configuracao.png" alt="Configurações" />
+            <span>Configurações</span>
         </button>
 
-        <button type="button" class="nav-item" @onclick='() => Go("processos")'>
-            <i class="fa-solid fa-diagram-project" aria-hidden="true"></i><span>Processos</span>
+        <button class="nav-item" @onclick='() => Go("process")'>
+            <img src="img/automation/processo.png" alt="Processos" />
+            <span>Processos</span>
         </button>
 
-        <button type="button" class="nav-item" @onclick='() => Go("ocorrencia")'>
-            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i><span>Ocorrência</span>
+        <button class="nav-item" @onclick='() => Go("ocorrencia")'>
+            <img src="img/automation/ocorrencia.png" alt="Ocorrências" />
+            <span>Ocorrências</span>
         </button>
 
-        <button type="button" class="nav-item" @onclick='() => Go("relatorios")'>
-            <i class="fa-solid fa-file-lines" aria-hidden="true"></i><span>Relatórios</span>
+        <button class="nav-item" @onclick='() => Go("relatorios")'>
+            <img src="img/automation/relatorio.png" alt="Relatórios" />
+            <span>Relatórios</span>
         </button>
     </nav>
 
-    <div class="sidebar-logo">
-        <img src="img/logo.png" alt="Logo Coldline">
-    </div>
 
-    <button class="btn-circle" @onclick="() => OnLogout.InvokeAsync()">
-        <i class="fas fa-arrow-left" aria-hidden="true"></i>
-        <span class="visually-hidden">Sair</span>
-    </button>
+    <!-- Rodapé -->
+    <div class="sidebar-footer">
+        <div class="dark-mode-toggle">
+            <label>
+                <input type="checkbox"
+                       checked="@isDarkMode"
+                       @onchange="OnDarkModeChanged" />
+                <span>🌙 Modo escuro</span>
+            </label>
+        </div>
+
+        <button class="logout-btn" @onclick="() => OnLogout.InvokeAsync()">
+            <img src="img/automation/sair.png" alt="Logout" />
+            <span>Sair</span>
+        </button>
+    </div>
 </div>

@@ -2,8 +2,7 @@
 @using ColdlineWeb.Models
 @inherits UsersPage
 
-<link rel="stylesheet" href="css/Automation/userAutomation.css" />
-
+<link rel="stylesheet" href="css/Automation/User.css" />
 
 @if (isLoading)
 {
@@ -18,76 +17,128 @@ else if (!string.IsNullOrEmpty(errorMessage))
 }
 else
 {
-    <!-- Card de Filtros -->
-    <div class="filter-card">
-        <div class="search-filters">
-            <button class="btn btn-success mb-3" @onclick="OpenAddUserModal">
-                <img src="img/novo-usuario.png" alt="Novo Usuário" style="width: 16px; height: 16px;" />
-            </button>
-            <input class="form-control" placeholder="Nome" @bind="filterName" />
-            <input class="form-control" placeholder="Email" @bind="filterEmail" />
+    <!-- ==============================
+         Card de Pesquisa e Filtros
+         ============================== -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <strong>Pesquisar Usuários</strong>
 
-            <button class="btn btn-primary" @onclick="ApplyFilters" aria-label="Buscar">
-                <img src="img/lupa.png" alt="Buscar" style="width: 16px; height: 16px;" />
-            </button>  
+            <button class="btn btn-success btn-sm btn-icon"
+                    title="Adicionar novo usuário"
+                    @onclick="OpenAddUserModal">
+                <span class="btn-icon-plus">+</span>
+                <img src="img/novo-usuario.png" alt="Novo Usuário" class="btn-icon-img" />
+            </button>
+        </div>
+
+        <div class="card-body">
+            <div class="row g-2 align-items-end filter-row">
+
+                <!-- Campo Nome -->
+                <div class="col-12 col-md-4 col-lg-4">
+                    <label class="form-label mb-1 d-none d-md-block">Nome</label>
+                    <input class="form-control"
+                           placeholder="Ex.: João da Silva"
+                           @bind="filterName" />
+                </div>
+
+                <!-- Campo Email -->
+                <div class="col-12 col-md-4 col-lg-4">
+                    <label class="form-label mb-1 d-none d-md-block">Email</label>
+                    <input class="form-control"
+                           placeholder="Ex.: joao@email.com"
+                           @bind="filterEmail" />
+                </div>
+
+                <!-- Botões de ação -->
+                <div class="col-12 col-md-4 col-lg-4">
+                    <div class="filter-actions d-flex gap-2 justify-content-start justify-content-md-end">
+                        <button class="btn btn-primary btn-icon filter-btn"
+                                title="Filtrar"
+                                @onclick="ApplyFilters">
+                            <img src="img/lupa.png" alt="Filtrar" class="btn-icon-img" />
+                        </button>
+
+                        <button class="btn btn-outline-secondary btn-icon filter-btn"
+                                title="Limpar filtros"
+                                @onclick="() => { filterName = null; filterEmail = null; ApplyFilters(); }">
+                            <img src="img/limpar-limpo.png" alt="Limpar filtros" class="btn-icon-img" />
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Card para a Tabela de usuários -->
-    <div class="table-card">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Foto</th>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Email</th>
-                    <th>Custo hora</th>
-                    <th>Tipo de Usuário</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var u in users)
-                {
+    <!-- ==============================
+         Tabela de Usuários
+         ============================== -->
+    <div class="card mt-4 table-card">
+        <div class="card-body p-0">
+            <table class="table mb-0">
+                <thead>
                     <tr>
-                        <td>
-                            @if (!string.IsNullOrEmpty(u.UrlPhoto))
-                            {
-                                <img src="@($"http://10.0.0.44:5000/uploads/{u.UrlPhoto}?t={DateTime.UtcNow.Ticks}")"
-                                     alt="Foto" width="50" />
-                            }
-                        </td>
-                        <td>@u.IdentificationNumber</td>
-                        <td>@u.Name</td>
-                        <td>@u.Email</td>
-                        <td>@u.WorkHourCost</td>
-                        <td>@(u.UserType?.Name ?? "Sem Tipo")</td>
-                        <td>
-                            <button class="btn btn-warning btn-sm" @onclick="() => OpenEditUserModal(u)">
-                                <img src="img/editar.png" alt="Editar" style="width: 16px; height: 16px;" />
-                            </button>
-                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(u.Id)">
-                                <img src="img/lixeira.png" alt="Excluir" style="width: 16px; height: 16px;" />
-                            </button>
-                        </td>
+                        <th>Foto</th>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Custo Hora</th>
+                        <th>Tipo de Usuário</th>
+                        <th>Ações</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var u in users)
+                    {
+                        <tr>
+                            <td>
+                                @if (!string.IsNullOrEmpty(u.UrlPhoto))
+                                {
+                                    <img src="@($"http://10.0.0.44:4000/uploads/{u.UrlPhoto}?t={DateTime.UtcNow.Ticks}")"
+                                         alt="Foto" width="50" />
+                                }
+                            </td>
+                            <td>@u.IdentificationNumber</td>
+                            <td>@u.Name</td>
+                            <td>@u.Email</td>
+                            <td>@u.WorkHourCost</td>
+                            <td>@(u.UserType?.Name ?? "Sem Tipo")</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm"
+                                        title="Editar"
+                                        @onclick="() => OpenEditUserModal(u)">
+                                    <img src="img/editar.png" alt="Editar" style="width: 16px; height: 16px;" />
+                                </button>
+
+                                <button class="btn btn-danger btn-sm"
+                                        title="Excluir"
+                                        @onclick="() => DeleteUser(u.Id)">
+                                    <img src="img/lixeira.png" alt="Excluir" style="width: 16px; height: 16px;" />
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <!-- Controles de paginação -->
+    <!-- ==============================
+         Paginação
+         ============================== -->
     <div class="pagination-container">
         <button class="btn btn-secondary"
+                title="Anterior"
                 @onclick="GoToPreviousPage"
                 disabled="@(!CanGoPrevious)">
             <img src="img/seta-esquerda.png" alt="Anterior" style="width: 16px; height: 16px;" />
         </button>
 
-        <span> @pageNumber de @totalPages</span>
+        <span>@pageNumber de @totalPages</span>
 
         <button class="btn btn-secondary"
+                title="Próxima"
                 @onclick="GoToNextPage"
                 disabled="@(!CanGoNext)">
             <img src="img/seta-direita.png" alt="Próxima" style="width: 16px; height: 16px;" />
@@ -95,6 +146,9 @@ else
     </div>
 }
 
+<!-- ==============================
+     Modal de Usuário
+     ============================== -->
 <UserModal
     ShowModal="@showModal"
     IsEditing="@isEditing"

@@ -1,57 +1,99 @@
 @using ColdlineWeb.Models
+@using Microsoft.AspNetCore.Components
 
 @if (ShowModal)
 {
-    <div class="modal d-block">
-        <div class="modal-dialog">
+    <div class="modal d-block" style="background-color: rgba(0,0,0,0.4);">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">@((IsEditing) ? "Editar Processo" : "Adicionar Processo")</h5>
                 </div>
 
                 <div class="modal-body">
-                    <label>Identificação:</label>
-                    <input class="form-control" @bind="CurrentProcess.IdentificationNumber" />
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label>Identificação:</label>
+                            <input class="form-control" @bind="CurrentProcess.IdentificationNumber" />
+                        </div>
 
-                    <label>Usuário:</label>
-                    <select class="form-control" @bind="CurrentProcess.User.Id">
-                        <option value="">Selecione...</option>
-                        @foreach (var u in Users)
-                        {
-                            <option value="@u.Id">@u.Name</option>
-                        }
-                    </select>
+                        <div class="col-md-6">
+                            <label>Usuário:</label>
+                            <select class="form-control" @bind="CurrentProcess.User.Id">
+                                <option value="">Selecione...</option>
+                                @foreach (var u in Users)
+                                {
+                                    <option value="@u.Id">@u.Name</option>
+                                }
+                            </select>
+                        </div>
 
-                    <label>Departamento:</label>
-                    <select class="form-control" @bind="CurrentProcess.Department.Id">
-                        <option value="">Selecione...</option>
-                        @foreach (var d in Departments)
-                        {
-                            <option value="@d.Id">@d.Name</option>
-                        }
-                    </select>
+                        <div class="col-md-6">
+                            <label>Departamento:</label>
+                            <select class="form-control" @bind="CurrentProcess.Department.Id">
+                                <option value="">Selecione...</option>
+                                @foreach (var d in Departments)
+                                {
+                                    <option value="@d.Id">@d.Name</option>
+                                }
+                            </select>
+                        </div>
 
-                    <label>Tipo de Processo:</label>
-                    <select class="form-control" @bind="CurrentProcess.ProcessType.Id">
-                        <option value="">Selecione...</option>
-                        @foreach (var t in ProcessTypes)
-                        {
-                            <option value="@t.Id">@t.Name</option>
-                        }
-                    </select>
+                        <div class="col-md-6">
+                            <label>Tipo de Processo:</label>
+                            <select class="form-control" @bind="CurrentProcess.ProcessType.Id">
+                                <option value="">Selecione...</option>
+                                @foreach (var t in ProcessTypes)
+                                {
+                                    <option value="@t.Id">@t.Name</option>
+                                }
+                            </select>
+                        </div>
 
-                    <label>Tempo do Processo:</label>
-                    <input class="form-control" @bind="CurrentProcess.ProcessTime" placeholder="00:00:00" />
+                        <div class="col-md-6">
+                            <label>Tempo do Processo:</label>
+                            <input class="form-control" @bind="CurrentProcess.ProcessTime" placeholder="00:00:00" />
+                        </div>
 
-                    <label>Data de Início:</label>
-                    <input type="datetime-local" class="form-control"
-                           @bind-value="CurrentProcess.StartDate"
-                           @bind-value:event="oninput" />
+                        <div class="col-md-6">
+                            <label>Status:</label>
+                            <select class="form-control" @bind="SelectedStatus">
+                                <option value="false">Em andamento</option>
+                                <option value="true">Finalizado</option>
+                            </select>
+                        </div>
 
-                    <label>Data de Término:</label>
-                    <input type="datetime-local" class="form-control"
-                           @bind-value="CurrentProcess.EndDate"
-                           @bind-value:event="oninput" />
+                        <div class="col-md-6">
+                            <label>Data de Início:</label>
+                            <input type="datetime-local" class="form-control"
+                                   @bind-value="CurrentProcess.StartDate"
+                                   @bind-value:event="oninput" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Data de Término:</label>
+                            <input type="datetime-local" class="form-control"
+                                   @bind-value="CurrentProcess.EndDate"
+                                   @bind-value:event="oninput" />
+                        </div>
+
+                        <div class="col-12">
+                            <label>Ocorrências:</label>
+                            <div class="border rounded p-2" style="max-height: 150px; overflow-y: auto;">
+                                @foreach (var o in Occurrences)
+                                {
+                                    <div class="form-check">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               value="@o.Id"
+                                               checked="@CurrentProcess.Occurrences!.Any(x => x.Id == o.Id)"
+                                               @onchange="() => ToggleOccurrence(o)">
+                                        <label class="form-check-label">@o.Name</label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
@@ -64,7 +106,6 @@
         </div>
     </div>
 }
-
 @code {
     [Parameter] public bool ShowModal { get; set; }
     [Parameter] public bool IsEditing { get; set; }
@@ -72,9 +113,16 @@
     [Parameter] public List<ReferenceEntity> Users { get; set; } = new();
     [Parameter] public List<ReferenceEntity> Departments { get; set; } = new();
     [Parameter] public List<ReferenceEntity> ProcessTypes { get; set; } = new();
+    [Parameter] public List<ReferenceEntity> Occurrences { get; set; } = new();
     [Parameter] public EventCallback CloseModal { get; set; }
     [Parameter] public EventCallback SaveProcess { get; set; }
     [Parameter] public EventCallback UpdateProcess { get; set; }
+
+    private string SelectedStatus
+    {
+        get => CurrentProcess.Finished ? "true" : "false";
+        set => CurrentProcess.Finished = value == "true";
+    }
 
     private async Task CloseModalInternal() => await CloseModal.InvokeAsync();
 
@@ -84,5 +132,17 @@
             await UpdateProcess.InvokeAsync();
         else
             await SaveProcess.InvokeAsync();
+    }
+
+    private void ToggleOccurrence(ReferenceEntity o)
+    {
+        if (CurrentProcess.Occurrences == null)
+            CurrentProcess.Occurrences = new();
+
+        var existing = CurrentProcess.Occurrences.FirstOrDefault(x => x.Id == o.Id);
+        if (existing != null)
+            CurrentProcess.Occurrences.Remove(existing);
+        else
+            CurrentProcess.Occurrences.Add(new ReferenceEntity { Id = o.Id, Name = o.Name });
     }
 }

@@ -1,0 +1,36 @@
+@inherits ReportPage
+@using Blazorise.Charts
+
+<link rel="stylesheet" href="css/Automation/Report.css" />
+
+<div class="dashboard-container">
+    <h2>📊 Dashboard de Teste — Blazorise Charts</h2>
+
+    @if (isLoading)
+    {
+        <div class="text-center mt-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p>Carregando dados...</p>
+        </div>
+    }
+    else
+    {
+        <div class="chart-grid">
+            <div class="chart-card">
+                <h5>Produção Diária</h5>
+                <LineChart TItem="double" @ref="lineChart" />
+            </div>
+
+            <div class="chart-card">
+                <h5>Vendas Semanais</h5>
+                <BarChart TItem="double" @ref="barChart" />
+            </div>
+
+            <div class="chart-card">
+                <h5>Distribuição de Setores</h5>
+                <PieChart TItem="double" @ref="pieChart" />
+            </div>
+        </div>
+
+    }
+</div>

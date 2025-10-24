@@ -623,6 +623,7 @@ namespace ColdlineAPI.Application.Services
                 .Set(p => p.User, process.User ?? existing.User)
                 .Set(p => p.Department, process.Department ?? existing.Department)
                 .Set(p => p.ProcessType, process.ProcessType ?? existing.ProcessType)
+                .Set(p => p.Occurrences, process.Occurrences ?? existing.Occurrences)
                 .Set(p => p.Finished, process.Finished)
                 .Set(p => p.ReWork, process.ReWork)
                 .Set(p => p.Machine, process.Machine ?? existing.Machine);

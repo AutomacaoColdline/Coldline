@@ -214,6 +214,7 @@ namespace ColdlineAPI.Application.Services
                 .Set(o => o.Finished,        occurrence.Finished)
                 .Set(o => o.User,            occurrence.User)
                 .Set(o => o.Description,     occurrence.Description)
+                .Set(o => o.Department,     occurrence.Department)
                 .Set(o => o.OccurrenceType,  occurrence.OccurrenceType)
                 .Set(o => o.Part,            occurrence.Part)
                 .Set(o => o.Machine,         occurrence.Machine);

@@ -1,0 +1,18 @@
+.dashboard-container {
+  padding: 24px;
+  color: var(--auto-text);
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.chart-card {
+  background: var(--auto-card-bg);
+  border: 1px solid var(--auto-border);
+  border-radius: var(--auto-radius);
+  box-shadow: var(--auto-shadow);
+  padding: 16px;
+}

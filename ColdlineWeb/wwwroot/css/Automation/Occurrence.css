@@ -1,0 +1,309 @@
+/* ================================================================
+   Occurrence.css — Padrão unificado com AutomationHome + Modo Escuro
+   ================================================================ */
+
+.main-content {
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* =====================================================================
+   CARD PADRÃO
+   ===================================================================== */
+.card {
+  background: var(--auto-card-bg);
+  border: 1px solid var(--auto-border);
+  border-radius: var(--auto-radius);
+  box-shadow: var(--auto-shadow);
+  width: 100%;
+  max-width: 1120px;
+  color: var(--auto-text);
+  transition: background-color .3s ease, color .3s ease, border-color .3s ease;
+}
+
+.card-header {
+  padding: 12px 16px;
+  border-bottom: 1px dashed var(--auto-border);
+  background: linear-gradient(180deg, rgba(13,110,253,0.04), transparent 70%);
+  font-weight: 600;
+  color: var(--auto-text);
+}
+
+/* =====================================================================
+   BOTÕES COM ÍCONES
+   ===================================================================== */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 8px;
+}
+.btn-icon-img {
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+.btn-icon-plus {
+  font-weight: 700;
+  line-height: 1;
+  font-size: 14px;
+}
+
+/* =====================================================================
+   FILTROS E INPUTS
+   ===================================================================== */
+.filter-row .form-control,
+.filter-row .form-select {
+  height: 38px;
+  border-radius: 10px;
+  background: var(--auto-card-bg);
+  color: var(--auto-text);
+  border: 1px solid var(--auto-border);
+}
+.filter-row .form-control::placeholder {
+  color: var(--auto-muted);
+}
+
+.filter-actions .filter-btn {
+  height: 38px;
+  min-width: 38px;
+  padding: 6px 8px;
+}
+
+/* =====================================================================
+   BOTÕES PADRÃO
+   ===================================================================== */
+.btn-success.btn-sm {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+  font-weight: 600;
+}
+.btn-success.btn-sm:hover {
+  background-color: #c3e6cb;
+  border-color: #b1dfbb;
+}
+
+.btn-primary {
+  background-color: #cce5ff;
+  border-color: #b8daff;
+  color: #004085;
+  font-weight: 600;
+}
+.btn-primary:hover {
+  background-color: #b8daff;
+  border-color: #99cfff;
+}
+
+.btn-outline-secondary {
+  background-color: #f8f9fa;
+  border-color: #d6d8db;
+  color: #495057;
+}
+.btn-outline-secondary:hover {
+  background-color: #e2e6ea;
+  border-color: #c6c8ca;
+}
+
+.btn-warning.btn-sm {
+  background-color: #fff6cf;
+  border: 1px solid #ffe89a;
+  color: #6b5d00;
+  border-radius: 10px;
+}
+.btn-warning.btn-sm:hover {
+  background-color: #ffe89a;
+}
+
+.btn-danger.btn-sm {
+  background-color: #ffe1e4;
+  border: 1px solid #ffb6be;
+  color: #7a1e25;
+  border-radius: 10px;
+}
+.btn-danger.btn-sm:hover {
+  background-color: #ffb6be;
+}
+
+/* =====================================================================
+   TABELA
+   ===================================================================== */
+.table-card {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  border-radius: var(--auto-radius);
+  box-shadow: var(--auto-shadow);
+  border: 1px solid var(--auto-border);
+  overflow: hidden;
+  background: var(--auto-card-bg);
+  transition: background-color .3s ease, color .3s ease, border-color .3s ease;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--auto-card-bg);
+}
+
+.table thead {
+  background: linear-gradient(180deg, #162032 0%, #2C67D7 100%);
+  color: #ffffff;
+}
+.table th, .table td {
+  text-align: center;
+  padding: 12px;
+  color: var(--auto-text);
+  border-color: var(--auto-border);
+}
+
+.table tbody tr {
+  background: var(--auto-card-bg);
+  transition: background-color .2s ease;
+}
+
+/* Linha destacada para ocorrências ativas */
+.table tbody tr:not(:has(td:contains('Sim'))) {
+  background: rgba(255, 255, 0, 0.03);
+}
+
+.table tbody tr:hover {
+  background: rgba(44,103,215,0.05);
+}
+
+/* =====================================================================
+   PAGINAÇÃO
+   ===================================================================== */
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 12px 22px;
+}
+.pagination-container .btn.btn-secondary {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--auto-card-bg);
+  border: 1px solid var(--auto-border);
+  color: var(--auto-text);
+  box-shadow: var(--auto-shadow);
+  transition: background-color .2s ease, color .2s ease;
+}
+.pagination-container .btn.btn-secondary:hover:not([disabled]) {
+  background: rgba(44,103,215,0.1);
+}
+.pagination-container .btn.btn-secondary[disabled] {
+  opacity: .5;
+  box-shadow: none;
+}
+.pagination-container span {
+  color: var(--auto-muted);
+  font-weight: 600;
+}
+
+/* =====================================================================
+   LOADER
+   ===================================================================== */
+.loader-wrapper {
+  display: grid;
+  place-items: center;
+  padding: 60px 0;
+}
+.custom-loader {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid var(--auto-primary);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+.loading-text {
+  color: var(--auto-text);
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =====================================================================
+   RESPONSIVIDADE
+   ===================================================================== */
+@media (max-width: 767.98px) {
+  .filter-actions { margin-top: 6px; }
+  .table th, .table td { font-size: 13px; padding: 8px; }
+}
+
+/* =====================================================================
+   🌙 MODO ESCURO AUTOMÁTICO
+   ===================================================================== */
+body.dark-mode .card,
+body.dark-mode .table-card {
+  background: var(--auto-card-bg) !important;
+  border-color: var(--auto-border) !important;
+  color: var(--auto-text) !important;
+}
+
+/* Cabeçalho */
+body.dark-mode .card-header {
+  background: rgba(255,255,255,0.05) !important;
+  border-bottom: 1px dashed var(--auto-border) !important;
+  color: var(--auto-text) !important;
+}
+
+/* Inputs */
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+  background: #0f172a !important;
+  color: var(--auto-text) !important;
+  border-color: var(--auto-border) !important;
+}
+body.dark-mode .form-control::placeholder {
+  color: var(--auto-muted) !important;
+}
+
+/* Tabela */
+body.dark-mode .table-card table,
+body.dark-mode .table-card thead,
+body.dark-mode .table-card tbody,
+body.dark-mode .table-card tr,
+body.dark-mode .table-card th,
+body.dark-mode .table-card td {
+  background-color: var(--auto-card-bg) !important;
+  color: var(--auto-text) !important;
+  border-color: var(--auto-border) !important;
+}
+body.dark-mode .table thead th {
+  background: linear-gradient(180deg, #1e293b 0%, #334155 100%) !important;
+  color: #f1f5f9 !important;
+}
+body.dark-mode .table tbody tr:hover {
+  background: rgba(255,255,255,0.05) !important;
+}
+
+/* Paginação */
+body.dark-mode .pagination-container .btn.btn-secondary {
+  background: var(--auto-card-bg) !important;
+  border-color: var(--auto-border) !important;
+  color: var(--auto-text) !important;
+}
+body.dark-mode .pagination-container .btn.btn-secondary:hover:not([disabled]) {
+  background-color: rgba(255,255,255,0.08) !important;
+}
+body.dark-mode .pagination-container span {
+  color: var(--auto-muted) !important;
+}
+
+/* Transição geral */
+html, body, .card, .table-card, .btn.btn-secondary {
+  transition: background-color .3s ease, color .3s ease, border-color .3s ease;
+}

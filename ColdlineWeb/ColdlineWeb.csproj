@@ -10,6 +10,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="9.0.2" />
+    <PackageReference Include="Blazorise" Version="1.7.0" />
+    <PackageReference Include="Blazorise.Charts" Version="1.7.0" />
+    <PackageReference Include="Blazorise.Bootstrap5" Version="1.7.0" />
+    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.7.0" />
   </ItemGroup>
 
 </Project>

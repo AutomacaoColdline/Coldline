@@ -9,6 +9,8 @@
 @using ColdlineWeb.Pages.PagesAutomation.Monitoring
 @using ColdlineWeb.Pages.PagesAutomation.Configuration
 @using ColdlineWeb.Pages.PagesAutomation.Process
+@using ColdlineWeb.Pages.PagesAutomation.Occurrence
+@using ColdlineWeb.Pages.PagesAutomation.Reports
 @inherits AutomationHomePage
 
 <!-- Importa o estilo global da área de automação -->
@@ -62,6 +64,14 @@
 
                 case "process":
                     <Process />
+                    break;
+
+                case "occurrence":
+                    <Occurrence />
+                    break;
+
+                case "reports":
+                    <Report />
                     break;
 
                 default:

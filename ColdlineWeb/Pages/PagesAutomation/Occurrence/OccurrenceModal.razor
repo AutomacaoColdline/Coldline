@@ -1,0 +1,154 @@
+@using ColdlineWeb.Models
+@using Microsoft.AspNetCore.Components
+@using System.Linq
+
+@if (ShowModal)
+{
+    <div class="modal d-block" style="background-color: rgba(0,0,0,0.4);">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@((IsEditing) ? "Editar Ocorrência" : "Nova Ocorrência")</h5>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label>Usuário:</label>
+                            <select class="form-control" @onchange="OnUserChanged">
+                                <option value="">Selecione...</option>
+                                @foreach (var u in Users)
+                                {
+                                    <option value="@u.Id" selected="@(CurrentOccurrence.User?.Id == u.Id)">
+                                        @u.Name
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Departamento:</label>
+                            <select class="form-control" @onchange="OnDepartmentChanged">
+                                <option value="">Selecione...</option>
+                                @foreach (var d in Departments)
+                                {
+                                    <option value="@d.Id" selected="@(CurrentOccurrence.Department?.Id == d.Id)">
+                                        @d.Name
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Processo:</label>
+                            <select class="form-control" @onchange="OnProcessChanged">
+                                <option value="">Selecione...</option>
+                                @foreach (var p in Processes)
+                                {
+                                    <option value="@p.Id" selected="@(CurrentOccurrence.Process?.Id == p.Id)">
+                                        @p.Name
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Tipo de Ocorrência:</label>
+                            <select class="form-control" @bind="CurrentOccurrence.OccurrenceType.Id">
+                                <option value="">Selecione...</option>
+                                @foreach (var t in OccurrenceTypes)
+                                {
+                                    <option value="@t.Id">@t.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label>Descrição:</label>
+                            <textarea class="form-control" rows="3" @bind="CurrentOccurrence.Description"></textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Data de Início:</label>
+                            <input type="datetime-local" class="form-control"
+                                   @bind-value="CurrentOccurrence.StartDate"
+                                   @bind-value:event="oninput" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Data de Término:</label>
+                            <input type="datetime-local" class="form-control"
+                                   @bind-value="CurrentOccurrence.EndDate"
+                                   @bind-value:event="oninput" />
+                        </div>
+
+                        <div class="col-12 mt-2">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" @bind="CurrentOccurrence.Finished" />
+                                Finalizada
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModalInternal">Cancelar</button>
+                    <button class="btn btn-success" @onclick="SaveChanges">
+                        @((IsEditing) ? "Salvar Alterações" : "Criar Ocorrência")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool ShowModal { get; set; }
+    [Parameter] public bool IsEditing { get; set; }
+    [Parameter] public OccurrenceModel CurrentOccurrence { get; set; } = new();
+    [Parameter] public List<ReferenceEntity> Users { get; set; } = new();
+    [Parameter] public List<ReferenceEntity> Departments { get; set; } = new();
+    [Parameter] public List<ReferenceEntity> Processes { get; set; } = new();
+    [Parameter] public List<ReferenceEntity> OccurrenceTypes { get; set; } = new();
+    [Parameter] public EventCallback CloseModal { get; set; }
+    [Parameter] public EventCallback SaveOccurrence { get; set; }
+    [Parameter] public EventCallback UpdateOccurrence { get; set; }
+
+    private async Task CloseModalInternal() => await CloseModal.InvokeAsync();
+
+    private async Task SaveChanges()
+    {
+        if (IsEditing)
+            await UpdateOccurrence.InvokeAsync();
+        else
+            await SaveOccurrence.InvokeAsync();
+    }
+
+    private void OnUserChanged(ChangeEventArgs e)
+    {
+        var selectedId = e.Value?.ToString();
+        var user = Users.FirstOrDefault(u => u.Id == selectedId);
+        CurrentOccurrence.User = user != null
+            ? new ReferenceEntity { Id = user.Id, Name = user.Name }
+            : new ReferenceEntity();
+    }
+
+    private void OnDepartmentChanged(ChangeEventArgs e)
+    {
+        var selectedId = e.Value?.ToString();
+        var dep = Departments.FirstOrDefault(d => d.Id == selectedId);
+        CurrentOccurrence.Department = dep != null
+            ? new ReferenceEntity { Id = dep.Id, Name = dep.Name }
+            : new ReferenceEntity();
+    }
+
+    private void OnProcessChanged(ChangeEventArgs e)
+    {
+        var selectedId = e.Value?.ToString();
+        var proc = Processes.FirstOrDefault(p => p.Id == selectedId);
+        CurrentOccurrence.Process = proc != null
+            ? new ReferenceEntity { Id = proc.Id, Name = proc.Name }
+            : new ReferenceEntity();
+    }
+}

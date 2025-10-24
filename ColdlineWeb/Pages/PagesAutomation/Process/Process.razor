@@ -16,9 +16,6 @@ else if (!string.IsNullOrEmpty(errorMessage))
 }
 else
 {
-    <!-- ==============================
-         Card de Pesquisa e Filtros
-         ============================== -->
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <strong>Pesquisar Processos</strong>
@@ -33,28 +30,11 @@ else
 
         <div class="card-body">
             <div class="row g-2 align-items-end filter-row">
-
-                <!-- Identificação -->
                 <div class="col-12 col-md-4 col-lg-3">
                     <label class="form-label mb-1 d-none d-md-block">Nº de Identificação</label>
-                    <input class="form-control"
-                           placeholder="Ex.: 12345"
-                           @bind="filterIdentification" />
+                    <input class="form-control" placeholder="Ex.: 12345" @bind="filterIdentification" />
                 </div>
 
-                <!-- Departamento -->
-                <div class="col-12 col-md-4 col-lg-3">
-                    <label class="form-label mb-1 d-none d-md-block">Departamento</label>
-                    <select class="form-select" @bind="filterDepartmentId">
-                        <option value="">Todos</option>
-                        @foreach (var dept in departments)
-                        {
-                            <option value="@dept.Id">@dept.Name</option>
-                        }
-                    </select>
-                </div>
-
-                <!-- Tipo de Processo -->
                 <div class="col-12 col-md-4 col-lg-3">
                     <label class="form-label mb-1 d-none d-md-block">Tipo de Processo</label>
                     <select class="form-select" @bind="filterProcessTypeId">
@@ -66,7 +46,6 @@ else
                     </select>
                 </div>
 
-                <!-- Status -->
                 <div class="col-12 col-md-4 col-lg-3">
                     <label class="form-label mb-1 d-none d-md-block">Status</label>
                     <select class="form-select" @bind="filterFinished">
@@ -76,29 +55,21 @@ else
                     </select>
                 </div>
 
-                <!-- Data de Início -->
                 <div class="col-12 col-md-4 col-lg-3">
                     <label class="form-label mb-1 d-none d-md-block">Data Inicial</label>
                     <input type="date" class="form-control" @bind="filterStartDate" />
                 </div>
 
-                <!-- Data de Fim -->
                 <div class="col-12 col-md-4 col-lg-3">
                     <label class="form-label mb-1 d-none d-md-block">Data Final</label>
                     <input type="date" class="form-control" @bind="filterEndDate" />
                 </div>
 
-                <!-- Botões -->
                 <div class="col-12 mt-3 d-flex justify-content-end gap-2">
-                    <button class="btn btn-primary btn-icon filter-btn"
-                            title="Filtrar"
-                            @onclick="ApplyFilters">
+                    <button class="btn btn-primary btn-icon filter-btn" title="Filtrar" @onclick="ApplyFilters">
                         <img src="img/lupa.png" alt="Filtrar" class="btn-icon-img" />
                     </button>
-
-                    <button class="btn btn-outline-secondary btn-icon filter-btn"
-                            title="Limpar filtros"
-                            @onclick="ClearFilters">
+                    <button class="btn btn-outline-secondary btn-icon filter-btn" title="Limpar filtros" @onclick="ClearFilters">
                         <img src="img/limpar-limpo.png" alt="Limpar filtros" class="btn-icon-img" />
                     </button>
                 </div>
@@ -106,9 +77,6 @@ else
         </div>
     </div>
 
-    <!-- ==============================
-         Lista de Processos
-         ============================== -->
     <div class="card mt-4 table-card">
         <div class="card-body p-0">
             <table class="table mb-0">
@@ -116,9 +84,8 @@ else
                     <tr>
                         <th>Nº Identificação</th>
                         <th>Usuário</th>
-                        <th>Departamento</th>
                         <th>Tipo de Processo</th>
-                        <th>Tempo de Processo</th>
+                        <th>Tempo</th>
                         <th>Início</th>
                         <th>Término</th>
                         <th>Status</th>
@@ -128,9 +95,7 @@ else
                 <tbody>
                     @if (processList.Count == 0)
                     {
-                        <tr>
-                            <td colspan="9" class="text-center text-muted">Nenhum processo encontrado.</td>
-                        </tr>
+                        <tr><td colspan="9" class="text-center text-muted">Nenhum processo encontrado.</td></tr>
                     }
                     else
                     {
@@ -139,27 +104,22 @@ else
                             <tr>
                                 <td>@p.IdentificationNumber</td>
                                 <td>@p.User?.Name</td>
-                                <td>@p.Department?.Name</td>
                                 <td>@p.ProcessType?.Name</td>
                                 <td>@p.ProcessTime</td>
                                 <td>@p.StartDate.ToString("dd/MM/yyyy HH:mm")</td>
                                 <td>@(p.EndDate?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
                                 <td>
                                     @if (p.Finished)
-                                    {
-                                        <span class="badge bg-success">Finalizado</span>
-                                    }
+                                        { <span class="badge bg-success">Finalizado</span> }
                                     else
-                                    {
-                                        <span class="badge bg-warning text-dark">Em andamento</span>
-                                    }
+                                        { <span class="badge bg-warning text-dark">Em andamento</span> }
                                 </td>
                                 <td>
                                     <button class="btn btn-warning btn-sm" title="Editar" @onclick="() => OpenEditProcessModal(p)">
-                                        <img src="img/editar.png" alt="Editar" width="16" height="16" />
+                                        <img src="img/editar.png" width="16" height="16" />
                                     </button>
                                     <button class="btn btn-danger btn-sm" title="Excluir" @onclick="() => DeleteProcess(p.Id)">
-                                        <img src="img/lixeira.png" alt="Excluir" width="16" height="16" />
+                                        <img src="img/lixeira.png" width="16" height="16" />
                                     </button>
                                 </td>
                             </tr>
@@ -170,31 +130,17 @@ else
         </div>
     </div>
 
-    <!-- ==============================
-         Paginação
-         ============================== -->
     <div class="pagination-container">
-        <button class="btn btn-secondary"
-                title="Anterior"
-                @onclick="GoToPreviousPage"
-                disabled="@(!CanGoPrevious)">
-            <img src="img/seta-esquerda.png" alt="Anterior" style="width: 16px; height: 16px;" />
+        <button class="btn btn-secondary" title="Anterior" @onclick="GoToPreviousPage" disabled="@(!CanGoPrevious)">
+            <img src="img/seta-esquerda.png" width="16" height="16" />
         </button>
-
         <span>@pageNumber de @totalPages</span>
-
-        <button class="btn btn-secondary"
-                title="Próxima"
-                @onclick="GoToNextPage"
-                disabled="@(!CanGoNext)">
-            <img src="img/seta-direita.png" alt="Próxima" style="width: 16px; height: 16px;" />
+        <button class="btn btn-secondary" title="Próxima" @onclick="GoToNextPage" disabled="@(!CanGoNext)">
+            <img src="img/seta-direita.png" width="16" height="16" />
         </button>
     </div>
 }
 
-<!-- ==============================
-     Modal de Processo
-     ============================== -->
 <ProcessModal
     ShowModal="@showModal"
     IsEditing="@isEditing"
@@ -202,7 +148,7 @@ else
     Users="@users"
     Departments="@departments"
     ProcessTypes="@processTypes"
+    Occurrences="@occurrences"
     CloseModal="CloseModal"
     SaveProcess="SaveProcess"
-    UpdateProcess="UpdateProcess"
-/>
+    UpdateProcess="UpdateProcess" />

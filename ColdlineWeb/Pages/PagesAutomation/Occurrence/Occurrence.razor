@@ -1,0 +1,169 @@
+@using ColdlineWeb.Models
+@inherits OccurrencePage
+
+<link rel="stylesheet" href="css/Automation/Occurrence.css" />
+
+@if (isLoading)
+{
+    <div class="loader-wrapper">
+        <div class="custom-loader"></div>
+        <span class="loading-text">Carregando...</span>
+    </div>
+}
+else if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+else
+{
+    <!-- ==============================
+         Card de Pesquisa e Filtros
+         ============================== -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <strong>Pesquisar Ocorrências</strong>
+
+            <button class="btn btn-success btn-sm btn-icon"
+                    title="Adicionar nova ocorrência"
+                    @onclick="OpenAddOccurrenceModal">
+                <span class="btn-icon-plus">+</span>
+                <img src="img/automation/adicionar.png" alt="Nova Ocorrência" class="btn-icon-img" />
+            </button>
+        </div>
+
+        <div class="card-body">
+            <div class="row g-2 align-items-end filter-row">
+
+                <!-- Usuário -->
+                <div class="col-12 col-md-3">
+                    <label class="form-label mb-1 d-none d-md-block">Usuário</label>
+                    <select class="form-select" @bind="filterUserId">
+                        <option value="">Todos</option>
+                        @foreach (var u in users)
+                        {
+                            <option value="@u.Id">@u.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Tipo de Ocorrência -->
+                <div class="col-12 col-md-3">
+                    <label class="form-label mb-1 d-none d-md-block">Tipo de Ocorrência</label>
+                    <select class="form-select" @bind="filterOccurrenceTypeId">
+                        <option value="">Todos</option>
+                        @foreach (var t in occurrenceTypes)
+                        {
+                            <option value="@t.Id">@t.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Status -->
+                <div class="col-12 col-md-2">
+                    <label class="form-label mb-1 d-none d-md-block">Finalizada</label>
+                    <select class="form-select" @bind="filterFinished">
+                        <option value="">Todas</option>
+                        <option value="true">Sim</option>
+                        <option value="false">Não</option>
+                    </select>
+                </div>
+
+                <!-- Datas -->
+                <div class="col-12 col-md-2">
+                    <label class="form-label mb-1 d-none d-md-block">Data Início</label>
+                    <input type="date" class="form-control" @bind="filterStartDate" />
+                </div>
+
+                <div class="col-12 col-md-2">
+                    <label class="form-label mb-1 d-none d-md-block">Data Fim</label>
+                    <input type="date" class="form-control" @bind="filterEndDate" />
+                </div>
+
+                <!-- Ações -->
+                <div class="col-12 mt-2 d-flex justify-content-end gap-2">
+                    <button class="btn btn-primary btn-icon" @onclick="ApplyFilters">
+                        <img src="img/lupa.png" alt="Filtrar" class="btn-icon-img" />
+                    </button>
+                    <button class="btn btn-outline-secondary btn-icon" @onclick="ClearFilters">
+                        <img src="img/limpar-limpo.png" alt="Limpar" class="btn-icon-img" />
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==============================
+         Lista de Ocorrências
+         ============================== -->
+    <div class="card mt-4 table-card">
+        <div class="card-body p-0">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Usuário</th>
+                        <th>Tipo</th>
+                        <th>Início</th>
+                        <th>Fim</th>
+                        <th>Finalizada</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (occurrences.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">Nenhuma ocorrência encontrada.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var o in occurrences)
+                        {
+                            <tr>
+                                <td>@o.User?.Name</td>
+                                <td>@o.OccurrenceType?.Name</td>
+                                <td>@o.StartDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@(o.EndDate?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
+                                <td>@(o.Finished ? "Sim" : "Não")</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm" title="Editar" @onclick="() => OpenEditOccurrenceModal(o)">
+                                        <img src="img/editar.png" width="16" height="16" />
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" title="Excluir" @onclick="() => DeleteOccurrence(o.Id)">
+                                        <img src="img/lixeira.png" width="16" height="16" />
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Paginação -->
+    <div class="pagination-container">
+        <button class="btn btn-secondary" disabled="@(!CanGoPrevious)" @onclick="GoToPreviousPage">
+            <img src="img/seta-esquerda.png" width="16" height="16" />
+        </button>
+
+        <span>@pageNumber de @totalPages</span>
+
+        <button class="btn btn-secondary" disabled="@(!CanGoNext)" @onclick="GoToNextPage">
+            <img src="img/seta-direita.png" width="16" height="16" />
+        </button>
+    </div>
+}
+
+<!-- Modal -->
+<OccurrenceModal
+    ShowModal="@showModal"
+    IsEditing="@isEditing"
+    CurrentOccurrence="@currentOccurrence"
+    Users="@users"
+    Departments="@departments"
+    Processes="@processes"
+    OccurrenceTypes="@occurrenceTypes"
+    CloseModal="CloseModal"
+    SaveOccurrence="SaveOccurrence"
+    UpdateOccurrence="UpdateOccurrence" />

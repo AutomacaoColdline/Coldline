@@ -1,0 +1,31 @@
+@inherits ReportPage
+@using ColdlineWeb.Services
+
+<div class="charts-grid">
+    <div class="chart-card">
+        <h3>📈 Processos por Dia</h3>
+        <canvas id="chartProcessesPerDay" @key="chartKey1"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <h3>📈 Ocorrências por Dia</h3>
+        <canvas id="chartOccurrencesPerDay" @key="chartKey2"></canvas>
+    </div>
+
+    <div class="chart-card wide">
+        <h3>📊 Processos vs Ocorrências (Mensal)</h3>
+        <canvas id="chartComparison" @key="chartKey3"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <h3>🔁 Taxa de Ocorrência (%)</h3>
+        <canvas id="chartRate" @key="chartKey4"></canvas>
+    </div>
+</div>
+
+@code {
+    private readonly string chartKey1 = Guid.NewGuid().ToString();
+    private readonly string chartKey2 = Guid.NewGuid().ToString();
+    private readonly string chartKey3 = Guid.NewGuid().ToString();
+    private readonly string chartKey4 = Guid.NewGuid().ToString();
+}

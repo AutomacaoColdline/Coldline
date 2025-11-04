@@ -1,0 +1,60 @@
+@using ColdlineWeb.Models
+@inherits ColdlineWeb.Pages.PagesAutomation.Coldvisio.ColdvisioPage
+
+<link rel="stylesheet" href="css/Automation/Coldvisio.css" />
+
+<div class="coldvisio-container">
+    @if (Steps.Count == 0)
+    {
+        <div class="alert alert-warning text-center mt-5">
+            Nenhum passo encontrado no diretório.
+        </div>
+    }
+    else
+    {
+        var step = Steps[CurrentStepIndex];
+
+        <!-- Barra de progresso -->
+        <div class="progress-section">
+            <div class="progress">
+                <div class="progress-bar" style="width:@($"{ProgressPercent:F1}%")"></div>
+            </div>
+            <div class="progress-label">Passo @(CurrentStepIndex + 1) de @Steps.Count</div>
+        </div>
+
+        <!-- Card principal -->
+        <div class="step-card">
+            <div class="step-header">
+                🧩 Passo @step.Number — @step.Title
+            </div>
+
+            <div class="step-body">
+                <div class="step-grid">
+                    @foreach (var file in step.Files)
+                    {
+                        if (file.IsText)
+                        {
+                            <div class="text-box">
+                                <pre>@(file.TextContent ?? "[arquivo vazio]")</pre>
+                                <div class="caption">@file.Name</div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="image-box">
+                                <img src="@file.Url" alt="@file.Name" />
+                                <div class="caption">@file.Name</div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Navegação -->
+        <div class="navigation-controls">
+            <button class="btn-nav prev" disabled="@(CurrentStepIndex == 0)" @onclick="PrevStep">⬅️ Anterior</button>
+            <button class="btn-nav next" disabled="@(CurrentStepIndex == Steps.Count - 1)" @onclick="NextStep">Próximo ➡️</button>
+        </div>
+    }
+</div>

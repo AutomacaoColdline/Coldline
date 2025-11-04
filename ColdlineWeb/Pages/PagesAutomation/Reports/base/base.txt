@@ -1,0 +1,35 @@
+using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using System.Globalization;
+
+namespace ColdlineWeb.Pages.PagesAutomation.Reports
+{
+    public partial class ReportPage : ComponentBase
+    {
+        [Inject] protected IJSRuntime JS { get; set; } = default!;
+
+        protected string ChartType { get; set; } = "linha";
+        protected string LabelInput { get; set; } = "Seg,Ter,Qua,Qui,Sex,Sáb,Dom";
+        protected string DataInput { get; set; } = "10,14,18,9,15,7,12";
+
+        protected async Task GenerateChart()
+        {
+            var labels = LabelInput.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var rawValues = DataInput.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            var values = rawValues
+                .Select(v => double.TryParse(v, NumberStyles.Any, CultureInfo.InvariantCulture, out var num) ? num : 0)
+                .ToArray();
+
+            var dataset = new
+            {
+                label = "Série 1",
+                data = values
+            };
+
+            Console.WriteLine($"[Blazor] Gerando gráfico: {ChartType} | Labels: {LabelInput} | Valores: {DataInput}");
+
+            await JS.InvokeVoidAsync("reportCharts.generate", "reportChart", ChartType, labels, new[] { dataset });
+        }
+    }
+}

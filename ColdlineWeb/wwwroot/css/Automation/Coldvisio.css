@@ -1,0 +1,173 @@
+/* ============================================================
+   Coldvisio.css — Tutorial passo a passo Coldline Automation
+   ============================================================ */
+
+.coldvisio-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem 2rem;
+  color: var(--auto-text);
+  background: var(--auto-bg);
+  min-height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+/* ===============================
+   Barra de progresso
+=============================== */
+.progress-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  margin-bottom: 1rem;
+}
+
+.progress {
+  width: 100%;
+  height: 10px;
+  border-radius: 6px;
+  background: var(--auto-border);
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: var(--auto-primary);
+  transition: width 0.3s ease;
+}
+
+.progress-label {
+  font-size: 0.85rem;
+  color: var(--auto-text-muted);
+}
+
+/* ===============================
+   Card principal
+=============================== */
+.step-card {
+  background: var(--auto-card-bg);
+  border: 1px solid var(--auto-border);
+  border-radius: var(--auto-radius);
+  box-shadow: var(--auto-shadow);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.step-header {
+  background: var(--auto-primary);
+  color: #fff;
+  padding: 0.9rem 1.2rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  letter-spacing: 0.3px;
+}
+
+.step-body {
+  padding: 1.5rem;
+}
+
+.step-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.25rem;
+}
+
+/* ===============================
+   Exibição de texto
+=============================== */
+.text-box {
+  background: var(--auto-bg);
+  border: 1px solid var(--auto-border);
+  border-radius: 10px;
+  padding: 1rem;
+  max-width: 700px;
+  overflow-x: auto;
+  font-family: monospace;
+  color: var(--auto-text);
+}
+
+/* ===============================
+   Exibição de imagens
+=============================== */
+.image-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--auto-card-bg);
+  border: 1px solid var(--auto-border);
+  border-radius: 10px;
+  overflow: hidden;
+  max-width: 800px;
+  box-shadow: var(--auto-shadow);
+}
+
+.image-box img {
+  width: 100%;
+  height: auto;
+  border-bottom: 1px solid var(--auto-border);
+}
+
+.image-box .caption {
+  padding: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--auto-text-muted);
+  text-align: center;
+}
+
+/* ===============================
+   Navegação
+=============================== */
+.navigation-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.btn-nav {
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-nav.prev {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.btn-nav.next {
+  background: var(--auto-primary);
+  color: #fff;
+}
+
+.btn-nav:hover {
+  transform: translateY(-2px);
+}
+
+.btn-nav:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===============================
+   Responsividade
+=============================== */
+@media (max-width: 768px) {
+  .coldvisio-container {
+    padding: 1rem;
+  }
+
+  .step-body {
+    padding: 1rem;
+  }
+
+  .image-box {
+    max-width: 100%;
+  }
+}

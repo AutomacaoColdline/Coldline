@@ -11,6 +11,7 @@
 @using ColdlineWeb.Pages.PagesAutomation.Process
 @using ColdlineWeb.Pages.PagesAutomation.Occurrence
 @using ColdlineWeb.Pages.PagesAutomation.Reports
+@using ColdlineWeb.Pages.PagesAutomation.Coldvisio
 @inherits AutomationHomePage
 
 <!-- Importa o estilo global da área de automação -->
@@ -72,6 +73,10 @@
 
                 case "reports":
                     <Report />
+                    break;
+
+                case "coldvisio":
+                    <Coldvisio />
                     break;
 
                 default:

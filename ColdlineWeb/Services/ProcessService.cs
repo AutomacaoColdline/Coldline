@@ -135,5 +135,12 @@ namespace ColdlineWeb.Services
 
             return response.IsSuccessStatusCode;
         }
+        public async Task<List<MonthlyWorkSummaryModel>> GetUserMonthlySummaryAsync(string userId, int year, int month)
+        {
+            var url = $"api/Process/monthly-summary/{userId}/{year}/{month}";
+            var result = await _http.GetFromJsonAsync<List<MonthlyWorkSummaryModel>>(url);
+            return result ?? new List<MonthlyWorkSummaryModel>();
+        }
+
     }
 }

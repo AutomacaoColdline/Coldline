@@ -1,18 +1,341 @@
+/* ===========================================================
+   Report.css — Coldline Automation Reports
+   Versão premium com integração total ao tema e modo escuro
+   =========================================================== */
+
+/* ===========================================================
+   CONTAINER GERAL — sem espaçamento superior
+   =========================================================== */
 .dashboard-container {
-  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 0 1.5rem 1.5rem; /* 🔹 Remove padding-top */
+  color: var(--auto-text);
+  background: var(--auto-bg);
+  min-height: calc(100vh - 48px);
+  position: relative;
+  overflow: visible;
+  z-index: 2;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ===========================================================
+   NAVBAR DO DASHBOARD — colada no topo
+   =========================================================== */
+.navbar-report {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--auto-card-bg);
+  border: 1px solid var(--auto-border);
+  border-radius: var(--auto-radius);
+  padding: 0.55rem 1rem; /* 🔹 padding compacto */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(6px);
+
+  /* 🔹 Encaixa o navbar no topo real */
+  position: sticky;
+  top: 0;
+  margin-top: 0;
+  z-index: 20;
+}
+
+/* Efeito de profundidade leve sem afastar do topo */
+.navbar-report::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), transparent 75%);
+  pointer-events: none;
+}
+
+/* ===========================================================
+   BOTÕES DE NAVEGAÇÃO
+   =========================================================== */
+.tab-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.navbar-report button {
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.55rem 1.25rem;
+  font-size: 0.93rem;
+  border-radius: 10px;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+
+.tab-active {
+  background: linear-gradient(135deg, var(--auto-primary), #2563eb);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.3);
+}
+
+.tab-inactive {
+  background: transparent;
   color: var(--auto-text);
 }
 
-.chart-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 24px;
+.tab-inactive:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--auto-primary);
 }
 
+/* ===========================================================
+   BOTÃO DE ATUALIZAR
+   =========================================================== */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+}
+
+.btn-generate {
+  background: var(--auto-primary);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.55rem 1.2rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: 0 3px 8px rgba(59, 130, 246, 0.3);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-generate:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.btn-generate:active {
+  transform: translateY(1px);
+}
+
+/* ===========================================================
+   GRID DE GRÁFICOS
+   =========================================================== */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 1.5rem;
+  align-items: stretch;
+  width: 100%;
+  position: relative;
+  z-index: 3;
+}
+
+/* ===========================================================
+   CARD DE GRÁFICO
+   =========================================================== */
 .chart-card {
   background: var(--auto-card-bg);
   border: 1px solid var(--auto-border);
   border-radius: var(--auto-radius);
+  padding: 1.25rem;
   box-shadow: var(--auto-shadow);
-  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  position: relative;
+  min-height: 400px;
+  overflow: visible;
+  transition: all 0.3s ease;
+}
+
+.chart-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+}
+
+.chart-card.wide {
+  grid-column: span 2;
+}
+
+.chart-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--auto-text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chart-card h3::before {
+  content: "📊";
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+/* ===========================================================
+   CANVAS DO CHART.JS
+   =========================================================== */
+.chart-card canvas {
+  flex: 1;
+  width: 100%;
+  height: 340px;
+  max-height: 360px;
+  display: block;
+  margin: 0 auto;
+  position: relative;
+  z-index: 5;
+}
+
+.chart-card canvas[data-type="pie"],
+.chart-card canvas[data-type="doughnut"] {
+  height: 300px;
+  width: 300px;
+  max-height: 300px;
+  max-width: 300px;
+  margin: auto;
+}
+
+canvas {
+  aspect-ratio: auto;
+  max-width: 100%;
+}
+
+/* ===========================================================
+   LOADER
+   =========================================================== */
+.loader-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: var(--auto-radius);
+  z-index: 10;
+}
+
+.loader {
+  border: 4px solid var(--auto-border);
+  border-top: 4px solid var(--auto-primary);
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===========================================================
+   TEMA ESCURO
+   =========================================================== */
+body.dark-mode .navbar-report {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: #334155;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .tab-active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  box-shadow: 0 3px 10px rgba(59, 130, 246, 0.4);
+}
+
+body.dark-mode .tab-inactive {
+  color: #cbd5e1;
+}
+
+body.dark-mode .tab-inactive:hover {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+}
+
+body.dark-mode .chart-card {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+body.dark-mode .chart-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+}
+
+body.dark-mode .chart-card h3 {
+  color: #f8fafc;
+}
+
+body.dark-mode .btn-generate {
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(59, 130, 246, 0.4);
+}
+
+body.dark-mode .btn-generate:hover {
+  background: #1d4ed8;
+}
+
+/* ===========================================================
+   TRANSIÇÕES SUAVES
+   =========================================================== */
+html,
+body,
+.chart-card,
+.navbar-report {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ===========================================================
+   RESPONSIVIDADE
+   =========================================================== */
+@media (max-width: 1024px) {
+  .chart-card {
+    min-height: 360px;
+  }
+
+  .chart-card canvas {
+    height: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .navbar-report {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .chart-card {
+    min-height: 320px;
+    padding: 1rem;
+  }
+
+  .chart-card h3 {
+    font-size: 0.95rem;
+  }
+
+  .chart-card canvas {
+    height: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-card.wide {
+    grid-column: auto;
+  }
 }

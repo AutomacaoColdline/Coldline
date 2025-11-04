@@ -1,0 +1,8 @@
+cd ..
+cd ..
+cd "C:\Program Files\PostgreSQL\12\data" 
+notepad pg_hba.conf
+=------
+No final do arquivo cole essa linha 
+
+host	all             all             0.0.0.0/0            	md5

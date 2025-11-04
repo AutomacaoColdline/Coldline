@@ -1,0 +1,39 @@
+@inherits ReportPage
+
+<link rel="stylesheet" href="css/Automation/Report.css" />
+
+<div class="dashboard-container">
+    <h2>📊 Dashboard Genérico (JS Interop)</h2>
+
+    <div class="controls">
+        <div class="control-row">
+            <label>Tipo de Gráfico:</label>
+            <select @bind="ChartType">
+                <option value="linha">Linha</option>
+                <option value="colunas">Colunas</option>
+                <option value="barras">Barras Horizontais</option>
+                <option value="pizza">Pizza</option>
+                <option value="rosquinha">Rosquinha</option>
+                <option value="área">Área</option>
+                <option value="dispersão">Dispersão</option>
+            </select>
+        </div>
+
+        <div class="control-row">
+            <label>Labels (X):</label>
+            <input @bind="LabelInput" placeholder="Ex: Seg,Ter,Qua,Qui,Sex" />
+        </div>
+
+        <div class="control-row">
+            <label>Valores (Y):</label>
+            <input @bind="DataInput" placeholder="Ex: 10,14,18,9,15" />
+        </div>
+
+        <button class="btn-generate" @onclick="GenerateChart">Gerar Gráfico</button>
+    </div>
+
+    <div class="chart-area">
+        <canvas id="reportChart"></canvas>
+    </div>
+</div>
+

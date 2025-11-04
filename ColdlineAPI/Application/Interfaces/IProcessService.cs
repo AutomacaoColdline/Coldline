@@ -30,5 +30,7 @@ namespace ColdlineAPI.Application.Interfaces
         Task<List<ProcessTypeTotalTimeDto>> GetTotalProcessTimeByProcessTypeAsync(DateTime start, DateTime end);
         Task<List<IndividualUserProcessDto>> GetIndividualProcessTimesByUserAsync(string userId, DateTime startDate, DateTime endDate, bool? preIndustrialization = null);
         Task<byte[]> GenerateExcelReportAsync(DateTime startDate, DateTime endDate);
+        Task<List<MonthlyWorkSummaryDto>> GetUserMonthlyWorkSummaryAsync(string userId, int year, int month);
+
     }
 }

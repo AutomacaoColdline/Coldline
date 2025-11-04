@@ -1,10 +1,15 @@
 @using ColdlineWeb.Models
+@using ColdlineWeb.Models.Config
+@using Microsoft.Extensions.Options
+
+@inject IOptions<ServerSettings> ServerOptions
 @inject IJSRuntime JS
 
 @code {
     [Parameter] public UserModel? User { get; set; }
     [Parameter] public EventCallback OnLogout { get; set; }
     [Parameter] public EventCallback<string> OnNavigate { get; set; }
+    private string ApiBaseUrl => ServerOptions?.Value?.ApiBaseUrl?.TrimEnd('/') ?? string.Empty;
 
     private bool isCollapsed;
     private bool isDarkMode;
@@ -39,7 +44,7 @@
     @if (User != null)
     {
         <div class="user-section">
-            <img src="@($"http://10.0.0.44:4000/uploads/{User.UrlPhoto}?t={DateTime.UtcNow.Ticks}")"
+            <img src="@($"{ApiBaseUrl}/uploads/{User.UrlPhoto}?t={DateTime.UtcNow.Ticks}")"
                  alt="Foto do Usuário"
                  onerror="this.onerror=null;this.src='https://via.placeholder.com/60';" />
             <div class="user-info">
@@ -85,6 +90,11 @@
             <img src="img/automation/relatorio.png" alt="Relatórios" />
             <span>Relatórios</span>
         </button>
+
+        <button class="nav-item" @onclick='() => Go("coldvisio")'>
+            <img src="img/automation/relatorio.png" alt="Coldvisio" />
+            <span>Coldvisio</span>
+        </button>
     </nav>
 
 
@@ -105,3 +115,5 @@
         </button>
     </div>
 </div>
+
+

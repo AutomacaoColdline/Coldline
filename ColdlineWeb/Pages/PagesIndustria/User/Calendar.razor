@@ -1,5 +1,4 @@
 @using ColdlineWeb.Models
-@using ColdlineWeb.Models.Filter
 @using ColdlineWeb.Services
 @inject ProcessService ProcessService
 
@@ -47,14 +46,14 @@
                                     <div class="calendar-cell" @key="day">
                                         <span class="day-number">@day.Day</span>
 
-                                        @if (ProcessData.ContainsKey(day))
+                                        @if (ProcessData.TryGetValue(day.Date, out var info))
                                         {
                                             <div class="process-info">
                                                 <div class="process-count">
-                                                    <strong>@ProcessData[day].Count</strong> processo(s)
+                                                    <strong>@info.Count</strong> processo(s)
                                                 </div>
                                                 <div class="process-time">
-                                                    <small>@ProcessData[day].TotalTime</small>
+                                                    <small>@info.TotalTime</small>
                                                 </div>
                                             </div>
                                         }
@@ -80,46 +79,33 @@
     [Parameter] public EventCallback CloseModal { get; set; }
 
     private DateTime currentMonth = DateTime.Now;
-    private List<DateTime> DaysInCalendar = new List<DateTime>();
-    private Dictionary<DateTime, (int Count, string TotalTime)> ProcessData = new Dictionary<DateTime, (int Count, string TotalTime)>();
+    private List<DateTime> DaysInCalendar = new();
+    private Dictionary<DateTime, (int Count, string TotalTime)> ProcessData = new();
     private bool IsLoading = false;
 
     protected override async Task OnParametersSetAsync()
     {
-        if (!ShowModal)
-        {
-            return;
-        }
+        if (!ShowModal) return;
 
-        // Garante que UserId tenha valor
-        UserId = string.IsNullOrWhiteSpace(UserId) ? User?.Id : UserId;
+        UserId ??= User?.Id;
 
-        // Somente chama BuildCalendar se UserId tiver valor válido
         if (!string.IsNullOrWhiteSpace(UserId))
-        {
             await BuildCalendar();
-        }
         else
         {
-            // Limpa o calendário se não houver UserId
             DaysInCalendar.Clear();
             ProcessData.Clear();
         }
     }
 
-    private bool IsCurrentMonth =>
-        currentMonth.Year == DateTime.Now.Year && currentMonth.Month == DateTime.Now.Month;
-
-    private bool IsFirstMonth =>
-        currentMonth <= new DateTime(2000, 1, 1);
+    private bool IsCurrentMonth => currentMonth.Year == DateTime.Now.Year && currentMonth.Month == DateTime.Now.Month;
+    private bool IsFirstMonth => currentMonth <= new DateTime(2000, 1, 1);
 
     private async Task PreviousMonth()
     {
         currentMonth = currentMonth.AddMonths(-1);
         if (!string.IsNullOrWhiteSpace(UserId))
-        {
             await BuildCalendar();
-        }
     }
 
     private async Task NextMonth()
@@ -128,15 +114,12 @@
         {
             currentMonth = currentMonth.AddMonths(1);
             if (!string.IsNullOrWhiteSpace(UserId))
-            {
                 await BuildCalendar();
-            }
         }
     }
 
     private async Task BuildCalendar()
     {
-        // Segurança extra: não faz nada se UserId estiver vazio
         if (string.IsNullOrWhiteSpace(UserId))
         {
             DaysInCalendar.Clear();
@@ -144,79 +127,35 @@
             return;
         }
 
-        // Mostra loading
         IsLoading = true;
-        StateHasChanged(); // Força atualização da UI
+        StateHasChanged();
 
         try
         {
-            // Cria os dias do mês atual
-            DaysInCalendar = Enumerable.Range(1, DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month))
-                                       .Select(day => new DateTime(currentMonth.Year, currentMonth.Month, day))
-                                       .ToList();
+            DaysInCalendar = Enumerable
+                .Range(1, DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month))
+                .Select(day => new DateTime(currentMonth.Year, currentMonth.Month, day))
+                .ToList();
 
             ProcessData.Clear();
 
-            // Carrega os dados de cada dia
-            foreach (var day in DaysInCalendar)
+            // 🔥 Chama o novo endpoint otimizado
+            var summaryList = await ProcessService.GetUserMonthlySummaryAsync(UserId, currentMonth.Year, currentMonth.Month);
+
+            if (summaryList != null)
             {
-                var (count, totalTime) = await GetProcessInfo(UserId!, DepartmentId, day);
-                if (count > 0)
+                foreach (var item in summaryList)
                 {
-                    ProcessData[day] = (count, totalTime);
+                    var day = item.Day.Date;
+                    ProcessData[day] = (item.ProcessCount, item.TotalHours);
                 }
             }
         }
         finally
         {
-            // Esconde loading
             IsLoading = false;
-            StateHasChanged(); // Força atualização da UI
+            StateHasChanged();
         }
-    }
-
-    private async Task<(int Count, string TotalTime)> GetProcessInfo(string userId, string? departmentId, DateTime day)
-    {
-        // Segurança absoluta: nunca chamar se userId for vazio
-        if (string.IsNullOrWhiteSpace(userId))
-        {
-            return (0, "00:00:00");
-        }
-
-        Console.WriteLine($"[Calendar] Chamando ProcessService para UserId: {userId}, Data: {day:yyyy-MM-dd}");
-
-        var filter = new ProcessFilterModel
-        {
-            UserId = userId,
-            DepartmentId = departmentId,
-            StartDate = day.Date,
-            EndDate = day.Date,
-            Page = 1,
-            PageSize = 100,
-            Finished = null
-        };
-
-        var result = await ProcessService.SearchProcessesAsync(filter);
-
-        if (result?.Items == null || result.Items.Count == 0)
-        {
-            return (0, "00:00:00");
-        }
-
-        int count = result.Items.Count;
-
-        TimeSpan totalTimeSpan = TimeSpan.Zero;
-        foreach (var process in result.Items)
-        {
-            if (TimeSpan.TryParse(process.ProcessTime, out TimeSpan duration))
-            {
-                totalTimeSpan = totalTimeSpan.Add(duration);
-            }
-        }
-
-        string totalTimeFormatted = $"{(int)totalTimeSpan.TotalHours:D2}:{totalTimeSpan.Minutes:D2}:{totalTimeSpan.Seconds:D2}";
-
-        return (count, totalTimeFormatted);
     }
 
     private async Task CloseModalInternal()

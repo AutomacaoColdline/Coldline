@@ -202,6 +202,28 @@ namespace ColdlineAPI.Presentation.Controllers
                 return StatusCode(500, new { Message = $"Erro ao gerar Excel: {ex.Message}" });
             }
         }
+        [HttpGet("monthly-summary/{userId}/{year:int}/{month:int}")]
+        public async Task<ActionResult<List<MonthlyWorkSummaryDto>>> GetUserMonthlySummary(string userId, int year, int month)
+        {
+            try
+            {
+                var result = await _processService.GetUserMonthlyWorkSummaryAsync(userId, year, month);
+
+                if (result == null || result.Count == 0)
+                    return Ok(new List<MonthlyWorkSummaryDto>()); // retorna lista vazia de forma limpa
+
+                return Ok(result);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Erro interno: {ex.Message}" });
+            }
+        }
+
 
 
     }

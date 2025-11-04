@@ -4,16 +4,23 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
+    <CopyRefAssembliesToPublishDirectory>true</CopyRefAssembliesToPublishDirectory>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="9.0.2" />
-    <PackageReference Include="Blazorise" Version="1.7.0" />
-    <PackageReference Include="Blazorise.Charts" Version="1.7.0" />
-    <PackageReference Include="Blazorise.Bootstrap5" Version="1.7.0" />
-    <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.7.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.0" />
+
+
+  </ItemGroup>
+
+  <ItemGroup> 
+  
+    
   </ItemGroup>
 
 </Project>

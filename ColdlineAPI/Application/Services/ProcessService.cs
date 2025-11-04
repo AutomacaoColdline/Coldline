@@ -822,5 +822,76 @@ namespace ColdlineAPI.Application.Services
         {
             return new Random().Next(100000, 999999).ToString();
         }
+        public async Task<List<MonthlyWorkSummaryDto>> GetUserMonthlyWorkSummaryAsync(string userId, int year, int month)
+        {
+            var builder = Builders<Process>.Filter;
+            var startMonth = new DateTime(year, month, 1);
+            var endMonth = startMonth.AddMonths(1).AddDays(-1);
+
+            var filter = builder.Eq(p => p.User.Id, userId) &
+                        builder.Gte(p => p.StartDate, startMonth) &
+                        builder.Lte(p => p.StartDate, endMonth);
+
+            var processes = await _processes.GetCollection()
+                .Find(filter)
+                .ToListAsync();
+
+            var result = new List<MonthlyWorkSummaryDto>();
+
+            for (var day = startMonth; day <= endMonth; day = day.AddDays(1))
+            {
+                if (day.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday)
+                    continue;
+
+                TimeSpan total = TimeSpan.Zero;
+                int processCount = 0;
+
+                var workPeriods = new List<(TimeSpan start, TimeSpan end)>
+                {
+                    (TimeSpan.FromHours(7.5),  TimeSpan.FromHours(11.5)),   // 07:30–11:30
+                    (TimeSpan.FromHours(13),   TimeSpan.FromHours(15)),     // 13:00–15:00
+                    (TimeSpan.FromHours(15.25),TimeSpan.FromHours(17.5))    // 15:15–17:30
+                };
+
+                var dayProcesses = processes
+                    .Where(p => p.StartDate.Date <= day && (p.EndDate?.Date ?? day) >= day)
+                    .ToList();
+
+                foreach (var proc in dayProcesses)
+                {
+                    DateTime processStart = proc.StartDate < day ? day : proc.StartDate;
+                    DateTime processEnd = (proc.EndDate ?? day.AddDays(1).AddSeconds(-1));
+                    if (processEnd.Date > day) processEnd = day.AddDays(1).AddSeconds(-1);
+
+                    foreach (var (periodStart, periodEnd) in workPeriods)
+                    {
+                        var start = day.Add(periodStart);
+                        var end = day.Add(periodEnd);
+
+                        var effectiveStart = processStart > start ? processStart : start;
+                        var effectiveEnd = processEnd < end ? processEnd : end;
+
+                        if (effectiveEnd > effectiveStart)
+                            total += (effectiveEnd - effectiveStart);
+                    }
+
+                    processCount++;
+                }
+
+                if (processCount > 0)
+                {
+                    result.Add(new MonthlyWorkSummaryDto
+                    {
+                        Day = day,
+                        TotalHours = total.ToString(@"hh\:mm\:ss"),
+                        ProcessCount = processCount
+                    });
+                }
+            }
+
+            return result;
+        }
+
+
     }
 }

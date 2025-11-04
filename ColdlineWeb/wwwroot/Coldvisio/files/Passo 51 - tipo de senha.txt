@@ -1,0 +1,2 @@
+dev - é somente desenvolvimento e dura 2h 
+a que utilizamos em produção é a L4 
